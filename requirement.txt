@@ -1,5 +1,6 @@
 asgiref==3.6.0
 Django==4.1.4
+django_debug_toolbar==3.8.1
 psycopg2==2.9.5
 python-decouple==3.6
 sqlparse==0.4.3
