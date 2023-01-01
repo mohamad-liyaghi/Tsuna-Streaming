@@ -1,0 +1,36 @@
+version: '3.9'
+
+services:
+
+  backend:
+
+    build: .
+    command: sh setup-dev.sh
+
+
+    container_name: backend
+    restart: on-failure
+
+    ports:
+      - 8000:8000
+
+    volumes:
+      - .:/backend
+
+    environment:
+      - DJANGO_SETTINGS_MODULE=config.settings.development
+    
+    depends_on:
+      - db
+
+  db:
+    image: postgres:11
+
+    container_name: database
+    restart: on-failure
+
+    ports: 
+          - "5432:5432"
+
+    environment:
+      - "POSTGRES_HOST_AUTH_METHOD=trust"
