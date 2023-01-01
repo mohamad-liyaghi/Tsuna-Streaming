@@ -31,6 +31,8 @@ services:
 
     ports: 
           - "5432:5432"
-
+    volumes:
+            - /var/lib/docker/basedata:/var/lib/postgresql/data
+          
     environment:
       - "POSTGRES_HOST_AUTH_METHOD=trust"
