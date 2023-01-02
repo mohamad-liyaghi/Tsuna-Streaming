@@ -21,6 +21,7 @@ INSTALLED_APPS = [
 
     # third party 
     'rest_framework',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -94,5 +95,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Tsuna Streaming',
+    'DESCRIPTION': 'A Video streaming api',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,    
 }
