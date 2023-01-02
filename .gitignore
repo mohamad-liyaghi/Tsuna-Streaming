@@ -8,3 +8,4 @@ media
 .idea/
 .env
 venv/
+data/
