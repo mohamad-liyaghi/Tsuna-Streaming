@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from accounts.managers import AccountManager
 
 class Account(AbstractUser):
 
@@ -28,8 +28,10 @@ class Account(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "bio"]
 
+    objects = AccountManager()
+    
     def __str__(self) -> str:
-        return self.user_id
+        return str(self.user_id)
 
     class Meta:
         app_label = "accounts"
