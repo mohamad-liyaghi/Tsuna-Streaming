@@ -3,7 +3,7 @@ from decouple import config
 import os, sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = SECRET_KEY = config("SECRET_KEY")
 # default v1 application location
@@ -22,6 +22,9 @@ INSTALLED_APPS = [
     # third party 
     'rest_framework',
     'drf_spectacular',
+
+    # local apps
+    'v1.accounts.apps.AccountsConfig'
 ]
 
 MIDDLEWARE = [
