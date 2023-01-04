@@ -3,9 +3,10 @@
 *.pyc
 __pycache__
 db.sqlite3
-media
+accounts/profile
 .vscode/* 
 .idea/
 .env
 venv/
 data/
+.pytest_cache/

@@ -39,6 +39,5 @@ class AccountManager(BaseUserManager):
         user.set_password(password)
 
         user.save()
-        print(user)
 
         return user
