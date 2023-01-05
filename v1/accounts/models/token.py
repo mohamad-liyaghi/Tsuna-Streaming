@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+import datetime
+from django.utils import timezone
+
 
 class Token(models.Model):
     '''
@@ -15,5 +18,21 @@ class Token(models.Model):
     retry = models.PositiveIntegerField(default=0)
 
     def __str__(self) -> str:
-        return self.user
+        return str(self.user)
+    
+    @property
+    def is_valid(self):
+        # check if tries are not more than 5 times.
+        if self.retry == 5:
+            return False
+    
+        # check if code was created within 10 mins
+        now = timezone.now()
+        ten_mins_before_now = now - datetime.timedelta(minutes=10)
+
+        if self.date_created <=  ten_mins_before_now:
+            return False
+
+        return True
+
     
