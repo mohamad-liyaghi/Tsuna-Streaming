@@ -16,7 +16,7 @@ class TokenAdmin(admin.ModelAdmin):
     list_display = ["user", "date_created", "is_valid"]
 
     fieldsets = (
-		(None, {'fields':('user', 'date_created', "retry")}),
+		(None, {'fields':('user', 'token', "retry")}),
 	)
 
     def has_change_permission(self, request, obj=None):
