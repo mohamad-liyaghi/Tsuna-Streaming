@@ -1,4 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
+from django.db import models
 import random
 
 class AccountManager(BaseUserManager):
@@ -41,3 +42,15 @@ class AccountManager(BaseUserManager):
         user.save()
 
         return user
+
+
+class TokenManager(models.Manager):
+
+    def create(self, user, **kwargs):
+
+        token = self.model(user=user, **kwargs)
+        token.save()
+
+        #TODO send email
+
+        return token
