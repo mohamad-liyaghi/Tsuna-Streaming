@@ -10,4 +10,16 @@ class AccountAdmin(admin.ModelAdmin):
         '''No body can change info in admin panel'''
         return False
 
-admin.site.register(Token)
+
+@admin.register(Token)
+class TokenAdmin(admin.ModelAdmin):
+    list_display = ["user", "date_created", "is_valid"]
+
+    fieldsets = (
+		(None, {'fields':('user', 'date_created', "retry")}),
+	)
+
+    def has_change_permission(self, request, obj=None):
+        '''No body can change info in admin panel'''
+        return False
+    
