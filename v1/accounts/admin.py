@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import Account
+from accounts.models import Account, Token
 
 
 @admin.register(Account)
@@ -9,3 +9,5 @@ class AccountAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         '''No body can change info in admin panel'''
         return False
+
+admin.site.register(Token)
