@@ -36,3 +36,12 @@ services:
           
     environment:
       - "POSTGRES_HOST_AUTH_METHOD=trust"
+
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+
+    ports:
+      - 5000:80
+      - 25:25
+      
+    restart: always
