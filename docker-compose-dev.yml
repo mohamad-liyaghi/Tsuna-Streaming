@@ -22,6 +22,7 @@ services:
     
     depends_on:
       - db
+      - redis
 
   db:
     image: postgres:11
@@ -45,3 +46,20 @@ services:
       - 25:25
       
     restart: always
+
+  redis:
+    image: redis:6.2-alpine
+    
+    ports:
+      - 6379:6379
+
+    restart: always
+
+
+  celery:
+    build: .
+    command: celery -A config worker --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - .:/backend
