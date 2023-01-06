@@ -1,0 +1,10 @@
+{% block subject %}
+Verify your account on tsuna streaming
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ first_name }}</h1>
+<p>Please click on the link bellow in order to verify your account</p>
+#TODO: add domain
+{{ token }}
+{% endblock html_body %}    

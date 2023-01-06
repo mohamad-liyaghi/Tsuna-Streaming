@@ -11,6 +11,7 @@ click-repl==0.2.0
 colorama==0.4.6
 Django==4.1.4
 django-filter==22.1
+django-templated-mail==1.1.1
 django_debug_toolbar==3.8.1
 djangorestframework==3.14.0
 drf-spectacular==0.25.1
