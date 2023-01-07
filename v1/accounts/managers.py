@@ -51,6 +51,7 @@ class TokenManager(models.Manager):
         token = self.model(user=user, **kwargs)
         token.save()
 
-        send_email.delay(user.email, user.first_name, token.token)
+        send_email.delay("verification", email=user.email, first_name=user.first_name, 
+                                        user_id = user.user_id, token=token.token)
 
         return token
