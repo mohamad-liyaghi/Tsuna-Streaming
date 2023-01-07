@@ -19,11 +19,21 @@ DEBUG_TOOLBAR_CONFIG = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config("DB_NAME"),
-        'USER': config("DB_USER"),
-        'PASSWORD': config("DB_PASSWORD"),
-        'HOST': config("DB_HOST"),
-        'PORT': config("DB_PORT")
+        'NAME': config("LOCAL_DB_NAME"),
+        'USER': config("LOCAL_DB_USER"),
+        'PASSWORD': config("LOCAL_DB_PASSWORD"),
+        'HOST': config("LOCAL_DB_HOST"),
+        'PORT': config("LOCAL_DB_PORT")
     }
 }
 
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config("LOCAL_EMAIL_HOST")
+EMAIL_HOST_USER = config("LOCAL_EMAIL_USER")
+EMAIL_HOST_PASSWORD = config("LOCAL_EMAIL_PASSWORD")
+EMAIL_PORT = config("LOCAL_EMAIL_PORT")
+DEFAULT_FROM_EMAIL = config("LOCAL_EMAIL_FROM")
+
+
+CELERY_BROKER_URL = config("LOCAL_CELERY_BROKER")

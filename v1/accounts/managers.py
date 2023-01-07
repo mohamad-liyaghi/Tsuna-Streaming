@@ -1,4 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
+from accounts.tasks import send_email
 from django.db import models
 import random
 
@@ -21,7 +22,6 @@ class AccountManager(BaseUserManager):
         user.set_password(password)
 
         user.save()
-
         return user
 
     def create_superuser(self, email, password, **kwargs):
@@ -51,6 +51,7 @@ class TokenManager(models.Manager):
         token = self.model(user=user, **kwargs)
         token.save()
 
-        #TODO send email
+        send_email.delay("verification", email=user.email, first_name=user.first_name, 
+                                        user_id = user.user_id, token=token.token)
 
         return token

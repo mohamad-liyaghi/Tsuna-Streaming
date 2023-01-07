@@ -1,0 +1,10 @@
+{% block subject %}
+Verify your account on tsuna streaming
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ first_name }}</h1>
+<p>Please click on the link bellow in order to verify your account</p>
+
+{% comment %} <a href="{% url 'accounts:verify' userid token %}">Click Me</a> {% endcomment %}
+{% endblock html_body %}    
