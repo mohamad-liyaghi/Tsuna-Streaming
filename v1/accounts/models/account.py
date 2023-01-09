@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from accounts.managers import AccountManager
 from accounts.validators import validate_profile_size
+from accounts.utils import user_id_generator
 
 class Account(AbstractUser):
 
@@ -25,7 +26,7 @@ class Account(AbstractUser):
     is_active = models.BooleanField(default=False)
     role = models.CharField(max_length=1, choices=Role.choices, default=Role.NORMAL)
 
-    user_id = models.CharField(max_length=15)
+    user_id = models.CharField(max_length=15, default=user_id_generator)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "bio"]

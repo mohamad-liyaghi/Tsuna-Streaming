@@ -6,5 +6,7 @@ Verify your account on tsuna streaming
 <h1>Hello dear {{ first_name }}</h1>
 <p>Please click on the link bellow in order to verify your account</p>
 
-{% comment %} <a href="{% url 'accounts:verify' userid token %}">Click Me</a> {% endcomment %}
+
+<a href="http://127.0.0.1:8000{% url 'v1_accounts:verify' user_id token %}">Click</a>
+
 {% endblock html_body %}    

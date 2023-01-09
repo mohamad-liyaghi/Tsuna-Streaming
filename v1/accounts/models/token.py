@@ -40,4 +40,7 @@ class Token(models.Model):
 
         return True
 
+    class Meta:
+        ordering = ["-date_created"]
+
     
