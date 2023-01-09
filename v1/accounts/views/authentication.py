@@ -3,6 +3,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 from accounts.permissions import NotAuthenticated
 from accounts.serializers import RegisterUserSerializer
 from accounts.models import Token
@@ -41,7 +46,6 @@ class RegisterUserView(APIView):
         return Response(serialized_data.errors, status=status.HTTP_403_FORBIDDEN)
 
 
-
 class VerifyUserView(APIView):
     '''Verify accounts.'''
 
@@ -67,3 +71,9 @@ class VerifyUserView(APIView):
             return Response("Token is expired.", status=status.HTTP_403_FORBIDDEN)
 
         return Response("Invalid Information", status=status.HTTP_403_FORBIDDEN)
+
+
+class LoginUserView(TokenObtainPairView):
+    '''Users can request to this endpoint in order to get new access key'''
+    permission_classes = [NotAuthenticated,]
+    pass

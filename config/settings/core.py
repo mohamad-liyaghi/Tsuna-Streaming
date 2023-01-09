@@ -1,6 +1,7 @@
 from pathlib import Path
 from decouple import config
 import os, sys
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -22,6 +23,7 @@ INSTALLED_APPS = [
     # third party 
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
 
     # local apps
     'v1.accounts.apps.AccountsConfig'
@@ -99,6 +101,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+        'rest_framework_simplejwt.authentication.JWTAuthentication',]
 }
 
 SPECTACULAR_SETTINGS = {
@@ -109,3 +113,8 @@ SPECTACULAR_SETTINGS = {
 }
 
 AUTH_USER_MODEL = "accounts.Account"
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
+  }

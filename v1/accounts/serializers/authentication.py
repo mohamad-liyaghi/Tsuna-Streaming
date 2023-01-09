@@ -10,10 +10,11 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     '''User registration serializer'''
     
     email = serializers.EmailField()
+    password = serializers.CharField(style={'input_type': 'password'})
 
     class Meta:
         model = USER
-        fields = ["email", "first_name", "last_name", "picture", "bio"]
+        fields = ["email", "first_name", "last_name", "picture", "bio", "password"]
 
 
     def validate_email(self, value):
@@ -42,3 +43,9 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("We have sent you a token to {}, please verify your account.".format(email))
 
         return value
+
+    def create(self, validated_data):
+        user = super(RegisterUserSerializer, self).create(validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
