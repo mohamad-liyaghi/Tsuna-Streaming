@@ -80,3 +80,12 @@ services:
       - redis
     volumes:
       - .:/backend
+
+  celery-beat:
+    build: .
+    container_name: tsuna-streaming-celery-beat
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      - redis
+    volumes:
+      - .:/backend

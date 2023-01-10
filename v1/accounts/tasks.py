@@ -1,5 +1,9 @@
 from templated_mail.mail import BaseEmailMessage
 from celery import shared_task
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+import datetime
+
 
 
 @shared_task
@@ -16,3 +20,15 @@ def send_email(type, **kwargs):
         BaseEmailMessage(template_name="emails/verification.html", 
                     context={"first_name" : first_name, "user_id" : user_id,
                                  "token" : token}).send(to=[email])
+
+
+@shared_task
+def auto_delete_expired_tokens():
+    '''Auto delete expired tokens from database'''
+    
+    # get the token model
+    Token = ContentType.objects.get(app_label="accounts", model="token").model_class()
+    # 10 mins before now
+    ten_mins_before_now = timezone.now() - datetime.timedelta(minutes=10)
+    # invalid tokens
+    Token.objects.filter(date_created__lte=ten_mins_before_now).delete()

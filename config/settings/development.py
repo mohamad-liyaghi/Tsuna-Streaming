@@ -37,3 +37,10 @@ DEFAULT_FROM_EMAIL = config("LOCAL_EMAIL_FROM")
 
 
 CELERY_BROKER_URL = config("LOCAL_CELERY_BROKER")
+
+CELERY_BEAT_SCHEDULE = {
+    "auto_delete_expired_tokens":{
+        "task" : "accounts.tasks.auto_delete_expired_tokens",
+        "schedule" : 15 * 60
+    }
+}

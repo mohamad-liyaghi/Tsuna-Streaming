@@ -10,3 +10,4 @@ accounts/profile
 venv/
 data/
 .pytest_cache/
+celerybeat-schedule
