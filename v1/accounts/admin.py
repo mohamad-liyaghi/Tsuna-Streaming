@@ -23,4 +23,7 @@ class TokenAdmin(admin.ModelAdmin):
         '''No body can change info in admin panel'''
         return False
     
-admin.site.register(Plan)
+
+@admin.register(Plan)
+class PlanAdmin(admin.ModelAdmin):
+    list_display = ["title", "price", "active_months", "is_avaiable"]
