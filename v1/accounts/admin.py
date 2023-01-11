@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import Account, Token
+from accounts.models import Account, Token, Plan
 
 
 @admin.register(Account)
@@ -23,3 +23,4 @@ class TokenAdmin(admin.ModelAdmin):
         '''No body can change info in admin panel'''
         return False
     
+admin.site.register(Plan)
