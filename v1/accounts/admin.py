@@ -26,4 +26,4 @@ class TokenAdmin(admin.ModelAdmin):
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ["title", "price", "active_months", "is_avaiable"]
+    list_display = ["title", "price", "active_months", "is_available"]

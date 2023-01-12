@@ -6,7 +6,7 @@ from accounts.serializers.subscription import PlanListSerializer, PlanDetailSeri
 
 class SubscriptionViewSet(ModelViewSet):
     '''A Viewset for Creating, retrieving, updating and deleting plans and buy subscriptions.'''
-    queryset = Plan.objects.all().order_by("-is_avaiable", "active_months")
+    queryset = Plan.objects.all().order_by("-is_available", "active_months")
     lookup_field = "token"
 
     def get_serializer_class(self):

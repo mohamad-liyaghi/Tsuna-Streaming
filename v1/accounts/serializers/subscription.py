@@ -6,7 +6,7 @@ class PlanListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Plan
-        fields = ["title", "description", "price", "active_months", "is_avaiable", "token",]
+        fields = ["title", "description", "price", "active_months", "is_available", "token",]
 
         extra_kwargs = {
             'description': {'write_only': True},       
@@ -18,7 +18,7 @@ class PlanDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Plan
-        fields = ["title", "description", "price", "active_months", "is_avaiable", "token",]
+        fields = ["title", "description", "price", "active_months", "is_available", "token",]
 
         extra_kwargs = {
             'token': {"read_only" : True}

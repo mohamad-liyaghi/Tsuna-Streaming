@@ -21,7 +21,7 @@ class Plan(models.Model):
         MinValueValidator(1)
     ])
 
-    is_avaiable = models.BooleanField(default=False)
+    is_available = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.token
