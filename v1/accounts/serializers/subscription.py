@@ -15,7 +15,11 @@ class PlanListSerializer(serializers.ModelSerializer):
 
 class PlanDetailSerializer(serializers.ModelSerializer):
     lookup_field = "token"
-    
+
     class Meta:
         model = Plan
         fields = ["title", "description", "price", "active_months", "is_avaiable", "token",]
+
+        extra_kwargs = {
+            'token': {"read_only" : True}
+        }
