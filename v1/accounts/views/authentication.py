@@ -5,10 +5,9 @@ from rest_framework import status
 
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
-    TokenRefreshView,
 )
 
-from accounts.permissions import NotAuthenticated
+from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import RegisterUserSerializer
 from accounts.models import Token
 
@@ -19,7 +18,7 @@ USER = get_user_model()
 class RegisterUserView(APIView):
     '''Register new accounts'''
 
-    permission_classes = [NotAuthenticated,]
+    permission_classes = [AllowUnAuthenticatedPermission,]
     serializer_class = RegisterUserSerializer
 
 
@@ -49,7 +48,7 @@ class RegisterUserView(APIView):
 class VerifyUserView(APIView):
     '''Verify accounts.'''
 
-    permission_classes = [NotAuthenticated,]
+    permission_classes = [AllowUnAuthenticatedPermission,]
 
     def get(self, request, *args, **kwargs):
         user_id = self.kwargs.get("user_id")
@@ -75,5 +74,5 @@ class VerifyUserView(APIView):
 
 class LoginUserView(TokenObtainPairView):
     '''Users can request to this endpoint in order to get new access key'''
-    permission_classes = [NotAuthenticated,]
+    permission_classes = [AllowUnAuthenticatedPermission,]
     pass
