@@ -15,7 +15,7 @@ class AllowAdminPermission(BasePermission):
     '''Only allow admins to access a page'''
 
     def has_permission(self, request, view):
-        if request.user.role == "a":
+        if request.user.is_authenticated and request.user.role == "a":
             return True
 
         return False
