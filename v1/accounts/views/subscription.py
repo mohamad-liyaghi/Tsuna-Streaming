@@ -57,6 +57,10 @@ class SubscriptionViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
     
+    def destroy(self, request, *args, **kwargs):
+        #TODO Check that nobody is using the plan
+        return super().destroy(request, *args, **kwargs)
+    
     
     @action(detail=True, methods=["GET", "POST"], url_path="availability")
     def availability(self, request, token):
