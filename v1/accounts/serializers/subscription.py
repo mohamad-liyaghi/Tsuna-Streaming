@@ -23,3 +23,6 @@ class PlanDetailSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'token': {"read_only" : True}
         }
+
+class AvailabilitySerializer(serializers.Serializer):
+    pass
