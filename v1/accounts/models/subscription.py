@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from v1.accounts.utils import token_generator
-
+from accounts.managers import SubscriptionManager
 
 class Plan(models.Model):
     '''Subscription plan model'''
@@ -36,9 +36,11 @@ class Subscription(models.Model):
     plan = models.ForeignKey("Plan", on_delete=models.CASCADE)
     
     start_date = models.DateTimeField(auto_now_add=True)
-    finish_date = models.DateTimeField()
+    finish_date = models.DateTimeField(blank=True, null=True)
 
     token = models.CharField(max_length=32, default=token_generator)    
+
+    objects = SubscriptionManager()
 
     def __str__(self) -> str:
         return str(self.token)
