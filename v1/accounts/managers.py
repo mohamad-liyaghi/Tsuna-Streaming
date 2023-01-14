@@ -42,20 +42,6 @@ class AccountManager(BaseUserManager):
 
         return user
 
-
-class TokenManager(models.Manager):
-
-    def create(self, user, **kwargs):
-
-        token = self.model(user=user, **kwargs)
-        token.save()
-
-        send_email.delay("verification", email=user.email, first_name=user.first_name, 
-                                        user_id = user.user_id, token=token.token)
-
-        return token
-
-
 class SubscriptionManager(models.Manager):
     def create(self, **kwargs):
 
