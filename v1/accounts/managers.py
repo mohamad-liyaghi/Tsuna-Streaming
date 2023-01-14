@@ -69,11 +69,14 @@ class SubscriptionManager(models.Manager):
         subscription = self.model(finish_date=finish_date, **kwargs)
         subscription.save()
 
-        #TODO send email to notify user
+        user = subscription.user
         
         # update user to premium
-        subscription.user.role = "p"
-        subscription.user.save()
+        user.role = "p"
+        user.save()
+
+        send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
+                                plan=subscription.plan.title, finish_date=subscription.finish_date)
 
         return subscription
         
