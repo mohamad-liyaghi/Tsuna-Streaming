@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from v1.accounts.utils import token_generator
-from accounts.managers import SubscriptionManager
+
 
 class Plan(models.Model):
     '''Subscription plan model'''
@@ -40,7 +40,6 @@ class Subscription(models.Model):
 
     token = models.CharField(max_length=32, default=token_generator)    
 
-    objects = SubscriptionManager()
 
     def __str__(self) -> str:
         return str(self.token)

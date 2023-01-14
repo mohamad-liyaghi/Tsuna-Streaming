@@ -1,9 +1,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save 
 from django.conf import settings
-from accounts.models import Token
+from accounts.models import Token, Subscription
 from accounts.tasks import send_email
-
+from django.utils import timezone
+import datetime
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -18,10 +19,31 @@ def send_email_when_token_created(sender, **kwargs):
         After creating a user, a token gets created.
         After that this signal emails that token.
     '''
-    
+
     if kwargs["created"]:
         token = kwargs["instance"]
         user = token.user
 
         send_email.delay("verification", email=user.email, first_name=user.first_name, 
                                         user_id = user.user_id, token=token.token)
+
+
+@receiver(post_save, sender=Subscription)
+def change_user_status_after_buying_premium_plan(sender, **kwargs):
+
+    if kwargs["created"]:
+        subscription = kwargs["instance"]
+        user = subscription.user
+
+        plan_active_months = subscription.plan.active_months
+        finish_date = timezone.now() + datetime.timedelta(plan_active_months * 30)
+
+        subscription.finish_date = finish_date
+        subscription.save()
+        
+        user.role = "p"
+        user.save()
+
+        send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
+                                plan=subscription.plan.title, finish_date=subscription.finish_date)
+

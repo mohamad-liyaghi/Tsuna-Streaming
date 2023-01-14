@@ -1,9 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 from accounts.tasks import send_email
 from django.db import models
-from django.utils import timezone
 
-import datetime
 
 class AccountManager(BaseUserManager):
 
@@ -41,28 +39,3 @@ class AccountManager(BaseUserManager):
         user.save()
 
         return user
-
-class SubscriptionManager(models.Manager):
-    def create(self, **kwargs):
-
-        if kwargs["user"].role == "p":
-            raise ValueError('User is already a premium user.')
-
-        plan_active_months = kwargs["plan"].active_months
-
-        finish_date = timezone.now() + datetime.timedelta(plan_active_months * 30)
-        
-        subscription = self.model(finish_date=finish_date, **kwargs)
-        subscription.save()
-
-        user = subscription.user
-        
-        # update user to premium
-        user.role = "p"
-        user.save()
-
-        send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
-                                plan=subscription.plan.title, finish_date=subscription.finish_date)
-
-        return subscription
-        
