@@ -28,4 +28,7 @@ class TokenAdmin(admin.ModelAdmin):
 class PlanAdmin(admin.ModelAdmin):
     list_display = ["title", "price", "active_months", "is_available"]
 
-admin.site.register(Subscription)
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ["user", "plan", "finish_date", "token"]
