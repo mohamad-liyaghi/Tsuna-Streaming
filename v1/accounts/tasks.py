@@ -21,6 +21,18 @@ def send_email(type, **kwargs):
                     context={"first_name" : first_name, "user_id" : user_id,
                                  "token" : token}).send(to=[email])
 
+    elif type == "notify_premium":
+        first_name = kwargs.get("first_name")   
+        email = kwargs.get("email")   
+        plan = kwargs.get("plan")   
+        finish_date = kwargs.get("finish_date")   
+
+        BaseEmailMessage(template_name="emails/notify_premium.html", 
+                    context={"first_name" : first_name,
+                                 "plan":plan, "finish_date" : finish_date}).send(to=[email])
+
+        
+
 
 @shared_task
 def auto_delete_expired_tokens():

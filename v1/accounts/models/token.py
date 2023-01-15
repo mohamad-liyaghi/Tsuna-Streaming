@@ -4,8 +4,6 @@ import datetime
 from django.utils import timezone
 
 from v1.accounts.utils import token_generator
-from v1.accounts.managers import TokenManager
-
 
 class Token(models.Model):
     '''
@@ -20,7 +18,6 @@ class Token(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     retry = models.PositiveIntegerField(default=0)
 
-    objects = TokenManager()
 
     def __str__(self) -> str:
         return str(self.user)

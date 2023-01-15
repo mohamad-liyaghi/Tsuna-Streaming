@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import Account, Token, Plan
+from accounts.models import Account, Token, Plan, Subscription
 
 
 @admin.register(Account)
@@ -27,3 +27,8 @@ class TokenAdmin(admin.ModelAdmin):
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
     list_display = ["title", "price", "active_months", "is_available"]
+
+
+@admin.register(Subscription)
+class SubscriptionAdmin(admin.ModelAdmin):
+    list_display = ["user", "plan", "finish_date", "token"]

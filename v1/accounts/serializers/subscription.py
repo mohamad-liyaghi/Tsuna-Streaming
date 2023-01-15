@@ -24,5 +24,11 @@ class PlanDetailSerializer(serializers.ModelSerializer):
             'token': {"read_only" : True}
         }
 
+class UserSubscriptionListSerializer(serializers.Serializer):
+    plan = serializers.CharField(read_only=True)
+    start_date = serializers.DateTimeField(read_only=True)
+    finish_date = serializers.DateTimeField(read_only=True)
+
+
 class AvailabilitySerializer(serializers.Serializer):
     pass
