@@ -41,8 +41,9 @@ def change_user_status_after_buying_premium_plan(sender, **kwargs):
         subscription.finish_date = finish_date
         subscription.save()
         
-        user.role = "p"
-        user.save()
+        if user.role != "a":
+            user.role = "p"
+            user.save()
 
         send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
                                 plan=subscription.plan.title, finish_date=subscription.finish_date)
