@@ -2,7 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from v1.accounts.utils import token_generator
-
+import datetime
+from django.utils import timezone
 
 class Plan(models.Model):
     '''Subscription plan model'''
@@ -40,6 +41,14 @@ class Subscription(models.Model):
 
     token = models.CharField(max_length=32, default=token_generator)    
 
+    @property
+    def is_active(self):     
+        now = timezone.now()  
+
+        if now <= self.finish_date:
+            return True
+
+        return False
 
     def __str__(self) -> str:
         return str(self.token)
