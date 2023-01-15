@@ -26,7 +26,7 @@ class Plan(models.Model):
     is_available = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.token
+        return self.title
 
 
 class Subscription(models.Model):
