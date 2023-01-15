@@ -1,8 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from accounts.models import Plan
+
+from accounts.models import Plan, Subscription
 from accounts.permissions import AllowAdminPermission, AllowAuthenticatedPermission
 from accounts.serializers.subscription import PlanListSerializer, PlanDetailSerializer, AvailabilitySerializer
 
@@ -45,11 +48,17 @@ class SubscriptionViewSet(ModelViewSet):
         
         elif self.action == "availability":
             return AvailabilitySerializer
+        
+        elif self.action == "buy_plan":
+            return AvailabilitySerializer
     
     def get_permissions(self):
         '''return the appropriate permission class'''
 
-        if self.action in ["list", "retrieve", "availability"] and self.request.method == "GET":
+        if self.action in ["list", "retrieve", "availability", "buy_plan"] and self.request.method == "GET":
+            permission_classes = [AllowAuthenticatedPermission]
+
+        elif self.action in ["buy_plan"] and self.request.method == "POST":
             permission_classes = [AllowAuthenticatedPermission]
 
         else:
@@ -67,18 +76,38 @@ class SubscriptionViewSet(ModelViewSet):
     
         if request.method == "GET":
             object = self.get_object()
-            return Response("{}'s availability is set to {}".format(object.title, object.is_available))
+            return Response("{}'s availability is set to {}".format(object.title, object.is_available),
+            status=status.HTTP_200_OK)
         
         elif request.method == "POST":
             object = self.get_object()
             if object.is_available:
                 object.is_available = False
                 object.save()
-                return Response("{}'s availability is set to {}".format(object.title, object.is_available))
+                return Response("{}'s availability is set to {}".format(object.title, object.is_available),
+                status=status.HTTP_200_OK)
 
             object.is_available = True
             object.save()
-            return Response("{}'s availability is set to {}".format(object.title, object.is_available))
+            return Response("{}'s availability is set to {}".format(object.title, object.is_available), 
+            status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["POST", "GET"], url_path="buy")
+    def buy_plan(self, request, token):
+        if request.method == "GET":
+            return Response("{} purchase page.".format(self.get_object().title))
+
+        elif self.request.method == "POST":
+            if not self.get_object().is_available:
+                return Response("This item is not currently available")
+
+            if request.user.role in ["a","p"]:
+                return Response("You are already a premium user.")
+
+            Subscription.objects.create(user=request.user, plan=self.get_object())
+            return Response("You are now a premium user.", status=status.HTTP_200_OK)
+
+
 
     
         
