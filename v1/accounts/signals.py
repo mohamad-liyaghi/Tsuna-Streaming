@@ -1,5 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save 
+from django.db.models.signals import post_save, pre_delete
 from django.conf import settings
 from accounts.models import Token, Subscription
 from accounts.tasks import send_email
@@ -47,4 +47,20 @@ def change_user_status_after_buying_premium_plan(sender, **kwargs):
 
         send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
                                 plan=subscription.plan.title, finish_date=subscription.finish_date)
+
+
+@receiver(pre_delete, sender=Subscription)
+def change_user_status_after_deleting_subscription(sender, **kwargs):
+    '''Demote user when a subscription is deleted.'''
+    subscription = kwargs["instance"]
+    user = subscription.user
+    
+    if user.role != "a":
+        user.role = "n"
+        user.save()
+
+    send_email.delay('notify_unsubscribed_user', first_name=subscription.user.first_name,
+                                email=subscription.user.email,
+                                plan=subscription.plan.title, 
+                                start_date=subscription.start_date)
 

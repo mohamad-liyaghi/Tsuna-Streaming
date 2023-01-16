@@ -80,13 +80,4 @@ def auto_delete_invalid_subscription():
     invalid_subscriptions = Subscription.objects.select_related('user').filter(finish_date__lte=now)
 
     for invalid_subscription in invalid_subscriptions:
-
-        if (user:=invalid_subscription.user).role == "p":
-            user.role = "n"
-            user.save()
-
-        send_email.delay('notify_unsubscribed_user', first_name=invalid_subscription.user.first_name,
-                                    email=invalid_subscription.user.email,
-                                    plan=invalid_subscription.plan.title, 
-                                    start_date=invalid_subscription.start_date)
         invalid_subscription.delete()
