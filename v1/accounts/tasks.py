@@ -31,8 +31,17 @@ def send_email(type, **kwargs):
                     context={"first_name" : first_name,
                                  "plan":plan, "finish_date" : finish_date}).send(to=[email])
 
-        
+    elif type == "notify_unsubscribed_user":
+        first_name = kwargs.get("first_name")   
+        email = kwargs.get("email")   
+        plan = kwargs.get("plan")   
+        start_date = kwargs.get("start_date")  
+        print(first_name, email, plan, start_date) 
 
+        BaseEmailMessage(template_name="emails/notify_unsubscribed_user.html", 
+                    context={"first_name" : first_name,
+                                 "plan":plan, "start_date" : start_date}).send(to=[email])
+        
 
 @shared_task
 def auto_delete_expired_tokens():
@@ -76,5 +85,8 @@ def auto_delete_invalid_subscription():
             user.role = "n"
             user.save()
 
+        send_email.delay('notify_unsubscribed_user', first_name=invalid_subscription.user.first_name,
+                                    email=invalid_subscription.user.email,
+                                    plan=invalid_subscription.plan.title, 
+                                    start_date=invalid_subscription.start_date)
         invalid_subscription.delete()
-        # TODO self email and notify
