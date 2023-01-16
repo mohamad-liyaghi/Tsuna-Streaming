@@ -60,7 +60,7 @@ class VerifyUserView(APIView):
             if user and not user.is_active:
                 token = Token.objects.filter(token=token, user=user).first()
 
-                if token.is_valid:
+                if token and token.is_valid and token.retry < 5:
                     user.is_active = True
                     user.save()
                     return Response("Account verified successfully.", status=status.HTTP_200_OK)
