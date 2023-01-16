@@ -1,9 +1,9 @@
-from templated_mail.mail import BaseEmailMessage
-from celery import shared_task
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from templated_mail.mail import BaseEmailMessage
+from celery import shared_task
 import datetime
-
+from django.utils import timezone
 
 
 @shared_task
@@ -59,3 +59,22 @@ def auto_delete_deactive_users():
 
     # deactivated users
     Account.objects.filter(date_joined__lte=a_day_before_now, is_active=False).delete()
+
+
+@shared_task
+def auto_delete_invalid_subscription():
+    '''Auto demote users that dont have premium plan anymore and delete their subscriptions'''
+    # get Subscription model
+    Subscription =  ContentType.objects.get(app_label="accounts", model="subscription").model_class()
+
+    now = timezone.now()
+    invalid_subscriptions = Subscription.objects.select_related('user').filter(finish_date__lte=now)
+
+    for invalid_subscription in invalid_subscriptions:
+
+        if (user:=invalid_subscription.user).role == "p":
+            user.role = "n"
+            user.save()
+
+        invalid_subscription.delete()
+        # TODO self email and notify
