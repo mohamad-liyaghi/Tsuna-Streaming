@@ -9,7 +9,7 @@ from django.utils import timezone
 @shared_task
 def send_email(type, **kwargs):
     '''This email task can be used for email verification and other purposes'''
-
+    # TODO fix the hard code
     if type == "verification":
         
         first_name = kwargs.get("first_name")    
@@ -36,11 +36,20 @@ def send_email(type, **kwargs):
         email = kwargs.get("email")   
         plan = kwargs.get("plan")   
         start_date = kwargs.get("start_date")  
-        print(first_name, email, plan, start_date) 
 
         BaseEmailMessage(template_name="emails/notify_unsubscribed_user.html", 
                     context={"first_name" : first_name,
                                  "plan":plan, "start_date" : start_date}).send(to=[email])
+
+    elif type == "notify_channel_creation":
+        first_name = kwargs.get("first_name")   
+        email = kwargs.get("email")   
+        channel_title = kwargs.get("channel_title")   
+        channel_token = kwargs.get("channel_token")  
+
+        BaseEmailMessage(template_name="emails/notify_channel_creation.html", 
+                    context={"first_name" : first_name,
+                                 "channel_title":channel_title, "channel_token" : channel_token}).send(to=[email])
         
 
 @shared_task
