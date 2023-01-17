@@ -26,7 +26,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
 
     # local apps
-    'v1.accounts.apps.AccountsConfig'
+    'v1.accounts.apps.AccountsConfig',
+    'v1.channels.apps.ChannelsConfig',
 ]
 
 MIDDLEWARE = [
