@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from channels.models import Channel
 from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
+from channels.permissions import ChannelLimitPermission
 
 @extend_schema_view(
     list=extend_schema(
@@ -17,7 +18,15 @@ from accounts.permissions import AllowAuthenticatedPermission
 class ChannelViewSet(ModelViewSet):
     '''A viewset for Creating, Updating, retrieving a channel'''
 
-    permission_classes = [AllowAuthenticatedPermission,]
+    def get_permissions(self):
+        '''return the appropriate permission class'''            
+        if self.action in ["create"]:
+            permission_classes = [ChannelLimitPermission]
+
+        else:
+            permission_classes = [AllowAuthenticatedPermission]
+
+        return [permission() for permission in permission_classes]
 
     def get_queryset(self):
         # TODO: union with channels that user is admin.
