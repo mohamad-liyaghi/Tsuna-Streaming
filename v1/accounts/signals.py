@@ -24,7 +24,7 @@ def send_email_when_token_created(sender, **kwargs):
         token = kwargs["instance"]
         user = token.user
 
-        send_email.delay("verification", email=user.email, first_name=user.first_name, 
+        send_email.delay(template_name="emails/verification.html", email=user.email, first_name=user.first_name, 
                                         user_id = user.user_id, token=token.token)
 
 
@@ -45,7 +45,7 @@ def change_user_status_after_buying_premium_plan(sender, **kwargs):
             user.role = "p"
             user.save()
 
-        send_email.delay("notify_premium", email=user.email, first_name=user.first_name, 
+        send_email.delay(template_name="emails/notify_premium.html", email=user.email, first_name=user.first_name, 
                                 plan=subscription.plan.title, finish_date=subscription.finish_date)
 
 
@@ -59,7 +59,7 @@ def change_user_status_after_deleting_subscription(sender, **kwargs):
         user.role = "n"
         user.save()
 
-    send_email.delay('notify_unsubscribed_user', first_name=subscription.user.first_name,
+    send_email.delay(template_name="emails/notify_unsubscribed_user.html", first_name=subscription.user.first_name,
                                 email=subscription.user.email,
                                 plan=subscription.plan.title, 
                                 start_date=subscription.start_date)

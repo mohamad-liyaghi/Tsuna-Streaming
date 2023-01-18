@@ -7,50 +7,12 @@ from django.utils import timezone
 
 
 @shared_task
-def send_email(type, **kwargs):
+def send_email(template_name, email, **kwargs):
     '''This email task can be used for email verification and other purposes'''
-    # TODO fix the hard code
-    if type == "verification":
-        
-        first_name = kwargs.get("first_name")    
-        user_id = kwargs.get("user_id")    
-        token = kwargs.get("token")    
-        email = kwargs.get("email")
 
-        BaseEmailMessage(template_name="emails/verification.html", 
-                    context={"first_name" : first_name, "user_id" : user_id,
-                                 "token" : token}).send(to=[email])
-
-    elif type == "notify_premium":
-        first_name = kwargs.get("first_name")   
-        email = kwargs.get("email")   
-        plan = kwargs.get("plan")   
-        finish_date = kwargs.get("finish_date")   
-
-        BaseEmailMessage(template_name="emails/notify_premium.html", 
-                    context={"first_name" : first_name,
-                                 "plan":plan, "finish_date" : finish_date}).send(to=[email])
-
-    elif type == "notify_unsubscribed_user":
-        first_name = kwargs.get("first_name")   
-        email = kwargs.get("email")   
-        plan = kwargs.get("plan")   
-        start_date = kwargs.get("start_date")  
-
-        BaseEmailMessage(template_name="emails/notify_unsubscribed_user.html", 
-                    context={"first_name" : first_name,
-                                 "plan":plan, "start_date" : start_date}).send(to=[email])
-
-    elif type == "notify_channel_creation":
-        first_name = kwargs.get("first_name")   
-        email = kwargs.get("email")   
-        channel_title = kwargs.get("channel_title")   
-        channel_token = kwargs.get("channel_token")  
-
-        BaseEmailMessage(template_name="emails/notify_channel_creation.html", 
-                    context={"first_name" : first_name,
-                                 "channel_title":channel_title, "channel_token" : channel_token}).send(to=[email])
-        
+    BaseEmailMessage(template_name=template_name, 
+                    context={"kwargs" : kwargs}).send(to=[email])
+                    
 
 @shared_task
 def auto_delete_expired_tokens():

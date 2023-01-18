@@ -12,7 +12,7 @@ def check_channel_limit_and_notify(sender, **kwargs):
     if user.role in ["a", "p"]:
         # premium users can have 10 channels
         if user.channels.count() != 10:
-            send_email("notify_channel_creation", first_name=user.first_name, email=user.email,
+            send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
                                                     channel_title=instance.title, channel_token=instance.token)
         else:
             raise ValueError("Premium users can not have more that 10 channels")
@@ -20,7 +20,7 @@ def check_channel_limit_and_notify(sender, **kwargs):
     else:
         # normal users can have 5 channels
         if user.channels.count() != 5:
-            send_email("notify_channel_creation", first_name=user.first_name, email=user.email,
+            send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
                                                     channel_title=instance.title, channel_token=instance.token)
         else:
             raise ValueError("Normal users can not have more that 5 channels")

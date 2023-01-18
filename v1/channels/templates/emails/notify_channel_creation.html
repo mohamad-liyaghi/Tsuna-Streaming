@@ -3,8 +3,8 @@ Your channel on Tsuna Streaming
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Hello dear {{ first_name }}</h1>
-<p>Your channel successfully created. Title: {{ channel_title }}, token: {{ channel_token }}</p>
+<h1>Hello dear {{ kwargs.first_name }}</h1>
+<p>Your channel successfully created.  <br> Channel Title: '{{ kwargs.channel_title }}', token: '{{ kwargs.channel_token }}'</p>
 
 
 {% comment %}#TODO add some links related to channel{% endcomment %}

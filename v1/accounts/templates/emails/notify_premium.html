@@ -3,8 +3,8 @@ Premium account on tsuna streaming
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Dear {{ first_name }}</h1>
-<p>Thanks for your choice, you have purchased "{{ plan }}" and from now until {{ finish_date }} your account remains Premium.</p>
+<h1>Dear {{ kwargs.first_name }}</h1>
+<p>Thanks for your choice, you have purchased "{{ kwargs.plan }}" and from now until {{ kwargs.finish_date }} your account remains Premium.</p>
 
 
 {% endblock html_body %}    
