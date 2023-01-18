@@ -3,12 +3,15 @@ from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
-from channels.serializers.channel import (ChannelListSerializer)
+from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
 
 @extend_schema_view(
     list=extend_schema(
-        description="List of channels that user is owner or admin."
+        description="List of channels that user is owner or admin of them."
+    ),
+    create=extend_schema(
+        description="Create a new channel [Premiums can create 10 and Normal users can create 5]."
     ),
 )
 class ChannelViewSet(ModelViewSet):
@@ -24,5 +27,13 @@ class ChannelViewSet(ModelViewSet):
         '''Return the appropiate'''
         if self.action == "list":
             return ChannelListSerializer
+        
+        elif self.action == "create":
+            return ChannelCreateSerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["request"] = self.request
+        return context
 
         
