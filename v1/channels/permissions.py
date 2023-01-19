@@ -13,7 +13,14 @@ class ChannelLimitPermission(BasePermission):
                 return not bool(user.channels.count() >= 10)
             
             elif user.role == 'n':
-                return not bool(user.channels.count() >= 5)
+                if user.channels.count() > 5 and user.channels.count() < 10:
+                    return True
+
+                elif user.channels.count() < 5:
+                    return True
+                    
+                return False
+                
 
         return False
 
