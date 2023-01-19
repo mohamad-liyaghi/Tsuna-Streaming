@@ -7,20 +7,23 @@ from channels.models import Channel
 def check_channel_limit_and_notify(sender, **kwargs):
     '''Check channel limits, create channel and notify'''
     instance = kwargs["instance"]
-    user = instance.owner
+    # check if object is not getting update
+    if not instance.pk:
+        
+        user = instance.owner
 
-    if user.role in ["a", "p"]:
-        # premium users can have 10 channels
-        if user.channels.count() != 10:
-            send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
-                                                    channel_title=instance.title, channel_token=instance.token)
-        else:
-            raise ValueError("Premium users can not have more that 10 channels")
+        if user.role in ["a", "p"]:
+            # premium users can have 10 channels
+            if user.channels.count() != 10:
+                send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
+                                                        channel_title=instance.title, channel_token=instance.token)
+            else:
+                raise ValueError("Premium users can not have more that 10 channels")
 
-    else:
-        # normal users can have 5 channels
-        if user.channels.count() != 5:
-            send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
-                                                    channel_title=instance.title, channel_token=instance.token)
         else:
-            raise ValueError("Normal users can not have more that 5 channels")
+            # normal users can have 5 channels
+            if user.channels.count() != 5:
+                send_email(template_name="emails/notify_channel_creation.html", first_name=user.first_name, email=user.email,
+                                                        channel_title=instance.title, channel_token=instance.token)
+            else:
+                raise ValueError("Normal users can not have more that 5 channels")

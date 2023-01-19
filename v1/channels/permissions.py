@@ -16,3 +16,8 @@ class ChannelLimitPermission(BasePermission):
                 return not bool(user.channels.count() >= 5)
 
         return False
+
+class ChennelAdminPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        #TODO check channel admin list
+        return bool(request.user == obj.owner)

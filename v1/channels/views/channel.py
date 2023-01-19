@@ -1,11 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
-
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
-from channels.permissions import ChannelLimitPermission
+from channels.permissions import ChannelLimitPermission, ChennelAdminPermission
 
 @extend_schema_view(
     list=extend_schema(
@@ -17,14 +17,16 @@ from channels.permissions import ChannelLimitPermission
 )
 class ChannelViewSet(ModelViewSet):
     '''A viewset for Creating, Updating, retrieving a channel'''
-    
+
     lookup_field = "token"
 
     def get_permissions(self):
         '''return the appropriate permission class'''            
         if self.action in ["create"]:
             permission_classes = [ChannelLimitPermission]
-
+        
+        elif self.action in ["update", "partial_update", "delete"]:
+            permission_classes = [ChennelAdminPermission]
         else:
             permission_classes = [AllowAuthenticatedPermission]
 
@@ -34,8 +36,12 @@ class ChannelViewSet(ModelViewSet):
         # TODO: union with channels that user is admin.
           return Channel.objects.filter(owner=self.request.user)
 
+    def get_object(self):
+        return get_object_or_404(Channel, token=self.kwargs["token"])
+
     def get_serializer_class(self):
-        '''Return the appropiate'''
+        '''Return the appropiate serializer'''
+
         if self.action == "list":
             return ChannelListSerializer
         
