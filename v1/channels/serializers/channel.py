@@ -30,8 +30,13 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 
 class ChannelDetailSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
-    
+
     class Meta:
         model = Channel
         fields = ["title", "description", "profile", "thumbnail", 
                         "owner", "token", "date_joined", "is_verified"]
+        extra_kwargs = {
+            "token" : {"read_only" : True},
+            "owner" : {"read_only" : True},
+            "is_verified" : {"read_only" : True},
+        }

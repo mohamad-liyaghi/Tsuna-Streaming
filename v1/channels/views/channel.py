@@ -14,6 +14,15 @@ from channels.permissions import ChannelLimitPermission, ChennelAdminPermission
     create=extend_schema(
         description="Create a new channel [Premiums can create 10 and Normal users can create 5]."
     ),
+    update=extend_schema(
+        description="Update channels information [Channel staff only]."
+    ),
+    prtial_update=extend_schema(
+        description="Update channels information [Channel staff only]."
+    ),
+    destroy=extend_schema(
+        description="Delete a channel [Channel staff only]."
+    ),
 )
 class ChannelViewSet(ModelViewSet):
     '''A viewset for Creating, Updating, retrieving a channel'''
@@ -25,7 +34,7 @@ class ChannelViewSet(ModelViewSet):
         if self.action in ["create"]:
             permission_classes = [ChannelLimitPermission]
         
-        elif self.action in ["update", "partial_update", "delete"]:
+        elif self.action in ["update", "partial_update", "destroy"]:
             permission_classes = [ChennelAdminPermission]
         else:
             permission_classes = [AllowAuthenticatedPermission]
