@@ -3,7 +3,7 @@ from rest_framework.viewsets import ModelViewSet
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
-from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer)
+from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
 from channels.permissions import ChannelLimitPermission
 
@@ -17,6 +17,8 @@ from channels.permissions import ChannelLimitPermission
 )
 class ChannelViewSet(ModelViewSet):
     '''A viewset for Creating, Updating, retrieving a channel'''
+    
+    lookup_field = "token"
 
     def get_permissions(self):
         '''return the appropriate permission class'''            
@@ -39,6 +41,9 @@ class ChannelViewSet(ModelViewSet):
         
         elif self.action == "create":
             return ChannelCreateSerializer
+        
+        elif self.action in ["retrieve", "update", "partial_update", "delete"]:
+            return ChannelDetailSerializer
     
     def get_serializer_context(self):
         context = super().get_serializer_context()

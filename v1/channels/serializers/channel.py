@@ -26,3 +26,12 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
         validated_data["owner"] = self.context["request"].user
         channel = super().create(validated_data)
         return channel
+
+
+class ChannelDetailSerializer(serializers.ModelSerializer):
+    owner = serializers.StringRelatedField()
+    
+    class Meta:
+        model = Channel
+        fields = ["title", "description", "profile", "thumbnail", 
+                        "owner", "token", "date_joined", "is_verified"]
