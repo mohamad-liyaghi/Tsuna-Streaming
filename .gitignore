@@ -11,4 +11,4 @@ venv/
 data/
 .pytest_cache/
 celerybeat-schedule
-channels/
+channels/profile
