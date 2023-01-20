@@ -26,7 +26,7 @@ class Admin(models.Model):
     publish_video = models.BooleanField(default=False)
     
     def __str__(self) -> str:
-        return self.user
+        return self.user.first_name
     
 
     

@@ -11,4 +11,10 @@ class ChannelAdmin(admin.ModelAdmin):
         '''No body can change info in admin panel'''
         return False
 
-admin.site.register(Admin)
+@admin.register(Admin)
+class AdminAdmin(admin.ModelAdmin):
+    list_display = ["user", "channel", "promoted_by", "date"]
+
+    def has_change_permission(self, request, obj=None):
+        '''No body can change info in admin panel'''
+        return False
