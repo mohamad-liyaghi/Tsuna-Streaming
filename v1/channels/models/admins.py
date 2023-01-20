@@ -4,7 +4,7 @@ from channels.models import Channel
 from v1.accounts.utils import token_generator
 
 
-class Admin(models.Model):
+class ChannelAdmin(models.Model):
     '''Channel admin model'''
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,

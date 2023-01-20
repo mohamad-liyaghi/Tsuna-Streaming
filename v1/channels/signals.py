@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from accounts.tasks import send_email
-from channels.models import Channel, Admin
+from channels.models import Channel, ChannelAdmin
 
 @receiver(pre_save, sender=Channel)
 def check_channel_limit_and_notify(sender, **kwargs):
@@ -35,7 +35,7 @@ def check_channel_limit_and_notify(sender, **kwargs):
 
 
 
-@receiver(pre_save, sender=Admin)
+@receiver(pre_save, sender=ChannelAdmin)
 def check_and_notify_after_promoting_admin(sender, **kwargs):
     instance = kwargs["instance"]
     

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from channels.models import Channel, Admin
+from channels.models import Channel
+from channels.models import ChannelAdmin as Admin
 
 
 @admin.register(Channel)
@@ -12,7 +13,7 @@ class ChannelAdmin(admin.ModelAdmin):
         return False
 
 @admin.register(Admin)
-class AdminAdmin(admin.ModelAdmin):
+class ChannelAdminAdmin(admin.ModelAdmin):
     list_display = ["user", "channel", "promoted_by", "date"]
 
     def has_change_permission(self, request, obj=None):
