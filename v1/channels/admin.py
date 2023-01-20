@@ -1,5 +1,5 @@
 from django.contrib import admin
-from channels.models import Channel
+from channels.models import Channel, Admin
 
 
 @admin.register(Channel)
@@ -10,3 +10,5 @@ class ChannelAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         '''No body can change info in admin panel'''
         return False
+
+admin.site.register(Admin)
