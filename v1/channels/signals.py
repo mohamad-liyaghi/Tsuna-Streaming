@@ -1,7 +1,7 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
 from accounts.tasks import send_email
-from channels.models import Channel
+from channels.models import Channel, Admin
 
 @receiver(pre_save, sender=Channel)
 def check_channel_limit_and_notify(sender, **kwargs):
@@ -32,3 +32,24 @@ def check_channel_limit_and_notify(sender, **kwargs):
                                                         channel_title=instance.title, channel_token=instance.token)
             else:
                 raise ValueError("Normal users can not have more that 5 channels")
+
+
+
+@receiver(pre_save, sender=Admin)
+def check_and_notify_after_promoting_admin(sender, **kwargs):
+    instance = kwargs["instance"]
+    
+    if not instance.pk:
+        user = instance.user
+        promoted_by = instance.promoted_by
+        channel = instance.channel
+
+        # check if user has permission to promote an admin
+        if channel.owner == promoted_by or \
+                promoted_by.channel_admin.filter(user=promoted_by, add_new_admin=True):
+
+                send_email("emails/notify_user_after_promoting.html", email=user.email,
+                            channel=channel.title, first_name=user.first_name)
+        
+        else:
+            raise ValueError("Permission denied for promoting in this channel.")

@@ -1,0 +1,11 @@
+{% block subject %}
+You have promoted!
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ kwargs.first_name }}</h1>
+<p>Now you are an admin in {{ kwargs.channel }}!</p>
+
+{% comment  %}#TODO add related urls{% endcomment %}
+
+{% endblock html_body %}    
