@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer
+from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailView
 from channels.models import Channel, ChannelAdmin
 
 
@@ -67,3 +67,25 @@ class ChannelAdminView(ListCreateAPIView):
         '''List of admins of a channel [Admins]'''
         return super().get(request, *args, **kwargs)
 
+
+
+class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
+    '''Detail page of admins'''
+
+    serializer_class = ChannelAdminDetailView
+    queryset = ChannelAdmin.objects.all()
+
+    def dispatch(self, request, *args, **kwargs):
+        self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
+
+        if request.user == self.channel.owner or \
+                      self.get_queryset().filter(user__id=request.user.id).exists():
+            return super().dispatch(request, *args, **kwargs)
+        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+    def get_object(self):
+        return get_object_or_404(ChannelAdmin, channel=self.channel, token=self.kwargs["admin_token"])
+
+    def get(self, request, *args, **kwargs):
+        '''Detail page of an admin [Admins only]'''
+        return super().get(request, *args, **kwargs)
