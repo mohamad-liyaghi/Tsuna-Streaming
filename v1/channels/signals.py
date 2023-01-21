@@ -43,6 +43,9 @@ def check_and_notify_after_promoting_admin(sender, **kwargs):
         user = instance.user
         promoted_by = instance.promoted_by
         channel = instance.channel
+        
+        if ChannelAdmin.objects.filter(user=user, channel=channel, promoted_by=promoted_by).exists():
+            raise ValueError("Admin already exists")
 
         # check if user has permission to promote an admin
         if channel.owner == promoted_by or \
