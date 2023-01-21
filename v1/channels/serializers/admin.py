@@ -15,7 +15,12 @@ class ChannelAdminCreateSerializer(serializers.ModelSerializer):
 
 
 class ChannelAdminDetailView(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
     class Meta:
         model = ChannelAdmin
         fields = ["user", "change_channel_info", "add_new_admin", "add_video",
                      "edit_video", "delete_video", "publish_video"]
+        extra_kwargs = {
+            "user" : {"read_only" : True},
+        }

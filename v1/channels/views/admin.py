@@ -89,9 +89,27 @@ class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         '''Detail page of an admin [Admins only]'''
         return super().get(request, *args, **kwargs)
-    
+
+
     def destroy(self, request, *args, **kwargs):
         '''Delete an admin [Owner only]'''
         if request.user == self.channel.owner:
             return super().destroy(request, *args, **kwargs)    
+        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+
+
+    def put(self, request, *args, **kwargs):
+        '''Update an admin [Admin]'''
+        if request.user == self.channel.owner or \
+                    self.get_object().promoted_by == self.request.user:
+            return super().put(request, *args, **kwargs)
+        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        
+
+    def patch(self, request, *args, **kwargs):
+        '''Update an admin [Admin]'''
+
+        if request.user == self.channel.owner or \
+                    self.get_object().promoted_by == self.request.user:
+            return super().put(request, *args, **kwargs)
         return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
