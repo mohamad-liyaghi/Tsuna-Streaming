@@ -46,3 +46,9 @@ class ChennelAdminPermission(BasePermission):
         return False
     
 
+class ChannelAdminDetailPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user == obj.channel.owner or request.user == obj.promoted_by:
+            return True
+            
+        return False

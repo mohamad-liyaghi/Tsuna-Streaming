@@ -4,9 +4,11 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework import status
 from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailView
 from channels.models import Channel, ChannelAdmin
-from channels.permissions import ChennelAdminPermission
+from channels.permissions import ChennelAdminPermission, ChannelAdminDetailPermission
 
 
 class ChannelAdminView(ListCreateAPIView):
@@ -30,23 +32,25 @@ class ChannelAdminView(ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         '''Create a new admin [Admins who have permission]'''
         # check if admin can add admin or not
+        channel = self.get_queryset().first().channel
+
         current_admin = self.request.user.channel_admin.filter(
-            channel=self.channel, add_new_admin=True
+            channel=channel, add_new_admin=True
             ).first()
 
-        if request.user == self.channel.owner or current_admin:
+        if request.user == channel.owner or current_admin:
             serializer = ChannelAdminCreateSerializer(data=request.data)  
 
             if serializer.is_valid():
                 # TODO check user is subscriber of not
                 # check if admin does not exists
                 if ChannelAdmin.objects.filter(user=serializer.validated_data["user"],
-                            promoted_by=self.request.user, channel=self.channel):
+                            promoted_by=self.request.user, channel=channel):
 
                             return JsonResponse({"Forbidden" : "Admin already exists."}, 
                                     status=status.HTTP_403_FORBIDDEN)       
 
-                serializer.save(promoted_by=self.request.user, channel=self.channel)
+                serializer.save(promoted_by=self.request.user, channel=channel)
                 return JsonResponse({"success" : "Admin added."}, status=status.HTTP_201_CREATED)        
 
             return JsonResponse({"Forbidden" : "Data is not valid."}, status=status.HTTP_403_FORBIDDEN)        
@@ -60,11 +64,25 @@ class ChannelAdminView(ListCreateAPIView):
 
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Admin permission list, [Admin and channel owner]."
+    ),
+    put=extend_schema(
+        description="Update an admins permission, [Channel owner]."
+    ),
+    patch=extend_schema(
+        description="Update an admins permission, [Channel owner]."
+    ),
+    destroy=extend_schema(
+        description="Delete an admin, [Channel owner]."
+    ),
+)
 class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
     '''Detail page of admins'''
 
     serializer_class = ChannelAdminDetailView
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, ChannelAdminDetailPermission]
     
     def get_queryset(self):
         return Channel.objects.filter(token=self.kwargs["channel_token"])
@@ -81,30 +99,16 @@ class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
         raise Http404("No result found.")
 
 
-    def get(self, request, *args, **kwargs):
-        '''Detail page of an admin [Admins only]'''
-        return super().get(request, *args, **kwargs)
-
-
     def destroy(self, request, *args, **kwargs):
         '''Delete an admin [Owner only]'''
-        if request.user == self.channel.owner:
-            return super().destroy(request, *args, **kwargs)    
-        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        return super().destroy(request, *args, **kwargs)    
 
 
     def put(self, request, *args, **kwargs):
         '''Update an admin [Admin]'''
-        if request.user == self.channel.owner or \
-                    self.get_object().promoted_by == self.request.user:
-            return super().put(request, *args, **kwargs)
-        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        return super().put(request, *args, **kwargs)
         
 
     def patch(self, request, *args, **kwargs):
         '''Update an admin [Admin]'''
-
-        if request.user == self.channel.owner or \
-                    self.get_object().promoted_by == self.request.user:
-            return super().put(request, *args, **kwargs)
-        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        return super().put(request, *args, **kwargs)
