@@ -2,7 +2,7 @@ from rest_framework.viewsets import ModelViewSet
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from channels.models import Channel
+from channels.models import Channel, ChannelAdmin
 from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
 from channels.permissions import ChannelLimitPermission, ChennelAdminPermission
@@ -45,11 +45,19 @@ class ChannelViewSet(ModelViewSet):
         return {"request" : self.request}
 
     def get_queryset(self):
-        # TODO: union with channels that user is admin.
-          return Channel.objects.filter(owner=self.request.user)
+        # channels that user is owner of them
+        owned_channel = Channel.objects.filter(owner=self.request.user)
+
+        # channels that user is admin of them
+        user_admin = ChannelAdmin.objects.filter(user=self.request.user).values("channel__id")
+        channel_admin = Channel.objects.filter(id__in=user_admin)
+
+        # return chained queryset
+        return owned_channel | channel_admin
 
     def get_object(self):
         return get_object_or_404(Channel, token=self.kwargs["token"])
+
 
     def get_serializer_class(self):
         '''Return the appropiate serializer'''
