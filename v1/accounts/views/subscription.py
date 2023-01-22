@@ -67,7 +67,11 @@ class SubscriptionViewSet(ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def destroy(self, request, *args, **kwargs):
-        #TODO Check that nobody is using the plan
+        '''Check if there is no subsription with given plan'''
+        subscription = Subscription.objects.filter(plan=self.get_object())
+        if subscription:
+            return Response("You can not delete this plan. {} users are using this plan".format(subscription.count()))
+            
         return super().destroy(request, *args, **kwargs)
     
     
