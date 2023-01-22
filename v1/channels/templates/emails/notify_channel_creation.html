@@ -7,6 +7,6 @@ Your channel on Tsuna Streaming
 <p>Your channel successfully created.  <br> Channel Title: '{{ kwargs.channel_title }}', token: '{{ kwargs.channel_token }}'</p>
 
 
-<a href="http://127.0.0.1:8000{% url 'v1_channels:channel-detail' kwargs.channel_token %}">Channel Profile</a>
+<a href="{{kwargs.domain}}{% url 'v1_channels:channel-detail' kwargs.channel_token %}">Channel Profile</a>
 
 {% endblock html_body %}    

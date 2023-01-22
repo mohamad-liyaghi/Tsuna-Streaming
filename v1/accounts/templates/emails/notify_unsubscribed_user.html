@@ -5,7 +5,9 @@ Your subscription time has come.
 {% block html_body %}
 <h1>Dear {{ kwargs.first_name }}</h1>
 <p>You have purchased {{ kwargs.plan }} on {{ kwargs.start_date }} and now its invalid and you are a normal user.</p>
-<a href="{% url 'v1_accounts:subscription-list' %}">Explore new plans</a>
+
+
+<a href="{{kwargs.domain}}{% url 'v1_accounts:subscription-list' %}">Explore new plans</a>
 
 
 {% endblock html_body %}    

@@ -1,15 +1,16 @@
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.utils import timezone
 from templated_mail.mail import BaseEmailMessage
 from celery import shared_task
 import datetime
-from django.utils import timezone
+
 
 
 @shared_task
 def send_email(template_name, email, **kwargs):
     '''This email task can be used for email verification and other purposes'''
-
+    kwargs.setdefault("domain", settings.DOMAIN)
     BaseEmailMessage(template_name=template_name, 
                     context={"kwargs" : kwargs}).send(to=[email])
                     

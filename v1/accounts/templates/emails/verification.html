@@ -7,6 +7,6 @@ Verify your account on tsuna streaming
 <p>Please click on the link bellow in order to verify your account</p>
 
 
-<a href="http://127.0.0.1:8000{% url 'v1_accounts:verify' kwargs.user_id kwargs.token %}">Click</a>
+<a href="{{kwargs.domain}}{% url 'v1_accounts:verify' kwargs.user_id kwargs.token %}">Click</a>
 
 {% endblock html_body %}    

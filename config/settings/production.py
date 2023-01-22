@@ -3,6 +3,8 @@ from settings.core import *
 DEBUG = True
 ALLOWED_HOSTS = []
 
+DOMAIN = config("PRODUCTION_DOMAIN")
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
