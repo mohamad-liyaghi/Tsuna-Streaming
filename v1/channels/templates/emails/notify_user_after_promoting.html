@@ -4,8 +4,8 @@ You have promoted!
 
 {% block html_body %}
 <h1>Hello dear {{ kwargs.first_name }}</h1>
-<p>Now you are an admin in {{ kwargs.channel }}!</p>
+<p>You have been promoted in '{{ kwargs.channel }}'!</p>
 
-{% comment  %}#TODO add related urls{% endcomment %}
+<a href="http://127.0.0.1:8000{% url 'v1_channels:channel_admin' kwargs.channel_token %}">Channel Admins list</a>
 
 {% endblock html_body %}    

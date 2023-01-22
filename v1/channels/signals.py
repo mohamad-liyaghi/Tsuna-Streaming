@@ -52,7 +52,7 @@ def check_and_notify_after_promoting_admin(sender, **kwargs):
                 promoted_by.channel_admin.filter(user=promoted_by, add_new_admin=True):
 
                 send_email("emails/notify_user_after_promoting.html", email=user.email,
-                            channel=channel.title, first_name=user.first_name)
+                            channel=channel.title, first_name=user.first_name, channel_token=channel.token)
         
         else:
             raise ValueError("Permission denied for promoting in this channel.")
