@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from channels.models import Channel
+from channels.models import Channel, ChannelAdmin
 
 
 class ChannelListSerializer(serializers.ModelSerializer):
@@ -29,14 +29,29 @@ class ChannelCreateSerializer(serializers.ModelSerializer):
 
 
 class ChannelDetailSerializer(serializers.ModelSerializer):
+
     owner = serializers.StringRelatedField()
+    role = serializers.SerializerMethodField(method_name="role_in_channel")
 
     class Meta:
         model = Channel
         fields = ["title", "description", "profile", "thumbnail", 
-                        "owner", "token", "date_joined", "is_verified"]
+                        "owner", "token", "date_joined", "is_verified", "role"]
         extra_kwargs = {
             "token" : {"read_only" : True},
             "owner" : {"read_only" : True},
             "is_verified" : {"read_only" : True},
+            "role" : {"read_only" : True}
         }
+
+    def role_in_channel(self, channel):
+        '''Return the user role in channel'''
+        user = self.context['request'].user
+
+        if channel.owner == user:
+            return "owner"
+
+        if ChannelAdmin.objects.filter(channel=channel, user=user).exists():
+            return "Admin"
+            
+        return None

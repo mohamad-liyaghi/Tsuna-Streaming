@@ -41,6 +41,9 @@ class ChannelViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
 
+    def get_serializer_context(self):
+        return {"request" : self.request}
+
     def get_queryset(self):
         # TODO: union with channels that user is admin.
           return Channel.objects.filter(owner=self.request.user)
