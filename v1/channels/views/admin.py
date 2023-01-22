@@ -2,14 +2,16 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
+from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
 from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailView
 from channels.models import Channel, ChannelAdmin
+from channels.permissions import ChennelAdminPermission
 
 
 class ChannelAdminView(ListCreateAPIView):
     '''Get channel admins and add an admin'''
-    permission_classes = [IsAuthenticated,] 
+    permission_classes = [IsAuthenticated, ChennelAdminPermission,] 
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -19,21 +21,10 @@ class ChannelAdminView(ListCreateAPIView):
             return ChannelAdminCreateSerializer
 
     def get_queryset(self):    
-        return ChannelAdmin.objects.filter(channel=self.channel)
-
-
-    def dispatch(self, request, *args, **kwargs):
-        '''Check user permissions'''
-
-        # get the given cahnnel
-        self.channel = get_object_or_404(Channel, token=self.kwargs["token"])
-    
-        # check if user has permission to access a channel admin list
-        if request.user == self.channel.owner or \
-                      self.get_queryset().filter(user__id=request.user.id).exists():
-            return super().dispatch(request, *args, **kwargs)
-
-        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
+        channel = get_object_or_404(Channel, token=self.kwargs["token"])
+        return ChannelAdmin.objects.select_related(
+                                        "channel", "channel__owner"
+                                    ).filter(channel=channel)
 
 
     def post(self, request, *args, **kwargs):
@@ -73,18 +64,22 @@ class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
     '''Detail page of admins'''
 
     serializer_class = ChannelAdminDetailView
-    queryset = ChannelAdmin.objects.all()
+    permission_classes = [IsAuthenticated,]
+    
+    def get_queryset(self):
+        return Channel.objects.filter(token=self.kwargs["channel_token"])
 
-    def dispatch(self, request, *args, **kwargs):
-        self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
-
-        if request.user == self.channel.owner or \
-                      self.get_queryset().filter(user__id=request.user.id).exists():
-            return super().dispatch(request, *args, **kwargs)
-        return JsonResponse({"Forbidden" : "Permission denied."}, status=status.HTTP_403_FORBIDDEN)
 
     def get_object(self):
-        return get_object_or_404(ChannelAdmin, channel=self.channel, token=self.kwargs["admin_token"])
+        channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
+        admin = get_object_or_404(ChannelAdmin, channel=channel, token=self.kwargs["admin_token"])
+
+        if self.request.user == channel.owner or \
+                 self.request.user == admin.user:
+            return admin
+
+        raise Http404("No result found.")
+
 
     def get(self, request, *args, **kwargs):
         '''Detail page of an admin [Admins only]'''

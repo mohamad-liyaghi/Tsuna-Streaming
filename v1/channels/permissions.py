@@ -1,5 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.permissions import BasePermission
-
+from channels.models import ChannelAdmin
 
 class ChannelLimitPermission(BasePermission):
     '''This permission doesnt let users to create channels more than expected amount'''
@@ -25,6 +26,23 @@ class ChannelLimitPermission(BasePermission):
         return False
 
 class ChennelAdminPermission(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        #TODO check channel admin list
-        return bool(request.user == obj.owner)
+    '''A permission for controling users access to channel admin list/detail'''
+    message = 'Access denied or result is empty'
+
+    def has_permission(self, request, view):
+
+        object = view.get_queryset().first()
+        
+        if object:
+
+            if request.user == object.channel.owner:
+                return True
+            
+            elif ChannelAdmin.objects.filter(user=request.user, channel=object.channel):
+                return True
+
+            return False
+
+        return False
+    
+
