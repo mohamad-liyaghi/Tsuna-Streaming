@@ -1,12 +1,13 @@
 from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from accounts.tasks import send_email
-from channels.models import Channel, ChannelAdmin
+from channels.models import Channel, ChannelAdmin, ChannelSubscriber
 
 @receiver(pre_save, sender=Channel)
 def check_channel_limit_and_notify(sender, **kwargs):
     '''Check channel limits, create channel and notify'''
     instance = kwargs["instance"]
+
     # check if object is not getting update
     if not instance.pk:
         user = instance.owner
@@ -56,3 +57,14 @@ def check_and_notify_after_promoting_admin(sender, **kwargs):
         
         else:
             raise ValueError("Permission denied for promoting in this channel.")
+
+
+
+@receiver(post_save, sender=Channel)
+def create_subscriber_after_creating_channel(sender, **kwargs):
+    '''Auto subscribe created channel by owner'''
+    
+    instance = kwargs["instance"]
+    ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
+
+    
