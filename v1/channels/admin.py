@@ -1,5 +1,5 @@
 from django.contrib import admin
-from channels.models import Channel
+from channels.models import Channel, ChannelSubscriber
 from channels.models import ChannelAdmin as Admin
 
 
@@ -19,3 +19,7 @@ class ChannelAdminAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         '''No body can change info in admin panel'''
         return False
+
+@admin.register(ChannelSubscriber)
+class ChannelSubscriberAdmin(admin.ModelAdmin):
+    list_display = ["user", "channel"]
