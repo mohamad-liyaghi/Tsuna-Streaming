@@ -19,7 +19,8 @@ class ChannelAdmin(models.Model):
     # permissions
     change_channel_info = models.BooleanField(default=False)
     add_new_admin = models.BooleanField(default=False)
-
+    block_user = models.BooleanField(default=False)
+    
     add_video = models.BooleanField(default=False)
     edit_video = models.BooleanField(default=False)
     delete_video = models.BooleanField(default=False)
