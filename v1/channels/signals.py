@@ -1,5 +1,5 @@
 from django.dispatch import receiver
-from django.db.models.signals import pre_save, post_save
+from django.db.models.signals import pre_save, post_save, post_delete
 from accounts.tasks import send_email
 from channels.models import Channel, ChannelAdmin, ChannelSubscriber
 
@@ -67,4 +67,10 @@ def create_subscriber_after_creating_channel(sender, **kwargs):
     instance = kwargs["instance"]
     ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
 
+
+@receiver(post_delete, sender=ChannelSubscriber)
+def delete_admin_after_unsubscribing(sender, **kwargs):
+    instance = kwargs["instance"]
     
+    if (admin:=ChannelAdmin.objects.filter(user=instance.user, channel=instance.channel)):
+        admin.delete()
