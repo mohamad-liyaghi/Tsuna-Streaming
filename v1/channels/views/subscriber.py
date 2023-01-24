@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -7,6 +8,7 @@ from rest_framework import status
 
 from channels.models import Channel
 from channels.models import ChannelSubscriber
+from channels.serializers.subscriber import SubscriberListSerializer
 
 
 class SubscriberView(APIView):
@@ -73,3 +75,22 @@ class SubscriberBlockView(APIView):
             return Response("User blocked", status=status.HTTP_200_OK)
 
         return Response("Permission denied.", status=status.HTTP_403_FORBIDDEN)
+
+
+class SubscriberListView(APIView):
+
+    permission_classes = [IsAuthenticated,]
+
+    def dispatch(self, request, *args, **kwargs):
+        self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
+        if request.user == self.channel.owner or\
+            request.user.channel_admin.filter(channel=self.channel).exists():
+            return super().dispatch(request, *args, **kwargs)
+
+        return JsonResponse({"forbidden" : "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
+
+
+    def get(self, request, *args, **kwargs):
+        subscribers = ChannelSubscriber.objects.filter(channel=self.channel, is_blocked=False)
+        serializer = SubscriberListSerializer(instance=subscribers, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

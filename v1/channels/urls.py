@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework import routers
 from channels.views.channel import ChannelViewSet
 from channels.views.admin import ChannelAdminView, ChannelAdminDetailView
-from channels.views.subscriber import SubscriberView, SubscriberBlockView
+from channels.views.subscriber import SubscriberView, SubscriberBlockView, SubscriberListView
 
 app_name = "v1_channels"
 router = routers.DefaultRouter()
@@ -15,6 +15,7 @@ urlpatterns = [
 
     path("subscriber/<str:channel_token>/", SubscriberView.as_view(), name="subscriber"),
     path("subscriber/<str:channel_token>/block/<str:user_id>/", SubscriberBlockView.as_view(), name="block_subscriber"),
+    path("subscriber/<str:channel_token>/list", SubscriberListView.as_view(), name="subscriber_list"),
     
 ]
 
