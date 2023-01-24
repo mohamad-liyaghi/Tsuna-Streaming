@@ -3,10 +3,10 @@ from channels.models import Channel, ChannelAdmin
 
 
 class ChannelListSerializer(serializers.ModelSerializer):
-    # TODO get subs count
     class Meta:
         model = Channel
         fields = ["profile", "title", "token", "is_verified"]
+    
 
 
 class ChannelCreateSerializer(serializers.ModelSerializer):
@@ -31,11 +31,12 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
 
     owner = serializers.StringRelatedField()
     role = serializers.SerializerMethodField(method_name="role_in_channel")
+    subscribers = serializers.SerializerMethodField(method_name="subscriber_count")
 
     class Meta:
         model = Channel
         fields = ["title", "description", "profile", "thumbnail", 
-                        "owner", "token", "date_joined", "is_verified", "role"]
+                        "owner", "token", "date_joined", "is_verified", "role", "subscribers"]
         extra_kwargs = {
             "token" : {"read_only" : True},
             "owner" : {"read_only" : True},
@@ -54,3 +55,6 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
             return "Admin"
             
         return None
+    
+    def subscriber_count(self, channel):
+        return channel.subscribers.count()
