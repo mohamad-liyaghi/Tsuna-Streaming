@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailView
-from channels.models import Channel, ChannelAdmin
+from channels.models import Channel, ChannelAdmin, ChannelSubscriber
 from channels.permissions import ChennelAdminPermission, ChannelAdminDetailPermission
 
 
@@ -42,16 +42,19 @@ class ChannelAdminView(ListCreateAPIView):
             serializer = ChannelAdminCreateSerializer(data=request.data)  
 
             if serializer.is_valid():
-                # TODO check user is subscriber of not
-                # check if admin does not exists
-                if ChannelAdmin.objects.filter(user=serializer.validated_data["user"],
-                            promoted_by=self.request.user, channel=channel):
+                # check that admin is channel subscriber
+                if ChannelSubscriber.objects.filter(user=serializer.validated_data["user"]):
+                    # check if admin does not exists
+                    if ChannelAdmin.objects.filter(user=serializer.validated_data["user"],
+                                promoted_by=self.request.user, channel=channel):
 
-                            return JsonResponse({"Forbidden" : "Admin already exists."}, 
-                                    status=status.HTTP_403_FORBIDDEN)       
+                                return JsonResponse({"Forbidden" : "Admin already exists."}, 
+                                        status=status.HTTP_403_FORBIDDEN)       
 
-                serializer.save(promoted_by=self.request.user, channel=channel)
-                return JsonResponse({"success" : "Admin added."}, status=status.HTTP_201_CREATED)        
+                    serializer.save(promoted_by=self.request.user, channel=channel)
+                    return JsonResponse({"success" : "Admin added."}, status=status.HTTP_201_CREATED)        
+
+                return JsonResponse({"Forbidden" : "User is not a channel subscriber."}, status=status.HTTP_403_FORBIDDEN)
 
             return JsonResponse({"Forbidden" : "Data is not valid."}, status=status.HTTP_403_FORBIDDEN)        
         
