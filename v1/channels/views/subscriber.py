@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+
 from channels.models import Channel
 from channels.models import ChannelSubscriber
 
@@ -40,3 +42,34 @@ class SubscriberView(APIView):
         # if hasnt subscribed
         ChannelSubscriber.objects.create(user=self.request.user, channel=self.channel)
         return Response("Subscribed successfully", status=status.HTTP_200_OK)
+
+
+class SubscriberBlockView(APIView):
+
+    permission_classes = [IsAuthenticated,]
+
+    def post(self, request, *args, **kwargs):
+        '''Block a user from accessing a channel [Admins only]'''
+
+        channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
+        user = get_object_or_404(get_user_model(), user_id=self.kwargs["user_id"])
+
+        if request.user == channel.owner or\
+             request.user.channel_admin.filter(channel=channel, block_user=True).exists():
+            
+            if user.channel_admin.filter(channel=channel):
+                return Response("You cant remove admins", status=status.HTTP_403_FORBIDDEN)
+
+            subscriber = get_object_or_404(ChannelSubscriber, channel=channel,
+                                            user=user)
+
+            if subscriber.is_blocked:
+                subscriber.is_blocked = False
+                subscriber.save()
+                return Response("User unblocked", status=status.HTTP_200_OK)
+
+            subscriber.is_blocked = True
+            subscriber.save()
+            return Response("User blocked", status=status.HTTP_200_OK)
+
+        return Response("Permission denied.", status=status.HTTP_403_FORBIDDEN)
