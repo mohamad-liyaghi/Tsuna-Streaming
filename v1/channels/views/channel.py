@@ -35,7 +35,7 @@ class ChannelViewSet(ModelViewSet):
             permission_classes = [ChannelLimitPermission]
         
         elif self.action in ["update", "partial_update", "destroy"]:
-            permission_classes = [ChennelAdminPermission]
+            permission_classes = [AllowAuthenticatedPermission]
         else:
             permission_classes = [AllowAuthenticatedPermission]
 
