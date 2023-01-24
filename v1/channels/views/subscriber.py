@@ -91,6 +91,9 @@ class SubscriberListView(APIView):
 
 
     def get(self, request, *args, **kwargs):
-        subscribers = ChannelSubscriber.objects.filter(channel=self.channel, is_blocked=False)
+        if request.resolver_match.url_name == "blocked_subscriber_list":
+            subscribers = ChannelSubscriber.objects.filter(channel=self.channel, is_blocked=True)
+        else:
+            subscribers = ChannelSubscriber.objects.filter(channel=self.channel, is_blocked=False)
         serializer = SubscriberListSerializer(instance=subscribers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
