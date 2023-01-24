@@ -12,14 +12,31 @@ class SubscriberView(APIView):
 
     def dispatch(self, request, *args, **kwargs):
         self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
+        self.subscriber = ChannelSubscriber.objects.filter(channel=self.channel,
+                                         user=self.request.user)
+
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
         '''Check weather or not user subscribed a channel.'''
 
-        subscriber = ChannelSubscriber.objects.filter(channel=self.channel,
-                                         user=self.request.user).exists()
-        if subscriber:
+        if self.subscriber.exists():
             return Response(True, status=status.HTTP_200_OK)
 
         return Response(False, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        '''Subscribe/UnSubscribe a channel.'''
+
+        if self.subscriber:
+            if request.user == self.channel.owner:
+                return Response("You can not unsubscribe your own channel.", 
+                                status=status.HTTP_403_FORBIDDEN)
+
+            # if subscribed
+            self.subscriber.first().delete()
+            return Response("Unsubscribed successfully", status=status.HTTP_200_OK)
+        
+        # if hasnt subscribed
+        ChannelSubscriber.objects.create(user=self.request.user, channel=self.channel)
+        return Response("Subscribed successfully", status=status.HTTP_200_OK)
