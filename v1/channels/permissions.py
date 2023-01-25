@@ -52,3 +52,30 @@ class ChannelAdminDetailPermission(BasePermission):
             return True
             
         return False
+
+
+class ChannelPermission(BasePermission):
+    '''Channel Permissions'''
+    message = "Only admins can perform this action."
+
+    def has_permission(self, request, view):
+        
+        object = view.get_object()
+        
+        # check permission for deleting channel
+        if request.method == "DELETE":
+            if request.user == object.owner:
+                return True
+
+            return False
+
+        # check permission for updating channel
+        elif request.method in ["PUT", "PATCH"]:
+
+            if request.user == object.owner or \
+                ChannelAdmin.objects.filter(user=request.user, channel=object, change_channel_info=True).exists():
+                return True
+
+            return False
+        
+        return True

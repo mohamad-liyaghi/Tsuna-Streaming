@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from channels.models import Channel, ChannelAdmin
 from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
 from accounts.permissions import AllowAuthenticatedPermission
-from channels.permissions import ChannelLimitPermission, ChennelAdminPermission
+from channels.permissions import  ChannelPermission, ChannelLimitPermission
 
 @extend_schema_view(
     list=extend_schema(
@@ -31,11 +31,13 @@ class ChannelViewSet(ModelViewSet):
 
     def get_permissions(self):
         '''return the appropriate permission class'''            
+
         if self.action in ["create"]:
             permission_classes = [ChannelLimitPermission]
         
         elif self.action in ["update", "partial_update", "destroy"]:
-            permission_classes = [AllowAuthenticatedPermission]
+            permission_classes = [ChannelPermission]
+        
         else:
             permission_classes = [AllowAuthenticatedPermission]
 
