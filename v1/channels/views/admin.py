@@ -6,14 +6,14 @@ from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailView
+from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailSerializer
 from channels.models import Channel, ChannelAdmin, ChannelSubscriber
-from channels.permissions import ChennelAdminPermission, ChannelAdminDetailPermission
+from channels.permissions import ChannelAdminPermission, ChannelAdminDetailPermission
 
 
 class ChannelAdminView(ListCreateAPIView):
     '''Get channel admins and add an admin'''
-    permission_classes = [IsAuthenticated, ChennelAdminPermission,] 
+    permission_classes = [IsAuthenticated, ChannelAdminPermission,] 
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -84,7 +84,7 @@ class ChannelAdminView(ListCreateAPIView):
 class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
     '''Detail page of admins'''
 
-    serializer_class = ChannelAdminDetailView
+    serializer_class = ChannelAdminDetailSerializer
     permission_classes = [IsAuthenticated, ChannelAdminDetailPermission]
     
     def get_queryset(self):

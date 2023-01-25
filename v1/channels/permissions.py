@@ -25,7 +25,7 @@ class ChannelLimitPermission(BasePermission):
 
         return False
 
-class ChennelAdminPermission(BasePermission):
+class ChannelAdminPermission(BasePermission):
     '''A permission for controling users access to channel admin list/detail'''
     message = 'Access denied or result is empty'
 

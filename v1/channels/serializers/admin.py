@@ -14,7 +14,7 @@ class ChannelAdminCreateSerializer(serializers.ModelSerializer):
                      "edit_video", "delete_video", "publish_video"]
 
 
-class ChannelAdminDetailView(serializers.ModelSerializer):
+class ChannelAdminDetailSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
 
     class Meta:
