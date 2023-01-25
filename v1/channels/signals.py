@@ -63,9 +63,9 @@ def check_and_notify_after_promoting_admin(sender, **kwargs):
 @receiver(post_save, sender=Channel)
 def create_subscriber_after_creating_channel(sender, **kwargs):
     '''Auto subscribe created channel by owner'''
-    
-    instance = kwargs["instance"]
-    ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
+    if kwargs["created"]:
+        instance = kwargs["instance"]
+        ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
 
 
 @receiver(post_delete, sender=ChannelSubscriber)
