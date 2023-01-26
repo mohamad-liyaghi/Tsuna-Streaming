@@ -1,9 +1,13 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework import status
+
 from accounts.serializers.profile import ProfileSerializer
 from rest_framework.response import Response
-from rest_framework import status
 
 USER = get_user_model()
 
@@ -18,7 +22,7 @@ class ProfileView(RetrieveUpdateAPIView):
     def get_object(self):
         return get_object_or_404(USER, user_id=self.kwargs["user_id"])
     
-
+    @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):
         '''Return given users information'''
         return super().get(request, *args, **kwargs)

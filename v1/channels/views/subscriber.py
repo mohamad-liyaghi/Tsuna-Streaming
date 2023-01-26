@@ -1,6 +1,9 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -21,6 +24,7 @@ class SubscriberView(APIView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    @method_decorator(cache_page(2))
     def get(self, request, *args, **kwargs):
         '''Check weather or not user subscribed a channel.'''
 
@@ -89,7 +93,7 @@ class SubscriberListView(APIView):
 
         return JsonResponse({"forbidden" : "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
-
+    @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):
         if request.resolver_match.url_name == "blocked_subscriber_list":
             subscribers = ChannelSubscriber.objects.filter(channel=self.channel, is_blocked=True)

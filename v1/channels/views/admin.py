@@ -1,5 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from django.http import Http404
@@ -60,7 +62,8 @@ class ChannelAdminView(ListCreateAPIView):
         
         return JsonResponse({"Forbidden" : "You dont have permission to add admin."},
                                 status=status.HTTP_403_FORBIDDEN)
-        
+    
+    @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):
         '''List of admins of a channel [Admins]'''
         return super().get(request, *args, **kwargs)
@@ -115,3 +118,7 @@ class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         '''Update an admin [Admin]'''
         return super().put(request, *args, **kwargs)
+    
+    @method_decorator(cache_page(5))
+    def get(self, request, *args, **kwargs):
+        return super().get(request, *args, **kwargs)
