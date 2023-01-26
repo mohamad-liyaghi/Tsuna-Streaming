@@ -55,3 +55,14 @@ CELERY_BEAT_SCHEDULE = {
     }, 
 
 }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": config("LOCAL_CACHE_DB_LOCATION"),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
