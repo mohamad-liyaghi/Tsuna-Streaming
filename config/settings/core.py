@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     # local apps
     'v1.accounts.apps.AccountsConfig',
     'v1.channels.apps.ChannelsConfig',
+    'v1.videos.apps.VideosConfig',
 ]
 
 MIDDLEWARE = [
