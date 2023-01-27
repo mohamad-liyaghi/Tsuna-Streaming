@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
+from videos.managers import VideoManager
 from channels.models import Channel
 from videos.utils import video_token_generator
 
@@ -25,6 +26,7 @@ class Video(models.Model):
     visibility = models.CharField(max_length=2, choices=Visibility.choices, default=Visibility.PRIVATE)
     is_updated = models.BooleanField(default=False)
 
+    objects = VideoManager()
 
     @property
     def is_published(self):
