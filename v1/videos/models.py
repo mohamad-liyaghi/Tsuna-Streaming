@@ -30,6 +30,9 @@ class Video(models.Model):
     def is_published(self):
         return self.visibility == "pu"
 
+    def __str__(self) -> str:
+        return self.title
+
     def clean(self):
         '''Check video size. Normal users can upload 20Mb videos and premiums can upload 50.'''
         if self.video.size > 5242880:
