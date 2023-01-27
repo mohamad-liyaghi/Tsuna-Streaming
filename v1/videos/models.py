@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from channels.models import Channel
+from videos.utils import video_token_generator
 
 
 class Video(models.Model):
@@ -15,7 +16,7 @@ class Video(models.Model):
     video = models.FileField(upload_to="videos/user_video/")
     thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="media/default-video-thumbnail.jpg")
 
-    token = models.CharField(max_length=32)
+    token = models.CharField(max_length=32, default=video_token_generator)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="videos")
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="videos")   
