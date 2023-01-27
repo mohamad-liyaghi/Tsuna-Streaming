@@ -1,0 +1,11 @@
+{% block subject %}
+New video added
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ kwargs.first_name }}</h1>
+<p>A new video added to {{ kwargs.channel_title }}!</p>
+
+{% comment  %}#TODO add related links{% endcomment %}
+
+{% endblock html_body %}    
