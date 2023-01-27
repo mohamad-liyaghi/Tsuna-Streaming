@@ -12,3 +12,4 @@ data/
 .pytest_cache/
 celerybeat-schedule
 channels/profile
+videos/user_video
