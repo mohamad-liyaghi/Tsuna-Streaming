@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.core.exceptions import ValidationError  
 from channels.models import Channel
 from videos.utils import video_token_generator
-
 
 class Video(models.Model):
 
@@ -29,3 +29,19 @@ class Video(models.Model):
     @property
     def is_published(self):
         return self.visibility == "pu"
+
+    def clean(self):
+        '''Check video size. Normal users can upload 20Mb videos and premiums can upload 50.'''
+        if self.video.size > 5242880:
+            raise ValidationError("File size must be less than 50MB.")
+
+        if self.user.role in ['a', 'p']:
+            if self.video.size <= 5242880:
+                return super().clean()
+            raise ValidationError("File size must be less than 50MB.")
+
+        if self.video.size <= 20971520:
+            return super().clean()
+
+        raise ValidationError("File size must be under 20MB.")
+            
