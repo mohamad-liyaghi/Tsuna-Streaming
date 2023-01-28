@@ -51,4 +51,13 @@ class VideoDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Video
         fields = [ "title", "description", "video", "thumbnail", "token", "user", 
-                        "channel", "date", "get_visibility_display", "is_updated", "is_published"]
+                        "channel", "date", "get_visibility_display", "visibility", "is_updated", "is_published"]
+
+        extra_kwargs = {
+            "video" : {'read_only' : True},
+            "token" : {'read_only' : True},
+            "user" : {'read_only' : True},
+            "channel" : {'read_only' : True},
+            "date" : {'read_only' : True},
+            "is_updated" : {'read_only' : True},
+        }

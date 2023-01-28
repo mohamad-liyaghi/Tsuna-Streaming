@@ -15,6 +15,13 @@ from videos.serializers import VideoListSerializer, VideoCreateSeriaizer, VideoD
     retrieve=extend_schema(
         description="Detail page of a video."
     ),
+    update=extend_schema(
+        description="Update a video [Users who have permission]."
+    ),
+    partial_update=extend_schema(
+        description="Update a video [Users who have permission]."
+    ),
+    
 )
 class VideoViewSet(ModelViewSet):
     '''A viewset for adding, updating and retrieving videos'''
@@ -41,3 +48,10 @@ class VideoViewSet(ModelViewSet):
 
         return Video.objects.select_related('user', 'channel')\
             .filter(user=self.request.user).order_by("-date")
+    
+    def update(self, request, *args, **kwargs):
+        # set is_updated to True after updating the video
+        object = self.get_object()
+        object.is_updated = True        
+        object.save()
+        return super().update(request, *args, **kwargs)
