@@ -40,3 +40,15 @@ class VideoCreateSeriaizer(serializers.ModelSerializer):
         # set user for video uploader
         kwargs["user"] = self.context['user']
         return super().save(**kwargs)
+
+
+class VideoDetailSerializer(serializers.ModelSerializer):
+    '''Serializer for retrieving, Updating a video'''
+
+    channel = serializers.StringRelatedField()
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Video
+        fields = [ "title", "description", "video", "thumbnail", "token", "user", 
+                        "channel", "date", "get_visibility_display", "is_updated", "is_published"]
