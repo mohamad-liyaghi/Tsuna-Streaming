@@ -32,11 +32,12 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
     role = serializers.SerializerMethodField(method_name="role_in_channel")
     subscribers = serializers.SerializerMethodField(method_name="subscriber_count")
+    videos = serializers.SerializerMethodField(method_name="video_count")
 
     class Meta:
         model = Channel
         fields = ["title", "description", "profile", "thumbnail", 
-                        "owner", "token", "date_joined", "is_verified", "role", "subscribers"]
+                        "owner", "token", "date_joined", "is_verified", "role", "subscribers", "videos"]
         extra_kwargs = {
             "token" : {"read_only" : True},
             "owner" : {"read_only" : True},
@@ -58,3 +59,6 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
     
     def subscriber_count(self, channel):
         return channel.subscribers.count()
+
+    def video_count(self, channel):
+        return channel.videos.filter(visibility="pu").count()
