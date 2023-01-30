@@ -1,9 +1,14 @@
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from videos.models import Video
-from channels.models import ChannelAdmin
+from channels.models import Channel
 from videos.permissions import VideoPermission
 from videos.serializers import VideoListSerializer, VideoCreateSeriaizer, VideoDetailSerializer
 
@@ -23,6 +28,12 @@ from videos.serializers import VideoListSerializer, VideoCreateSeriaizer, VideoD
     ),
     partial_update=extend_schema(
         description="Update a video [Users who have permission]."
+    ),
+    delete=extend_schema(
+        description="Delete a video."
+    ),
+    channel_video_list=extend_schema(
+        description="List of a channel's video."
     ),
     
 )
@@ -70,3 +81,28 @@ class VideoViewSet(ModelViewSet):
         object.is_updated = True        
         object.save()
         return super().update(request, *args, **kwargs)        
+    
+    @method_decorator(cache_page(3))
+    @action(detail=False, methods=["GET"], url_path="channel/(?P<channel_token>[^/.]+)", 
+                permission_classes=[IsAuthenticated,])
+    def channel_video_list(self, request, channel_token):
+        '''List of a channel video'''
+        channel = get_object_or_404(Channel, token=channel_token)
+
+        if request.user == channel.owner or \
+            request.user.channel_admin.filter(channel=channel):
+            videos = channel.videos.all()
+
+        else:
+            videos = channel.videos.filter(visibility="pu")
+
+        serializer = VideoListSerializer(instance=videos, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @method_decorator(cache_page(2))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+    @method_decorator(cache_page(4))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
