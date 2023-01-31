@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'v1.accounts.apps.AccountsConfig',
     'v1.channels.apps.ChannelsConfig',
     'v1.videos.apps.VideosConfig',
+    'v1.votes.apps.VotesConfig',
 ]
 
 MIDDLEWARE = [
