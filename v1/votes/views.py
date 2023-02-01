@@ -4,11 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from votes.models import Vote
-from votes.serializers import VoteSerializer
+from votes.serializers import VoteSerializer, VoteListSerializer
 
 
 @extend_schema_view(
@@ -19,7 +21,7 @@ from votes.serializers import VoteSerializer
         description="Vote or delete or update a vote."
     ),
 )
-class RateView(APIView):
+class VoteView(APIView):
     '''
         Get: show the upvote and downvotes and also user vote status
         Post: Vote a model
@@ -74,3 +76,23 @@ class RateView(APIView):
                 return Response("Vote saved", status=status.HTTP_200_OK)
 
         return Response("Invalid information", status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="List of users that voted an object."
+    ),
+)
+class VoteListView(APIView):
+    '''List of users that voted an object'''
+    permission_classes = [IsAuthenticated, ]
+    
+    @method_decorator(cache_page(5))
+    def get(self, request, content_type_id, token, *args, **kwargs):
+        content_type_model = get_object_or_404(ContentType, id=content_type_id)
+        object = get_object_or_404(content_type_model.model_class(), token=token)
+        votes = Vote.objects.filter(content_type=content_type_model, object_id=object.id)
+
+        serializer = VoteListSerializer(votes, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
