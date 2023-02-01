@@ -45,9 +45,9 @@ class RateView(APIView):
         return super().dispatch(request, content_type_id, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
-        # TODO add manager to get upvote and downvote 
-        upvotes = self.vote.filter(choice="u").count()
-        downvotes = self.vote.filter(choice="d").count()
+
+        upvotes = self.vote.upvotes()
+        downvotes = self.vote.downvotes()
 
         return Response({"upvotes" : upvotes, "downvotes" : downvotes, "voted" : True if self.user_vote else False,
         "user_vote" : self.user_vote.choice if self.user_vote else None}, status=status.HTTP_200_OK)
