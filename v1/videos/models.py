@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from videos.managers import VideoManager
 from channels.models import Channel
 from videos.utils import video_token_generator
+from votes.models import Vote
+from django.contrib.contenttypes.fields import GenericRelation
 
 class Video(models.Model):
 
@@ -27,6 +29,7 @@ class Video(models.Model):
     is_updated = models.BooleanField(default=False)
 
     objects = VideoManager()
+    vote = GenericRelation(Vote)
 
     @property
     def is_published(self):

@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from videos.models import Video
 from channels.models import Channel, ChannelAdmin
@@ -47,11 +49,13 @@ class VideoDetailSerializer(serializers.ModelSerializer):
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
+    content_type_id = serializers.SerializerMethodField(method_name="get_model_content_type_id")
 
     class Meta:
         model = Video
         fields = [ "title", "description", "video", "thumbnail", "token", "user", 
-                        "channel", "date", "get_visibility_display", "visibility", "is_updated", "is_published"]
+                        "channel", "date", "get_visibility_display",
+                             "visibility", "is_updated", "is_published", "content_type_id"]
 
         extra_kwargs = {
             "video" : {'read_only' : True},
@@ -61,3 +65,6 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "date" : {'read_only' : True},
             "is_updated" : {'read_only' : True},
         }
+
+    def get_model_content_type_id(self, video):
+        return get_object_or_404(ContentType, app_label="videos", model='video').id
