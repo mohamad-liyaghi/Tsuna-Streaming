@@ -27,6 +27,9 @@ class Video(models.Model):
 
     visibility = models.CharField(max_length=2, choices=Visibility.choices, default=Visibility.PRIVATE)
     is_updated = models.BooleanField(default=False)
+    
+    # whether or not user can add comment
+    allow_comment = models.BooleanField(default=True)
 
     objects = VideoManager()
     vote = GenericRelation(Vote)
