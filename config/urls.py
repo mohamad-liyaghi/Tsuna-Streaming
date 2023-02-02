@@ -14,6 +14,7 @@ urlpatterns = [
     path("v1/channels/", include("v1.channels.urls")),
     path("v1/videos/", include("v1.videos.urls")),
     path("v1/votes/", include("v1.votes.urls")),
+    # path("v1/comments/", include("v1.comments.urls")),
 
     # api docs
     path('docs/download/', SpectacularAPIView.as_view(), name='schema'),
