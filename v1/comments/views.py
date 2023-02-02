@@ -15,9 +15,13 @@ from comments.models import Comment
     get=extend_schema(
         description="List of an objects comments."
     ),
+    post=extend_schema(
+        description="Add a comment if comments are allowed for an object."
+    ),
 )
 class CommentView(APIView):
     permission_classes = [IsAuthenticated,]
+    serializer_class = CommentSerializer
 
 
     def dispatch(self, request, *args, **kwargs):
@@ -37,5 +41,17 @@ class CommentView(APIView):
         comment = Comment.objects.filter(content_type=self.content_type_model, 
                             object_id=self.object.id, parent__isnull=True).order_by("-pinned", "-date")
 
-        serializer = CommentSerializer(comment, many=True)
+        serializer = self.serializer_class(comment, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def post(self, request, *args, **kwargs):
+        # check if comments are allowed for a post
+        if self.object.allow_comment:
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            serializer.save(user=request.user, content_object=self.object)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)

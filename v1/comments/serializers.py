@@ -8,3 +8,8 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ["user", "body", "date", "edited", "pinned", "token"]
+        extra_kwargs = {
+            "edited" : {"read_only" : True},
+            "pinned" : {"read_only" : True},
+            "token" : {"read_only" : True},
+        }
