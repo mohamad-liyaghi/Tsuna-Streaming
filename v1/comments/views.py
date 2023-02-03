@@ -50,6 +50,9 @@ class CommentView(CommentObjectMixin, APIView):
     put=extend_schema(
         description="Update a comment [Only by its user]."
     ),
+    delete=extend_schema(
+        description="Delete a comment [by its user or channels owner]."
+    ),
 )
 class CommentDetailView(CommentObjectMixin, APIView):
     permission_classes = [IsAuthenticated,]
@@ -57,7 +60,7 @@ class CommentDetailView(CommentObjectMixin, APIView):
 
     def get_object(self):
         return get_object_or_404(
-            Comment.objects.prefetch_related("replies"), content_type=self.content_type_model, 
+            Comment.objects.prefetch_related("replies", "content_object__channel"), content_type=self.content_type_model, 
                       object_id=self.object.id, 
                       token=self.kwargs.get("comment_token"))
 
@@ -74,4 +77,13 @@ class CommentDetailView(CommentObjectMixin, APIView):
             serializer.save(edited=True)
             return Response("comment updated", status=status.HTTP_200_OK)
         
+        return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
+
+
+    def delete(self, request, *args, **kwargs):
+        if request.user == self.get_object().user or \
+            request.user == self.get_object().content_object.channel.owner:
+            self.get_object().delete()
+            return Response("Comment deleted", status=status.HTTP_200_OK)
+
         return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
