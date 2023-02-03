@@ -47,8 +47,12 @@ class CommentView(CommentObjectMixin, APIView):
     get=extend_schema(
         description="Comment detail page [Replies and votes]."
     ),
+    put=extend_schema(
+        description="Update a comment [Only by its user]."
+    ),
 )
 class CommentDetailView(CommentObjectMixin, APIView):
+    permission_classes = [IsAuthenticated,]
     serializer_class = CommentDetailSerializer
 
     def get_object(self):
@@ -60,3 +64,14 @@ class CommentDetailView(CommentObjectMixin, APIView):
 
     def get(self, request, *args, **kwargs):
         return Response(self.serializer_class(self.get_object()).data)
+    
+    
+    def put(self, request, *args, **kwargs):
+
+        if request.user == self.get_object().user:
+            serializer = self.serializer_class(self.get_object(), data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(edited=True)
+            return Response("comment updated", status=status.HTTP_200_OK)
+        
+        return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)

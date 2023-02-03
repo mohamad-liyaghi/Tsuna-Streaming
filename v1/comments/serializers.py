@@ -29,6 +29,11 @@ class CommentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ["user", "body", "date", "edited", "pinned", "token", "vote_count", "replies"]
+        extra_kwargs = {
+            "edited" : {"read_only" : True},
+            "pinned" : {"read_only" : True},
+            "token" : {"read_only" : True},
+        }
 
 
     def reply_list(self, comment):
@@ -36,7 +41,7 @@ class CommentDetailSerializer(serializers.ModelSerializer):
         serializer = CommentRepliesSerializer(instance=comment.replies.all(), many=True)
         return serializer.data
     
-    
+
     def vote_counts(self, comment):
         '''return count of vote of a comment''' 
         return {"upvotes" : comment.vote.upvotes(), "downvotes" : comment.vote.downvotes()}
