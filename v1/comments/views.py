@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from comments.serializers import CommentSerializer, CommentDetailSerializer
 from comments.mixins import CommentObjectMixin
+from channels.models import ChannelAdmin
 from comments.models import Comment
 
 
@@ -88,7 +89,11 @@ class CommentDetailView(CommentObjectMixin, APIView):
 
         return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
     
-
+@extend_schema_view(
+    get=extend_schema(
+        description="Reply a comment."
+    ),
+)
 class CommentReplyView(CommentObjectMixin, APIView):
     permission_classes = [IsAuthenticated,] 
     serializer_class = CommentSerializer
@@ -105,3 +110,30 @@ class CommentReplyView(CommentObjectMixin, APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="Pin a comment [Channel staff only]."
+    ),
+)
+class CommentPinView(CommentObjectMixin, APIView):
+    permission_classes = [IsAuthenticated,] 
+
+    def post(self, request, *args, **kwargs):
+        if self.object.allow_comment:
+            # get the parent comment 
+            comment = get_object_or_404(Comment, content_type=self.content_type_model, 
+                      object_id=self.object.id, token=self.kwargs.get("comment_token"))
+
+            # parent comment channel                      
+            channel = comment.content_object.channel
+
+            if request.user == channel.owner or \
+                        ChannelAdmin.objects.filter(user=request.user, channel=channel):
+                        
+                    comment.pinned = True if not comment.pinned else False
+                    comment.save()
+                    return Response(status=status.HTTP_200_OK)
+                    
+        return Response("Permission denied.", status=status.HTTP_403_FORBIDDEN)
