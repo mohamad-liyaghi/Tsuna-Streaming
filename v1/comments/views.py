@@ -53,7 +53,7 @@ class CommentDetailView(CommentObjectMixin, APIView):
 
     def get_object(self):
         return get_object_or_404(
-            Comment.objects.select_related("parent"), content_type=self.content_type_model, 
+            Comment.objects.prefetch_related("replies"), content_type=self.content_type_model, 
                       object_id=self.object.id, 
                       token=self.kwargs.get("comment_token"))
 

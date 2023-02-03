@@ -15,9 +15,20 @@ class CommentSerializer(serializers.ModelSerializer):
         }
 
 
+class CommentRepliesSerializer(serializers.Serializer):
+    user = serializers.CharField()
+    body = serializers.CharField()
+    token = serializers.CharField()
+
+
 class CommentDetailSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
+    replies = serializers.SerializerMethodField(method_name="reply_list")
 
     class Meta:
         model = Comment
-        fields = ["user", "body", "date", "edited", "pinned", "token"]
+        fields = ["user", "body", "date", "edited", "pinned", "token", "replies"]
+
+    def reply_list(self, comment):
+        serializer = CommentRepliesSerializer(instance=comment.replies.all(), many=True)
+        return serializer.data
