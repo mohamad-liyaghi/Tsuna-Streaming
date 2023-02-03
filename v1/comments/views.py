@@ -87,3 +87,21 @@ class CommentDetailView(CommentObjectMixin, APIView):
             return Response("Comment deleted", status=status.HTTP_200_OK)
 
         return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
+    
+
+class CommentReplyView(CommentObjectMixin, APIView):
+    permission_classes = [IsAuthenticated,] 
+    serializer_class = CommentSerializer
+
+    def post(self, request, *args, **kwargs):
+        if self.object.allow_comment:
+            comment = get_object_or_404(Comment, content_type=self.content_type_model, 
+                      object_id=self.object.id, token=self.kwargs.get("comment_token"))
+
+            serializer = self.serializer_class(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            
+            serializer.save(user=request.user, content_object=self.object, parent=comment)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
