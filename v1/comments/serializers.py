@@ -13,3 +13,11 @@ class CommentSerializer(serializers.ModelSerializer):
             "pinned" : {"read_only" : True},
             "token" : {"read_only" : True},
         }
+
+
+class CommentDetailSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+
+    class Meta:
+        model = Comment
+        fields = ["user", "body", "date", "edited", "pinned", "token"]

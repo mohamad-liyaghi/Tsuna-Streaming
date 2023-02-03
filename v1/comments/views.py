@@ -1,13 +1,12 @@
 from django.shortcuts import get_object_or_404
-from django.contrib.contenttypes.models import ContentType
-
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from comments.serializers import CommentSerializer
+from comments.serializers import CommentSerializer, CommentDetailSerializer
+from comments.mixins import CommentObjectMixin
 from comments.models import Comment
 
 
@@ -19,22 +18,9 @@ from comments.models import Comment
         description="Add a comment if comments are allowed for an object."
     ),
 )
-class CommentView(APIView):
+class CommentView(CommentObjectMixin, APIView):
     permission_classes = [IsAuthenticated,]
     serializer_class = CommentSerializer
-
-
-    def dispatch(self, request, *args, **kwargs):
-        content_type_id = self.kwargs.get("content_type_id")
-        object_token = self.kwargs.get('object_token')
-
-        # get the content type model [eg: Video model]
-        self.content_type_model = get_object_or_404(ContentType, id=content_type_id)
-
-        # get the object
-        self.object = get_object_or_404(self.content_type_model.model_class(), token=object_token)
-        return super().dispatch(request, *args, **kwargs)
-
 
     def get(self, request, *args, **kwargs):
 
@@ -55,3 +41,22 @@ class CommentView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="Comment detail page [Replies and votes]."
+    ),
+)
+class CommentDetailView(CommentObjectMixin, APIView):
+    serializer_class = CommentDetailSerializer
+
+    def get_object(self):
+        return get_object_or_404(
+            Comment.objects.select_related("parent"), content_type=self.content_type_model, 
+                      object_id=self.object.id, 
+                      token=self.kwargs.get("comment_token"))
+
+
+    def get(self, request, *args, **kwargs):
+        return Response(self.serializer_class(self.get_object()).data)
