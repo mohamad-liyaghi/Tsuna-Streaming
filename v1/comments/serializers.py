@@ -24,11 +24,19 @@ class CommentRepliesSerializer(serializers.Serializer):
 class CommentDetailSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     replies = serializers.SerializerMethodField(method_name="reply_list")
+    vote_count = serializers.SerializerMethodField(method_name="vote_counts")
 
     class Meta:
         model = Comment
-        fields = ["user", "body", "date", "edited", "pinned", "token", "replies"]
+        fields = ["user", "body", "date", "edited", "pinned", "token", "vote_count", "replies"]
+
 
     def reply_list(self, comment):
+        '''return list of comment list'''
         serializer = CommentRepliesSerializer(instance=comment.replies.all(), many=True)
         return serializer.data
+    
+    
+    def vote_counts(self, comment):
+        '''return count of vote of a comment''' 
+        return {"upvotes" : comment.vote.upvotes(), "downvotes" : comment.vote.downvotes()}
