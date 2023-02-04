@@ -1,11 +1,13 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
-from videos.managers import VideoManager
+from django.contrib.contenttypes.fields import GenericRelation
+
 from channels.models import Channel
 from videos.utils import video_token_generator
+from videos.managers import VideoManager
 from votes.models import Vote
-from django.contrib.contenttypes.fields import GenericRelation
+from comments.models import Comment
 
 class Video(models.Model):
 
@@ -33,6 +35,7 @@ class Video(models.Model):
 
     objects = VideoManager()
     vote = GenericRelation(Vote)
+    comment = GenericRelation(Comment)
 
     @property
     def is_published(self):
