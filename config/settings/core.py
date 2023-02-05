@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'v1.videos.apps.VideosConfig',
     'v1.votes.apps.VotesConfig',
     'v1.comments.apps.CommentsConfig',
+    'v1.viewers.apps.ViewersConfig',
 ]
 
 MIDDLEWARE = [
