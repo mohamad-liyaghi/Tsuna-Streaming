@@ -1,17 +1,24 @@
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from videos.models import Video
 from channels.models import Channel
 from videos.permissions import VideoPermission
-from videos.serializers import VideoListSerializer, VideoCreateSeriaizer, VideoDetailSerializer
 
+from videos.serializers import (
+    VideoListSerializer,
+    VideoCreateSeriaizer, 
+    VideoDetailSerializer
+)
+from viewers.decorators import check_viewer_status
 
 @extend_schema_view(
     list=extend_schema(
@@ -104,5 +111,6 @@ class VideoViewSet(ModelViewSet):
         return super().list(request, *args, **kwargs)
     
     @method_decorator(cache_page(4))
+    @check_viewer_status
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
