@@ -50,12 +50,13 @@ class VideoDetailSerializer(serializers.ModelSerializer):
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
     content_type_id = serializers.SerializerMethodField(method_name="get_model_content_type_id")
+    viewer_count = serializers.SerializerMethodField(method_name="get_viewer_count")
 
     class Meta:
         model = Video
         fields = [ "title", "description", "video", "thumbnail", "token", "user", 
                         "channel", "date", "get_visibility_display",
-                             "visibility", "is_updated", "is_published", "content_type_id", "allow_comment"]
+                             "visibility", "is_updated", "is_published", "content_type_id", "allow_comment", "viewer_count"]
 
         extra_kwargs = {
             "video" : {'read_only' : True},
@@ -68,3 +69,6 @@ class VideoDetailSerializer(serializers.ModelSerializer):
 
     def get_model_content_type_id(self, video):
         return get_object_or_404(ContentType, app_label="videos", model='video').id
+
+    def get_viewer_count(self, video):
+        return video.viewer.count()
