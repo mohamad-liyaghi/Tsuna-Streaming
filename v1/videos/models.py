@@ -8,6 +8,7 @@ from videos.utils import video_token_generator
 from videos.managers import VideoManager
 from votes.models import Vote
 from comments.models import Comment
+from viewers.models import Viewer
 
 class Video(models.Model):
 
@@ -36,6 +37,7 @@ class Video(models.Model):
     objects = VideoManager()
     vote = GenericRelation(Vote)
     comment = GenericRelation(Comment)
+    viewer = GenericRelation(Viewer)
 
     @property
     def is_published(self):
