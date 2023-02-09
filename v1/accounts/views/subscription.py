@@ -5,11 +5,12 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from accounts.models import Plan, Subscription
-from accounts.permissions import AllowAdminPermission, AllowAuthenticatedPermission
+from accounts.permissions import AllowAdminPermission
 from accounts.serializers.subscription import PlanListSerializer, PlanDetailSerializer, AvailabilitySerializer
 
 @extend_schema_view(
@@ -59,10 +60,10 @@ class SubscriptionViewSet(ModelViewSet):
         '''return the appropriate permission class'''
 
         if self.action in ["list", "retrieve", "availability", "buy_plan"] and self.request.method == "GET":
-            permission_classes = [AllowAuthenticatedPermission]
+            permission_classes = [IsAuthenticated]
 
         elif self.action in ["buy_plan"] and self.request.method == "POST":
-            permission_classes = [AllowAuthenticatedPermission]
+            permission_classes = [IsAuthenticated]
 
         else:
             permission_classes = [AllowAdminPermission]

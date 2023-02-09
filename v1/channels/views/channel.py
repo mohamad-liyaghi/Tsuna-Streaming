@@ -2,11 +2,11 @@ from django.views.decorators.cache import cache_page
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel, ChannelAdmin
 from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
-from accounts.permissions import AllowAuthenticatedPermission
 from channels.permissions import  ChannelPermission, ChannelLimitPermission
 
 @extend_schema_view(
@@ -41,7 +41,7 @@ class ChannelViewSet(ModelViewSet):
             permission_classes = [ChannelPermission]
         
         else:
-            permission_classes = [AllowAuthenticatedPermission]
+            permission_classes = [IsAuthenticated]
 
         return [permission() for permission in permission_classes]
 
