@@ -74,16 +74,26 @@ class VerifyUserView(APIView):
         if all([user_id, token]):
             user = get_object_or_404(USER, user_id=user_id)
 
-            if user and not user.is_active:
-                token = Token.objects.filter(token=token, user=user).first()
+            if not user.is_active:
+                user_token = Token.objects.filter(user=user).first()
 
-                if token and token.is_valid and token.retry < 5:
-                    user.is_active = True
-                    user.save()
-                    return Response("Account verified successfully.", status=status.HTTP_200_OK)
-                    
-                return Response("Token is expired.", status=status.HTTP_403_FORBIDDEN)
+                if user_token:
 
+                    if user_token.is_valid:
+
+                        if user_token.token == token:
+                            user.is_active = True
+                            user.save()
+                            return Response("Account verified successfully.", status=status.HTTP_200_OK)
+
+                        user_token.retry += 1
+                        user_token.save()
+                        return Response("Invalid token were given.", status=status.HTTP_403_FORBIDDEN)  
+
+                    return Response("Token was expired.", status=status.HTTP_403_FORBIDDEN)
+                                  
+                return Response("We couldnt find a valid token for given user.", status=status.HTTP_403_FORBIDDEN)
+                
             return Response("Invalid user was given.", status=status.HTTP_403_FORBIDDEN)
 
         return Response("Invalid Information", status=status.HTTP_403_FORBIDDEN)

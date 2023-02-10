@@ -25,17 +25,14 @@ class Token(models.Model):
     @property
     def is_valid(self):
         # check if tries are not more than 5 times.
-        if self.retry == 5:
+        if self.retry == 5 or self.retry > 5:
             return False
     
         # check if code was created within 10 mins
         now = timezone.now()
         ten_mins_before_now = now - datetime.timedelta(minutes=10)
 
-        if self.date_created <=  ten_mins_before_now:
-            return False
-
-        return True
+        return not (self.date_created <=  ten_mins_before_now)
 
     class Meta:
         ordering = ["-date_created"]
