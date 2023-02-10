@@ -13,3 +13,4 @@ data/
 celerybeat-schedule
 channels/profile
 videos/user_video
+media/

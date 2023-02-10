@@ -15,7 +15,7 @@ class Account(AbstractUser):
     username = None
     email = models.EmailField(max_length=200, unique=True)
 
-    picture = models.ImageField(upload_to="accounts/profile", default="default-user-profile.jpg",
+    picture = models.ImageField(upload_to="accounts/profile", default="assets/images/default-user-profile.jpg",
                                 validators=[validate_profile_size,])
 
     first_name = models.CharField(max_length=50)

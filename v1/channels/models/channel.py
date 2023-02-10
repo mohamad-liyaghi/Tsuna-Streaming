@@ -8,10 +8,10 @@ class Channel(models.Model):
     title = models.CharField(max_length=240)
     description = models.TextField(max_length=500, default="A new channel on Tsuna Streaming.")
 
-    profile = models.ImageField(upload_to="channels/profile", default="media/images/default-channel-profile.jpg",
+    profile = models.ImageField(upload_to="channels/profile", default="assets/images/default-channel-profile.jpg",
                                     validators=[validate_profile_size,])
 
-    thumbnail = models.ImageField(upload_to="channels/profile", default="media/images/default-thumbnail.jpg",
+    thumbnail = models.ImageField(upload_to="channels/profile", default="assets/images/default-thumbnail.jpg",
                                     validators=[validate_profile_size,])
     
     

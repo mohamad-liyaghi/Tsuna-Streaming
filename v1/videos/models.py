@@ -20,7 +20,7 @@ class Video(models.Model):
     description = models.TextField(max_length=300)
 
     video = models.FileField(upload_to="videos/user_video/")
-    thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="media/default-video-thumbnail.jpg")
+    thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="assets/images/default-video-thumbnail.jpg")
 
     token = models.CharField(max_length=32, default=video_token_generator)
 
