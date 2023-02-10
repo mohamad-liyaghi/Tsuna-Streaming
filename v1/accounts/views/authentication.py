@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,6 +8,9 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
 )
 
+from drf_spectacular.utils import extend_schema, extend_schema_view
+
+
 from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import RegisterUserSerializer
 from accounts.models import Token
@@ -14,7 +18,14 @@ from accounts.models import Token
 
 USER = get_user_model()
 
-
+@extend_schema_view(
+    get=extend_schema(
+        description='''Simply ask for credentials.'''
+    ),
+    post=extend_schema(
+        description='''Check and verify users credentials.'''
+    ),
+)
 class RegisterUserView(APIView):
     '''Register new accounts'''
 
@@ -45,6 +56,12 @@ class RegisterUserView(APIView):
         return Response(serialized_data.errors, status=status.HTTP_403_FORBIDDEN)
 
 
+
+@extend_schema_view(
+    get=extend_schema(
+        description='''Get the token from url and check whether  or not the token is active and do the activation process.'''
+    ),
+)
 class VerifyUserView(APIView):
     '''Verify accounts.'''
 
@@ -54,8 +71,8 @@ class VerifyUserView(APIView):
         user_id = self.kwargs.get("user_id")
         token = self.kwargs.get("token")
 
-        if user_id and token:
-            user = USER.objects.filter(user_id=user_id).first()
+        if all([user_id, token]):
+            user = get_object_or_404(USER, user_id=user_id)
 
             if user and not user.is_active:
                 token = Token.objects.filter(token=token, user=user).first()
@@ -67,11 +84,16 @@ class VerifyUserView(APIView):
                     
                 return Response("Token is expired.", status=status.HTTP_403_FORBIDDEN)
 
-            return Response("Token is expired.", status=status.HTTP_403_FORBIDDEN)
+            return Response("Invalid user was given.", status=status.HTTP_403_FORBIDDEN)
 
         return Response("Invalid Information", status=status.HTTP_403_FORBIDDEN)
 
 
+@extend_schema_view(
+    post=extend_schema(
+        description='''Return JWT token to users for loging in.'''
+    ),
+)
 class LoginUserView(TokenObtainPairView):
     '''Users can request to this endpoint in order to get new access key'''
     permission_classes = [AllowUnAuthenticatedPermission,]
