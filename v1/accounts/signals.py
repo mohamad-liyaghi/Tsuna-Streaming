@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_delete
 from django.conf import settings
 from accounts.models import Token, Subscription
-from accounts.tasks import send_email
+from config.tasks import send_email
 from django.utils import timezone
 import datetime
 

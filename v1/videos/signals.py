@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save
-from accounts.tasks import send_email
+from config.tasks import send_email
 from videos.models import Video
 from channels.models import ChannelAdmin
 

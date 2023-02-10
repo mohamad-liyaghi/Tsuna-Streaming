@@ -1,5 +1,5 @@
 from django.contrib.auth.models import BaseUserManager
-from accounts.tasks import send_email
+from config.tasks import send_email
 from django.db import models
 
 
