@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0004_alter_channel_token'),
+        ('channels', '0001_initial'),
     ]
 
     operations = [

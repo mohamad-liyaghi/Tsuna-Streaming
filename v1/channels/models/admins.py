@@ -14,7 +14,7 @@ class ChannelAdmin(models.Model):
     promoted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
-    token = models.CharField(max_length=32, default=token_generator)
+    token = models.CharField(max_length=32, null=True, blank=True)
 
     # permissions
     change_channel_info = models.BooleanField(default=False)
