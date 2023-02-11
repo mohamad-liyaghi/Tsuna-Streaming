@@ -68,11 +68,11 @@ class VerifyUserView(APIView):
     permission_classes = [AllowUnAuthenticatedPermission,]
 
     def get(self, request, *args, **kwargs):
-        user_id = self.kwargs.get("user_id")
+        user_id = self.kwargs.get("user_token")
         token = self.kwargs.get("token")
 
         if all([user_id, token]):
-            user = get_object_or_404(USER, user_id=user_id)
+            user = get_object_or_404(USER, token=user_id)
 
             if not user.is_active:
                 user_token = Token.objects.filter(user=user).first()

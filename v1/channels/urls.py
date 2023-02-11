@@ -15,7 +15,7 @@ urlpatterns = [
 
     path("subscriber/subscribed/", SubscribedChannelListView.as_view(), name='subscribed_channels'),
     path("subscriber/<str:channel_token>/", SubscriberView.as_view(), name="subscriber"),
-    path("subscriber/<str:channel_token>/block/<str:user_id>/", SubscriberBlockView.as_view(), name="block_subscriber"),
+    path("subscriber/<str:channel_token>/block/<str:token>/", SubscriberBlockView.as_view(), name="block_subscriber"),
     path("subscriber/<str:channel_token>/list", SubscriberListView.as_view(), name="subscriber_list"),
     path("subscriber/<str:channel_token>/list/blocked/", SubscriberListView.as_view(), name="blocked_subscriber_list"),
     

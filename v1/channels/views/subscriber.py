@@ -58,7 +58,7 @@ class SubscriberBlockView(APIView):
         '''Block a user from accessing a channel [Admins only]'''
 
         channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
-        user = get_object_or_404(get_user_model(), user_id=self.kwargs["user_id"])
+        user = get_object_or_404(get_user_model(), token=self.kwargs["token"])
 
         if request.user == channel.owner or\
              request.user.channel_admin.filter(channel=channel, block_user=True).exists():

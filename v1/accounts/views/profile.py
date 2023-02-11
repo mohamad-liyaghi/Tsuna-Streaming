@@ -32,7 +32,7 @@ class ProfileView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, ProfilePermission,]
 
     def get_object(self):
-        return get_object_or_404(USER, user_id=self.kwargs["user_id"])
+        return get_object_or_404(USER, token=self.kwargs["token"])
     
     @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):

@@ -12,7 +12,7 @@ def user_id_generator():
     user_id = random.randint(0, 999999999999999)
 
     # if user with generated userid exists, function get calls again.
-    if Account.objects.filter(user_id=user_id):
+    if Account.objects.filter(token=user_id):
         user_id_generator()
 
     return user_id

@@ -26,7 +26,7 @@ class Account(AbstractUser):
     is_active = models.BooleanField(default=False)
     role = models.CharField(max_length=1, choices=Role.choices, default=Role.NORMAL)
 
-    user_id = models.CharField(max_length=15, default=user_id_generator)
+    token = models.CharField(max_length=32, null=True, blank=True)
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["first_name", "last_name", "bio"]
@@ -34,7 +34,7 @@ class Account(AbstractUser):
     objects = AccountManager()
     
     def __str__(self) -> str:
-        return str(self.user_id)
+        return f'{self.first_name} {self.last_name}'
 
     class Meta:
         app_label = "accounts"

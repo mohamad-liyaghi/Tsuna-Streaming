@@ -4,7 +4,7 @@ from accounts.models import Account, Token, Plan, Subscription
 
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
-    list_display = ["email", "role", "is_active", "user_id"]
+    list_display = ["email", "role", "is_active", "token"]
 
     def has_change_permission(self, request, obj=None):
         '''No body can change info in admin panel'''

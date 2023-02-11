@@ -25,7 +25,7 @@ def send_email_when_token_created(sender, **kwargs):
         user = token.user
 
         send_email.delay(template_name="emails/verification.html", email=user.email, first_name=user.first_name, 
-                                        user_id = user.user_id, token=token.token)
+                                        user_token=user.token, token=token.token)
 
 
 @receiver(post_save, sender=Subscription)
