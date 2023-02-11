@@ -14,7 +14,7 @@ router.register("subscription", SubscriptionViewSet, basename="subscription")
 urlpatterns = [
     path("register/", RegisterUserView.as_view(), name='register'),
     path("login/", LoginUserView.as_view(), name="login"),
-    path("verify/<str:user_token>/<str:token>/", VerifyUserView.as_view(), name="verify"),
+    path("verify/<str:token>/<str:user_token>/", VerifyUserView.as_view(), name="verify"),
     path("profile/<str:token>/", ProfileView.as_view(), name='profile')
 ] 
 

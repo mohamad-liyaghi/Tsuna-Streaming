@@ -7,7 +7,7 @@ import v1.accounts.utils
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('accounts', '0007_alter_account_user_id'),
+        ('accounts', '0006_alter_token_options'),
     ]
 
     operations = [

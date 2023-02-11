@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from accounts.managers import AccountManager
 from accounts.validators import validate_profile_size
-from accounts.utils import user_id_generator
+
 
 class Account(AbstractUser):
 
