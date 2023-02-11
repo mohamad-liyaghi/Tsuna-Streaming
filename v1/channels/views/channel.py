@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel, ChannelAdmin
-from channels.serializers.channel import (ChannelListSerializer, ChannelCreateSerializer, ChannelDetailSerializer)
+from channels.serializers.channel import (ChannelListCreateSerializer, ChannelDetailSerializer)
 from channels.permissions import  ChannelPermission, ChannelLimitPermission
 
 @extend_schema_view(
@@ -66,11 +66,8 @@ class ChannelViewSet(ModelViewSet):
     def get_serializer_class(self):
         '''Return the appropiate serializer'''
 
-        if self.action == "list":
-            return ChannelListSerializer
-        
-        elif self.action == "create":
-            return ChannelCreateSerializer
+        if self.action in ["list", "create"]:
+            return ChannelListCreateSerializer
         
         elif self.action in ["retrieve", "update", "partial_update", "delete"]:
             return ChannelDetailSerializer
