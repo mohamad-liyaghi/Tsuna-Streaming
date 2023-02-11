@@ -23,5 +23,13 @@ class Channel(models.Model):
 
     is_verified = models.BooleanField(default=False)
 
+    @property
+    def subscribers_count(self):
+        return self.subscribers.all().count()
+
+    @property
+    def videos_count(self):
+        return self.videos.all().count()
+
     def __str__(self) -> str:
         return self.title

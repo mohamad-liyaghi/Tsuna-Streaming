@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from channels.models import Channel, ChannelAdmin
+from channels.models import Channel
 
 
 class ChannelListCreateSerializer(serializers.ModelSerializer):
@@ -39,13 +39,23 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
 
     owner = serializers.StringRelatedField()
     role = serializers.SerializerMethodField(method_name="role_in_channel")
-    subscribers = serializers.SerializerMethodField(method_name="subscriber_count")
-    videos = serializers.SerializerMethodField(method_name="video_count")
 
     class Meta:
         model = Channel
-        fields = ["title", "description", "profile", "thumbnail", 
-                        "owner", "token", "date_joined", "is_verified", "role", "subscribers", "videos"]
+        fields = [
+            "title",
+            "description", 
+            "profile", 
+            "thumbnail", 
+            "owner", 
+            "token", 
+            "date_joined", 
+            "is_verified", 
+            "role", 
+            "subscribers_count", 
+            "videos_count",            
+            ]
+
         extra_kwargs = {
             "token" : {"read_only" : True},
             "owner" : {"read_only" : True},
@@ -60,13 +70,7 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
         if channel.owner == user:
             return "owner"
 
-        if ChannelAdmin.objects.filter(channel=channel, user=user).exists():
+        if user.channel_admin.filter(channel=channel).exists():
             return "Admin"
             
         return None
-    
-    def subscriber_count(self, channel):
-        return channel.subscribers.count()
-
-    def video_count(self, channel):
-        return channel.videos.filter(visibility="pu").count()
