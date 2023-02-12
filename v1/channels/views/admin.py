@@ -4,6 +4,7 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
+from rest_framework.response import Response
 from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
@@ -13,9 +14,22 @@ from channels.models import Channel, ChannelAdmin, ChannelSubscriber
 from channels.permissions import ChannelAdminPermission, ChannelAdminDetailPermission
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="List of admins of a channel."
+    ),
+    post=extend_schema(
+        description="Add a new admin to a channel."
+    ),
+)
 class ChannelAdminView(ListCreateAPIView):
     '''Get channel admins and add an admin'''
-    permission_classes = [IsAuthenticated, ChannelAdminPermission,] 
+
+    permission_classes = [IsAuthenticated, ChannelAdminPermission] 
+    def dispatch(self, request, *args, **kwargs):
+        self.channel = get_object_or_404(Channel, token=self.kwargs["token"])
+        return super().dispatch(request, *args, **kwargs)
+
 
     def get_serializer_class(self):
         if self.request.method == "GET":
@@ -25,44 +39,23 @@ class ChannelAdminView(ListCreateAPIView):
             return ChannelAdminCreateSerializer
 
     def get_queryset(self):    
-        channel = get_object_or_404(Channel, token=self.kwargs["token"])
         return ChannelAdmin.objects.select_related(
                                         "channel", "channel__owner"
-                                    ).filter(channel=channel)
+                                    ).filter(channel=self.channel)
 
 
     def post(self, request, *args, **kwargs):
         '''Create a new admin [Admins who have permission]'''
-        # check if admin can add admin or not
-        channel = self.get_queryset().first().channel
 
-        current_admin = self.request.user.channel_admin.filter(
-            channel=channel, add_new_admin=True
-            ).first()
+        serializer = ChannelAdminCreateSerializer(data=request.data)  
 
-        if request.user == channel.owner or current_admin:
-            serializer = ChannelAdminCreateSerializer(data=request.data)  
+        if serializer.is_valid():
+            serializer.save(promoted_by=request.user, channel=self.channel)
+            return Response("Admin added.", status=status.HTTP_201_CREATED)    
 
-            if serializer.is_valid():
-                # check that admin is channel subscriber
-                if ChannelSubscriber.objects.filter(user=serializer.validated_data["user"]):
-                    # check if admin does not exists
-                    if ChannelAdmin.objects.filter(user=serializer.validated_data["user"],
-                                promoted_by=self.request.user, channel=channel):
+        return Response("Invalid information", status=status.HTTP_400_BAD_REQUEST)
 
-                                return JsonResponse({"Forbidden" : "Admin already exists."}, 
-                                        status=status.HTTP_403_FORBIDDEN)       
-
-                    serializer.save(promoted_by=self.request.user, channel=channel)
-                    return JsonResponse({"success" : "Admin added."}, status=status.HTTP_201_CREATED)        
-
-                return JsonResponse({"Forbidden" : "User is not a channel subscriber."}, status=status.HTTP_403_FORBIDDEN)
-
-            return JsonResponse({"Forbidden" : "Data is not valid."}, status=status.HTTP_403_FORBIDDEN)        
         
-        return JsonResponse({"Forbidden" : "You dont have permission to add admin."},
-                                status=status.HTTP_403_FORBIDDEN)
-    
     @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):
         '''List of admins of a channel [Admins]'''
@@ -103,21 +96,6 @@ class ChannelAdminDetailView(RetrieveUpdateDestroyAPIView):
             return admin
 
         raise Http404("No result found.")
-
-
-    def destroy(self, request, *args, **kwargs):
-        '''Delete an admin [Owner only]'''
-        return super().destroy(request, *args, **kwargs)    
-
-
-    def put(self, request, *args, **kwargs):
-        '''Update an admin [Admin]'''
-        return super().put(request, *args, **kwargs)
-        
-
-    def patch(self, request, *args, **kwargs):
-        '''Update an admin [Admin]'''
-        return super().put(request, *args, **kwargs)
     
     @method_decorator(cache_page(5))
     def get(self, request, *args, **kwargs):
