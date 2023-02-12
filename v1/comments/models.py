@@ -4,7 +4,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 
 from votes.models import Vote
-from accounts.utils import token_generator
 
 
 class Comment(models.Model):
@@ -21,7 +20,7 @@ class Comment(models.Model):
     edited = models.BooleanField(default=False)
     pinned = models.BooleanField(default=False)
 
-    token = models.CharField(max_length=32, default=token_generator)
+    token = models.CharField(max_length=32, null=True, blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()

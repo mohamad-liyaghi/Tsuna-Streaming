@@ -3,7 +3,6 @@
 from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
-import v1.accounts.utils
 
 
 class Migration(migrations.Migration):
@@ -19,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('date', models.DateTimeField(auto_now_add=True)),
-                ('token', models.CharField(default=v1.accounts.utils.token_generator, max_length=32)),
+                ('token', models.CharField(blank=True, null=True, max_length=32)),
                 ('change_channel_info', models.BooleanField(default=False)),
                 ('add_new_admin', models.BooleanField(default=False)),
                 ('add_video', models.BooleanField(default=False)),

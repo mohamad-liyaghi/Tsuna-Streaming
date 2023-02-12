@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from channels.models import Channel
-from v1.accounts.utils import token_generator
 
 
 class ChannelAdmin(models.Model):

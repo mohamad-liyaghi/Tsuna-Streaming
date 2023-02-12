@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
-from v1.accounts.utils import token_generator
-import datetime
 from django.utils import timezone
 
 class Plan(models.Model):
@@ -16,7 +14,7 @@ class Plan(models.Model):
         MinValueValidator(10)
     ])
     
-    token = models.CharField(max_length=32, default=token_generator)
+    token = models.CharField(max_length=32, null=True, blank=True)
 
     active_months = models.PositiveBigIntegerField(default=0,validators=[
         MaxValueValidator(24),
@@ -39,7 +37,7 @@ class Subscription(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     finish_date = models.DateTimeField(blank=True, null=True)
 
-    token = models.CharField(max_length=32, default=token_generator)    
+    token = models.CharField(max_length=32, null=True, blank=True)
 
     @property
     def is_active(self):     

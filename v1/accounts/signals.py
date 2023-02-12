@@ -3,13 +3,16 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.conf import settings
 from django.utils import timezone
 
-from accounts.models import Token, Subscription
+from accounts.models import Token, Subscription, Plan
 from config.tasks import send_email
 from config.receivers import create_token_after_creating_object
 import datetime
 
 # create a unique token for object
 pre_save.connect(create_token_after_creating_object, sender=settings.AUTH_USER_MODEL)
+pre_save.connect(create_token_after_creating_object, sender=Subscription)
+pre_save.connect(create_token_after_creating_object, sender=Token)
+pre_save.connect(create_token_after_creating_object, sender=Plan)
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_token_for_new_user(sender, **kwargs):

@@ -3,8 +3,6 @@ from django.conf import settings
 import datetime
 from django.utils import timezone
 
-from v1.accounts.utils import token_generator
-
 class Token(models.Model):
     '''
         A 32 char token for email verification stuff.
@@ -14,7 +12,8 @@ class Token(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name="tokens")
 
-    token = models.CharField(max_length=32, default=token_generator)
+    token = models.CharField(max_length=32, null=True, blank=True)
+    
     date_created = models.DateTimeField(auto_now_add=True)
     retry = models.PositiveIntegerField(default=0)
 
