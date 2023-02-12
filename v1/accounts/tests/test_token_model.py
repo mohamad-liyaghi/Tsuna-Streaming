@@ -13,6 +13,11 @@ class TestTokenModel:
     
     def test_check_token_is_valid(self):
         assert self.token.is_valid == True
+
+    def test_token_is_not_valid(self):
+        self.token.retry = 5
+        self.token.save()
+        assert self.token.is_valid == False
     
     def test_check_token_gets_deleted_after_deleting_user(self):
         self.user.delete()
