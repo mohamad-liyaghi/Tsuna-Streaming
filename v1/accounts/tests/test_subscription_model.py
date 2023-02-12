@@ -21,6 +21,9 @@ class TestSubscriptionModel:
         assert self.normal_user.role == "n"
 
 
+    def test_user_active_subscription(self):
+        assert self.premium_user.active_subscription.plan.title == self.plan.title
+
     def test_user_role_after_deleting_plan(self):
         assert self.premium_user.role == "p"
         self.subscription.delete()

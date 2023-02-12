@@ -36,6 +36,20 @@ class Account(AbstractUser):
     def __str__(self) -> str:
         return f'{self.first_name} {self.last_name}'
 
+    @property
+    def active_subscription(self):
+        '''return users premium plan'''
+        
+        if self.role == self.Role.PREMIUM:
+            subscription = self.subscriptions.select_related("plan").first()
+
+            if subscription.is_active:
+                return subscription
+
+            return None
+
+        return None
+
     class Meta:
         app_label = "accounts"
         db_table = 'accounts_account'
