@@ -10,8 +10,8 @@ router = routers.DefaultRouter()
 router.register("channel", ChannelViewSet, basename="channel")
 
 urlpatterns = [
-    path("channel-admin/<str:token>/", ChannelAdminView.as_view(), name="channel_admin"),
-    path("channel-admin/<str:channel_token>/<str:admin_token>/", ChannelAdminDetailView.as_view(), name="channel_admin_detail"),
+    path("channel/<str:token>/admin/", ChannelAdminView.as_view(), name="channel_admin"),
+    path("channel/<str:channel_token>/admin/<str:admin_token>/", ChannelAdminDetailView.as_view(), name="channel_admin_detail"),
 
     path("subscriber/subscribed/", SubscribedChannelListView.as_view(), name='subscribed_channels'),
     path("subscriber/<str:channel_token>/", SubscriberView.as_view(), name="subscriber"),
