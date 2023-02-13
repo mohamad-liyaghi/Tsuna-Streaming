@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from channels.models import ChannelAdmin
+
 
 class VideoPermission(BasePermission):
     
@@ -7,17 +7,13 @@ class VideoPermission(BasePermission):
         object = view.get_object()
         # only channel owner and some admins can update a video
         if request.method in ["PUT", "PATCH"]:
-            if request.user == object.channel.owner or\
-                ChannelAdmin.objects.filter(user=request.user, channel=object.channel, 
-                            edit_video=True).exists():
+            if request.user.channel_admin.filter(channel=object.channel, edit_video=True).exists():
                 return True
             return False
 
         # only channel owner and some admins can delete a video
         elif request.method == "DELETE":
-            if request.user == object.channel.owner or\
-                ChannelAdmin.objects.filter(user=request.user, channel=object.channel, 
-                                        delete_video=True).exists():
+            if request.user.channel_admin.filter(channel=object.channel, delete_video=True).exists():
                 return True
             return False
 
@@ -30,8 +26,7 @@ class VideoPermission(BasePermission):
             return True
         
         else:
-            if request.user == obj.channel.owner or \
-                ChannelAdmin.objects.filter(user=request.user, channel=obj.channel).exists():
+            if  request.user.channel_admin.filter(channel=obj.channel).exists():
                 return True
 
             return False

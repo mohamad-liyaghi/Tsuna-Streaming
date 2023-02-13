@@ -71,6 +71,19 @@ def create_subscriber_after_creating_channel(sender, **kwargs):
         instance = kwargs["instance"]
         ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
 
+@receiver(post_save, sender=Channel)
+def create_admin_after_creating_channel(sender, **kwargs):
+    '''Auto admin created channel by owner'''
+
+    if kwargs["created"]:
+        instance = kwargs["instance"]
+
+        ChannelAdmin.objects.create(
+            channel=instance, user=instance.owner, promoted_by=instance.owner,
+            change_channel_info=True, add_new_admin=True, block_user=True,
+            add_video=True, edit_video=True, delete_video=True, publish_video=True,
+        )
+
 
 @receiver(post_delete, sender=ChannelSubscriber)
 def delete_admin_after_unsubscribing(sender, **kwargs):

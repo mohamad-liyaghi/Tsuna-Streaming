@@ -18,7 +18,10 @@ class TestChannelAdminModel:
         self.super_user = Account.objects.create_superuser(email="superuser@superuser.com", password="1234USERnormal")
         self.channel = Channel.objects.create(owner=self.super_user, title="test")    
 
-    
+    def create_admin_after_creating_channel(self):
+        assert self.super_user.channel_admin.count() == 1
+
+        
     def test_raise_error_when_user_hasnt_subscribed(self):
         '''While user hasnt subscribed to channel, use cannot be promoted'''
         assert self.simple_user.channel_admin.count() == 0
@@ -52,6 +55,6 @@ class TestChannelAdminModel:
         
         self.create_subscriber()
         self.create_admin()
-        assert self.channel.admins.count() == 1
+        assert self.channel.admins.count() == 2
         self.subscriber.delete()
-        assert self.channel.admins.count() == 0
+        assert self.channel.admins.count() == 1

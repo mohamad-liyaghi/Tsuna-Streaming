@@ -60,8 +60,7 @@ class SubscriberBlockView(APIView):
         channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
         user = get_object_or_404(get_user_model(), token=self.kwargs["token"])
 
-        if request.user == channel.owner or\
-             request.user.channel_admin.filter(channel=channel, block_user=True).exists():
+        if request.user.channel_admin.filter(channel=channel, block_user=True).exists():
             
             if user.channel_admin.filter(channel=channel):
                 return Response("You cant remove admins", status=status.HTTP_403_FORBIDDEN)
@@ -87,8 +86,7 @@ class SubscriberListView(APIView):
 
     def dispatch(self, request, *args, **kwargs):
         self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
-        if request.user == self.channel.owner or\
-            request.user.channel_admin.filter(channel=self.channel).exists():
+        if request.user.channel_admin.filter(channel=self.channel).exists():
             return super().dispatch(request, *args, **kwargs)
 
         return JsonResponse({"forbidden" : "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
