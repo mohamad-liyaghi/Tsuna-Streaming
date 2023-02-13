@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from channels.models import ChannelAdmin
 
@@ -31,7 +32,16 @@ class ChannelAdminCreateSerializer(serializers.ModelSerializer):
         ).first()
 
         if user == channel.owner or request_admin:
-            return super().save(**kwargs)
+            try:
+                return super().save(**kwargs)
+
+            # raise a ValidationError when a user hasnt subscribed to channel and is getting promoted
+            except ValidationError: 
+                raise serializers.ValidationError("User hasnt subscribed to the channel.")
+            
+            # raise a ValueError when admin already exists
+            except ValueError:
+                raise serializers.ValidationError("Admin already exists.")
 
         raise serializers.ValidationError("User doesnt have permission to promote admins.")
 
