@@ -19,16 +19,11 @@ class TestChannelModel:
         '''Premium/Admin users can create less than 10 channels'''
 
         # create 10 channels, After this user is not able to create the 11th channel
-        for channel in range(1, 11):
-            Channel.objects.create(owner=self.super_user, title="test")    
+        with pytest.raises(ValueError):
+            for _ in range(1, 12):
+                Channel.objects.create(owner=self.super_user, title="test")    
 
-        try:
-            # It must raise ValueError
-            Channel.objects.create(owner=self.super_user, title="test")
-
-        except ValueError:
-            # check the channel did not create
-            assert self.super_user.channels.count() == 10
+        assert self.super_user.channels.count() == 10
 
     
 
