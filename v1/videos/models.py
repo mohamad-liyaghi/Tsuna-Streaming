@@ -60,4 +60,14 @@ class Video(models.Model):
             return super().clean()
 
         raise ValidationError("File size must be under 20MB.")
-            
+    
+    def save(self, *args, **kwargs):
+        '''Update is_updated status after updating an object'''
+
+        # check object was created before
+        if self.pk:
+            self.is_updated = True
+            return super(Video, self).save(*args, **kwargs)
+
+        return super(Video, self).save(*args, **kwargs)
+    

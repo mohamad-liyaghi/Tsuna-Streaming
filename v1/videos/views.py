@@ -82,13 +82,7 @@ class VideoViewSet(ModelViewSet):
         self.check_object_permissions(self.request, video)
         return video
     
-    def update(self, request, *args, **kwargs):
-        # set is_updated to True after updating the video
-        object = self.get_object()
-        object.is_updated = True        
-        object.save()
-        return super().update(request, *args, **kwargs)        
-    
+        
     @method_decorator(cache_page(3))
     @action(detail=False, methods=["GET"], url_path="channel/(?P<channel_token>[^/.]+)", 
                 permission_classes=[IsAuthenticated,])
