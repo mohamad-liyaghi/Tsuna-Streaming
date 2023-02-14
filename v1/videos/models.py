@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
 from django.contrib.contenttypes.fields import GenericRelation
-
+from config.content_model import BaseContentModel
 from channels.models import Channel
 from videos.utils import video_token_generator
 from videos.managers import VideoManager
@@ -10,7 +10,7 @@ from votes.models import Vote
 from comments.models import Comment
 from viewers.models import Viewer
 
-class Video(models.Model):
+class Video(BaseContentModel):
 
     class Visibility(models.TextChoices):
         PRIVATE = ("pr", "Private")

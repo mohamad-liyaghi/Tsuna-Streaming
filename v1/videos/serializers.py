@@ -1,5 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from videos.models import Video
 from channels.models import Channel, ChannelAdmin
@@ -14,8 +12,10 @@ class VideoListSerializer(serializers.ModelSerializer):
         fields = ["title", "thumbnail", "token", "channel", "date", "user", "is_published"]
 
 
+
 class CustomSlugRelatedField(serializers.SlugRelatedField):
     '''Get channels that user owns or they are admin and can add video'''
+
     def get_queryset(self):
         user = self.context.get("user")
         user_admin = ChannelAdmin.objects.filter(user=user, add_video=True).values("channel__id")
@@ -49,14 +49,26 @@ class VideoDetailSerializer(serializers.ModelSerializer):
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
-    content_type_id = serializers.SerializerMethodField(method_name="get_model_content_type_id")
-    viewer_count = serializers.SerializerMethodField(method_name="get_viewer_count")
 
     class Meta:
         model = Video
-        fields = [ "title", "description", "video", "thumbnail", "token", "user", 
-                        "channel", "date", "get_visibility_display",
-                             "visibility", "is_updated", "is_published", "content_type_id", "allow_comment", "viewer_count"]
+        fields = [
+            "title", 
+            "description", 
+            "video", 
+            "thumbnail", 
+            "token", 
+            "user", 
+            "channel", 
+            "date", 
+            "get_visibility_display",
+            "visibility", 
+            "is_updated", 
+            "is_published", 
+            "get_model_content_type_id", 
+            "allow_comment", 
+            "get_viewer_count"
+            ]
 
         extra_kwargs = {
             "video" : {'read_only' : True},
@@ -66,9 +78,3 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "date" : {'read_only' : True},
             "is_updated" : {'read_only' : True},
         }
-
-    def get_model_content_type_id(self, video):
-        return get_object_or_404(ContentType, app_label="videos", model='video').id
-
-    def get_viewer_count(self, video):
-        return video.viewer.count()
