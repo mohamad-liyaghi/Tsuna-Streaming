@@ -8,12 +8,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channels.models import ChannelSubscriber
 from channels.serializers.subscriber import SubscriberListSerializer
 
 
+@extend_schema_view(
+    get=extend_schema(
+        description="Check wether user subscribed to a channel or not."
+    ),
+    post=extend_schema(
+        description="Subscribe and unsibscribe a channel."
+    ),
+)
 class SubscriberView(APIView):
     permission_classes = [IsAuthenticated,]
 
@@ -49,7 +58,11 @@ class SubscriberView(APIView):
         ChannelSubscriber.objects.create(user=self.request.user, channel=self.channel)
         return Response("Subscribed successfully", status=status.HTTP_200_OK)
 
-
+@extend_schema_view(
+    post=extend_schema(
+        description="Block a subscriber from a channel."
+    ),
+)
 class SubscriberBlockView(APIView):
 
     permission_classes = [IsAuthenticated,]
@@ -79,7 +92,11 @@ class SubscriberBlockView(APIView):
 
         return Response("Permission denied.", status=status.HTTP_403_FORBIDDEN)
 
-
+@extend_schema_view(
+    get=extend_schema(
+        description="List of a channels subscribers."
+    ),
+)
 class SubscriberListView(APIView):
 
     permission_classes = [IsAuthenticated,]
@@ -105,7 +122,12 @@ class SubscriberListView(APIView):
         serializer = SubscriberListSerializer(instance=subscribers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    
+
+@extend_schema_view(
+    get=extend_schema(
+        description="List of the channels that user has subscribed"
+    ),
+)
 class SubscribedChannelListView(APIView):
     '''List of channels that user subscribed'''
     permission_classes = [IsAuthenticated,]

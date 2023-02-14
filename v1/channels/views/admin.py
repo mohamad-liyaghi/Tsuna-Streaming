@@ -2,16 +2,23 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
+from django.http import Http404
+
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import status
 from rest_framework.response import Response
-from django.http import Http404
 from rest_framework.permissions import IsAuthenticated
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from channels.serializers.admin import ChannelAdminListSerializer, ChannelAdminCreateSerializer, ChannelAdminDetailSerializer
-from channels.models import Channel, ChannelAdmin, ChannelSubscriber
-from channels.permissions import ChannelAdminPermission, ChannelAdminDetailPermission
+from channels.serializers.admin import (
+    ChannelAdminListSerializer,
+    ChannelAdminCreateSerializer,
+    ChannelAdminDetailSerializer
+)
+
+from channels.models import Channel, ChannelAdmin
+from channels.permissions import ChannelAdminDetailPermission
 
 
 @extend_schema_view(
@@ -25,10 +32,16 @@ from channels.permissions import ChannelAdminPermission, ChannelAdminDetailPermi
 class ChannelAdminView(ListCreateAPIView):
     '''Get channel admins and add an admin'''
 
-    permission_classes = [IsAuthenticated, ChannelAdminPermission] 
+    permission_classes = [IsAuthenticated] 
+
     def dispatch(self, request, *args, **kwargs):
         self.channel = get_object_or_404(Channel, token=self.kwargs["token"])
-        return super().dispatch(request, *args, **kwargs)
+
+        # check user permission 
+        if request.user.channel_admin.filter(channel=self.channel):
+            return super().dispatch(request, *args, **kwargs)
+
+        return JsonResponse({"Forbidden" : "Permission denied"}, status=status.HTTP_403_FORBIDDEN)
 
 
     def get_serializer_class(self):
@@ -39,9 +52,7 @@ class ChannelAdminView(ListCreateAPIView):
             return ChannelAdminCreateSerializer
 
     def get_queryset(self):    
-        return ChannelAdmin.objects.select_related(
-                                        "channel", "channel__owner"
-                                    ).filter(channel=self.channel)
+        return ChannelAdmin.objects.filter(channel=self.channel)
 
 
     def post(self, request, *args, **kwargs):
@@ -60,7 +71,6 @@ class ChannelAdminView(ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         '''List of admins of a channel [Admins]'''
         return super().get(request, *args, **kwargs)
-
 
 
 @extend_schema_view(
