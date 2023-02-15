@@ -32,6 +32,9 @@ INSTALLED_APPS = [
     'v1.votes.apps.VotesConfig',
     'v1.comments.apps.CommentsConfig',
     'v1.viewers.apps.ViewersConfig',
+
+    # clean up videos that has been deleted.
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
