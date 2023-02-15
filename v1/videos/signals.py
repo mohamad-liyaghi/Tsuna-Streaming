@@ -4,9 +4,12 @@ from config.tasks import send_email
 from videos.models import Video
 from channels.models import ChannelAdmin
 from votes.signals import delete_object_votes_after_deleting
+from comments.signals import delete_object_comments_after_deleting
 
 
 post_delete.connect(delete_object_votes_after_deleting, sender=Video)
+post_delete.connect(delete_object_comments_after_deleting, sender=Video)
+
 
 
 @receiver(pre_save, sender=Video)
