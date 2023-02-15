@@ -1,8 +1,13 @@
 from django.dispatch import receiver
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_delete
 from config.tasks import send_email
 from videos.models import Video
 from channels.models import ChannelAdmin
+from votes.signals import delete_object_votes_after_deleting
+
+
+post_delete.connect(delete_object_votes_after_deleting, sender=Video)
+
 
 @receiver(pre_save, sender=Video)
 def add_video_access_and_notify(sender, **kwargs):
@@ -27,3 +32,4 @@ def add_video_access_and_notify(sender, **kwargs):
 
         else:
             raise ValueError("Permission denied")
+
