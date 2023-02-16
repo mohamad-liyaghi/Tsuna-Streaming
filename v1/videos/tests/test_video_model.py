@@ -3,6 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from accounts.models import Account
 from channels.models import Channel
 from videos.models import Video
+from votes.models import Vote
 
 from PIL import Image
 from glob import glob
@@ -13,7 +14,7 @@ import pytest
 image = [Image.open(jpg) for jpg in glob(path.join('tests', 'fake_video.webp'))]
 
 @pytest.mark.django_db
-class TestVideoAdminModel:
+class TestVideoModel:
     def create_video(self):
         self.video = Video.objects.create(title='test', description='new video', 
                                         video=image, user=self.user, channel=self.channel)
@@ -52,3 +53,15 @@ class TestVideoAdminModel:
             visibility=Video.Visibility.PUBLISHED)
 
         assert self.channel.videos.published().count() == 1
+
+
+    def test_delete_vote_after_deleting_video(self):
+        '''There is a signal that deletes all votes related to a deleted object'''
+        self.create_video()
+        assert self.video.vote.count() == 0
+
+        Vote.objects.create(user=self.user, choice=Vote.Choice.UPVOTE, content_object=self.video)
+        assert self.video.vote.count() == 1
+
+        self.video.delete()
+        assert self.video.vote.count() == 0
