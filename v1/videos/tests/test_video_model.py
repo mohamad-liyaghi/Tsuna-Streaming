@@ -5,6 +5,7 @@ from channels.models import Channel
 from videos.models import Video
 from votes.models import Vote
 from comments.models import Comment
+from viewers.models import Viewer
 
 from PIL import Image
 from glob import glob
@@ -79,3 +80,16 @@ class TestVideoModel:
 
         self.video.delete()
         assert self.video.comment.count() == 0
+    
+    def test_delete_viewer_after_deleting_video(self):
+        '''There is a signal that deletes all comments related to a deleted object'''
+
+        self.create_video()
+        assert self.video.viewer.count() == 0
+
+        Viewer.objects.create(user=self.user, content_object=self.video)
+
+        assert self.video.viewer.count() == 1
+
+        self.video.delete()
+        assert self.video.viewer.count() == 0
