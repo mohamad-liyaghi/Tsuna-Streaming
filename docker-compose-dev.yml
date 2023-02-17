@@ -1,5 +1,8 @@
 version: '3.9'
 
+x-environment: &DJANGO_SETTINGS_MODULE
+    DJANGO_SETTINGS_MODULE: 'config.settings.development'
+
 services:
 
   backend:
@@ -18,7 +21,7 @@ services:
       - .:/backend
 
     environment:
-      - DJANGO_SETTINGS_MODULE=config.settings.development
+      *DJANGO_SETTINGS_MODULE
     
     depends_on:
       - db
@@ -80,6 +83,8 @@ services:
       - redis
     volumes:
       - .:/backend
+    environment:
+      *DJANGO_SETTINGS_MODULE
 
   celery-beat:
     build: .
@@ -89,3 +94,5 @@ services:
       - redis
     volumes:
       - .:/backend
+    environment:
+      *DJANGO_SETTINGS_MODULE

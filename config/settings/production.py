@@ -1,4 +1,4 @@
-from settings.core import *
+from .core import *
 
 DEBUG = True
 ALLOWED_HOSTS = []
