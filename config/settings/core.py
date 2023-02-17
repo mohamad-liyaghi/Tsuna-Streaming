@@ -110,11 +110,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        'rest_framework_simplejwt.authentication.JWTAuthentication',]
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+
+    # pagination
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 15
 }
 
+# Docs related to endpoints
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Tsuna Streaming',
     'DESCRIPTION': 'A Video streaming api',
@@ -122,9 +130,10 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,    
 }
 
+
 AUTH_USER_MODEL = "accounts.Account"
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
-  }
+}
