@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'rest_framework_simplejwt',
+    'django_filters',
 
     # local apps
     'v1.accounts.apps.AccountsConfig',
@@ -119,7 +120,10 @@ REST_FRAMEWORK = {
 
     # pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 15
+    'PAGE_SIZE': 15,
+    
+    # Filtering
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # Docs related to endpoints

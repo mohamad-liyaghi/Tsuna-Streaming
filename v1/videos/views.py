@@ -46,7 +46,9 @@ from viewers.decorators import check_viewer_status
 )
 class VideoViewSet(ModelViewSet):
     '''A viewset for adding, updating and retrieving videos'''
+
     lookup_field = "token"
+    filterset_fields = ['title', "visibility"]
 
     def get_permissions(self):
         if self.action in ["retrieve", "update", "partial_update", "destroy"]:

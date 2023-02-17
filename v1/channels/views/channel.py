@@ -30,6 +30,7 @@ class ChannelViewSet(ModelViewSet):
     '''A viewset for Creating, Updating, retrieving a channel'''
 
     lookup_field = "token"
+    filterset_fields = ['title']
 
     def get_permissions(self):
         '''return the appropriate permission class'''            
