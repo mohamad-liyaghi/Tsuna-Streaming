@@ -1,4 +1,4 @@
-from config.utils import unique_token_generator
+from v1.core.utils import unique_token_generator
 
 
 def create_token_after_creating_object(sender, instance, *args, **kwargs):

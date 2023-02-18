@@ -4,8 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 
 from accounts.models import Token, Subscription, Plan
-from config.tasks import send_email
-from config.receivers import create_token_after_creating_object
+from v1.core.tasks import send_email
+from v1.core.receivers import create_token_after_creating_object
 import datetime
 
 # create a unique token for object

@@ -1,6 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_delete
-from config.tasks import send_email
+from v1.core.tasks import send_email
 from videos.models import Video
 from channels.models import ChannelAdmin
 from votes.signals import delete_object_votes_after_deleting

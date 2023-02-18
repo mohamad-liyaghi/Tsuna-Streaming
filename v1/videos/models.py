@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
 from django.contrib.contenttypes.fields import GenericRelation
-from config.content_model import BaseContentModel
+from v1.core.models import BaseContentModel
 from channels.models import Channel
 from videos.utils import video_token_generator
 from videos.managers import VideoManager

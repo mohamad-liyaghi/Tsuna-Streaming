@@ -1,8 +1,8 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save, post_delete
-from config.tasks import send_email
+from v1.core.tasks import send_email
 from channels.models import Channel, ChannelAdmin, ChannelSubscriber
-from config.receivers import create_token_after_creating_object
+from v1.core.receivers import create_token_after_creating_object
 
 pre_save.connect(create_token_after_creating_object, sender=Channel)
 pre_save.connect(create_token_after_creating_object, sender=ChannelAdmin)
