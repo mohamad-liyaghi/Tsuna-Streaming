@@ -13,6 +13,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import RegisterUserSerializer
+from accounts.throttling import AuthenticationThrottle
 from accounts.models import Token
 
 
@@ -31,6 +32,7 @@ class RegisterUserView(APIView):
 
     permission_classes = [AllowUnAuthenticatedPermission,]
     serializer_class = RegisterUserSerializer
+    throttle_classes = [AuthenticationThrottle,]
 
 
     def get(self, request, *args, **kwargs):
@@ -66,6 +68,7 @@ class VerifyUserView(APIView):
     '''Verify accounts.'''
 
     permission_classes = [AllowUnAuthenticatedPermission,]
+    throttle_classes = [AuthenticationThrottle,]
 
     def get(self, request, *args, **kwargs):
         user_id = self.kwargs.get("user_token")
@@ -107,4 +110,5 @@ class VerifyUserView(APIView):
 class LoginUserView(TokenObtainPairView):
     '''Users can request to this endpoint in order to get new access key'''
     permission_classes = [AllowUnAuthenticatedPermission,]
+    throttle_classes = [AuthenticationThrottle,]
     pass
