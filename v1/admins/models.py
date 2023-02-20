@@ -7,7 +7,8 @@ class Admin(models.Model):
     '''Base Channel Admin model'''
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='admin')
-    promoted_by = models.ForeignKey(Account, on_delete=models.CharField, related_name='promoted_admin')
+    promoted_by = models.ForeignKey(Account, on_delete=models.CharField, blank=True, null=True,
+                                             related_name='promoted_admin')
 
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name='admins')
 
@@ -37,3 +38,19 @@ class Admin(models.Model):
             )
         ]
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+
+            # check admin exists or not
+            if self.user.admin.filter(channel=self.channel).exists():
+                raise ValueError("Admin already exists.")
+
+            if self.user == self.channel.owner:
+                return super(Admin, self).save(*args, **kwargs)
+
+            if self.promoted_by.admin.filter(channel=self.channel, add_new_admin=True):
+                return super(Admin, self).save(*args, **kwargs)
+        
+            raise ValueError("Permission denied to promote admin.")
+
+        return super(Admin, self).save(*args, **kwargs)
