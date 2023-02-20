@@ -9,7 +9,7 @@ class ChannelAdmin(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                 related_name="channel_admin")
 
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="admins")
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="admin")
     promoted_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
