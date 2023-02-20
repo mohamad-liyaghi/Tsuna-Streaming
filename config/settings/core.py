@@ -126,16 +126,13 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
+        'v1.accounts.throttling.AuthenticationThrottle',
+        'v1.videos.throttling.VideoThrottle',
     ], 
 
     'DEFAULT_THROTTLE_RATES': {
-        # TODO fix throttle time
-        'anon': '70/minute',
-        'user': '70/minute',
-
-        'authentication' : '5/minute'
+        'authentication' : '5/minute',
+        'video' : '40/minute',
     }
 }
 

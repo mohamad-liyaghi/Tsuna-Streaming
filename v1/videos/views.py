@@ -7,11 +7,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import throttle_classes
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from videos.models import Video
 from channels.models import Channel
 from videos.permissions import VideoPermission
+from videos.throttling import VideoThrottle
 
 from videos.serializers import (
     VideoListSerializer,
@@ -19,6 +22,7 @@ from videos.serializers import (
     VideoDetailSerializer
 )
 from viewers.decorators import check_viewer_status
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -101,11 +105,19 @@ class VideoViewSet(ModelViewSet):
         serializer = VideoListSerializer(instance=videos, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @throttle_classes([VideoThrottle,])
     @method_decorator(cache_page(2))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
     
-    @method_decorator(cache_page(4))
+
+    
     @check_viewer_status
+    @throttle_classes([VideoThrottle,])
+    @method_decorator(cache_page(4))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
+    
+    @throttle_classes([VideoThrottle,])
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
