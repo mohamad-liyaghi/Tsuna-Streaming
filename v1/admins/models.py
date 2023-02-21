@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from channels.models import Channel
 from accounts.models import Account
 
@@ -44,6 +45,10 @@ class Admin(models.Model):
             # check admin exists or not
             if self.user.admin.filter(channel=self.channel).exists():
                 raise ValueError("Admin already exists.")
+
+            # only subscribed users can be promoted
+            if not self.user.subscribed_channels.filter(channel=self.channel):
+                raise ValidationError("User hasnt subscribed to channel.")
 
             if self.user == self.channel.owner:
                 return super(Admin, self).save(*args, **kwargs)
