@@ -69,3 +69,23 @@ class TestAdminModel:
         assert self.channel.admins.count() == 1
 
     
+    def test_create_permission(self):
+        '''A signal for creating Permission object after creating an Admin object.'''
+        self.create_subscriber()
+        self.create_admin()
+
+        assert self.admin.permissions.count() != 0
+
+    def test_default_admin_permission_for_normal_user(self):
+        '''By default Channel admins do not have any permission'''
+        self.create_subscriber()
+        self.create_admin()
+
+        assert self.admin.permissions.first().add_object == False
+
+    
+    def test_default_admin_permission_for_super_user(self):
+        '''By default Chanenl owner has all the permissions'''
+
+        admin = self.super_user.admin.first().permissions.first()
+        assert admin.add_object == True
