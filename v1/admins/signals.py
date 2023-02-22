@@ -3,10 +3,10 @@ from django.db.models.signals import post_save, pre_save, post_delete
 from v1.core.tasks import send_email
 from channels.models import Channel, ChannelSubscriber
 from core.receivers import create_token_after_creating_object
-from admins.models import Admin
+from admins.models import Admin, Permission
 
 pre_save.connect(create_token_after_creating_object, sender=Admin)
-
+pre_save.connect(create_token_after_creating_object, sender=Permission)
 
 @receiver(pre_save, sender=Admin)
 def notify_after_promoting_admin_admin(sender, **kwargs):
