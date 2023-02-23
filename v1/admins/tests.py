@@ -1,8 +1,8 @@
-from django.core.exceptions import ValidationError
 import pytest
 from accounts.models import Account
 from channels.models import Channel, ChannelSubscriber
 from admins.models import Admin
+from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
 
 
 @pytest.mark.django_db
@@ -23,16 +23,6 @@ class TestAdminModel:
     def test_create_admin_after_creating_channel(self):
         assert self.super_user.admin.count() == 1
 
-        
-    def test_raise_error_promoting_unsubscribed_user(self):
-        '''While user hasnt subscribed to channel, use cannot be promoted'''
-
-        assert self.simple_user.admin.count() == 0
-
-        with pytest.raises(ValidationError):
-            self.create_admin()
-
-
     def test_add_admin(self):
 
         assert self.simple_user.admin.count() == 0
@@ -43,20 +33,6 @@ class TestAdminModel:
         self.create_admin()
 
         assert self.simple_user.admin.count() == 1
-
-
-    def test_raise_error_when_duplicating_admin(self):
-        '''user cannot be promoted for 2 times'''
-
-        assert self.simple_user.admin.count() == 0
-        # create a subscriber instance
-        self.create_subscriber()
-        # create an admin
-        self.create_admin()
-        assert self.simple_user.admin.count() == 1
-
-        with pytest.raises(ValueError):
-            self.create_admin()
     
     def test_delete_admin_after_unsubscribing(self):
         '''When a user unsubscribe a channel, the admin instance will be deleted.'''
@@ -89,3 +65,31 @@ class TestAdminModel:
 
         admin = self.super_user.admin.first().permissions.first()
         assert admin.add_object == True
+
+    def test_raise_permission_denied_for_promoting(self):
+        '''Users that dont have permission to add admin, gets PromotePermissionDenied'''
+
+        self.create_subscriber()
+        with pytest.raises(PromotePermissionDenied):
+            Admin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.simple_user)
+
+    def test_raise_error_promoting_unsubscribed_user(self):
+        '''While user hasnt subscribed to channel, use cannot be promoted'''
+
+        assert self.simple_user.admin.count() == 0
+
+        with pytest.raises(AdminNotSubscribedError):
+            self.create_admin()
+
+    def test_raise_error_when_duplicating_admin(self):
+        '''user cannot be promoted for 2 times'''
+
+        assert self.simple_user.admin.count() == 0
+        # create a subscriber instance
+        self.create_subscriber()
+        # create an admin
+        self.create_admin()
+        assert self.simple_user.admin.count() == 1
+
+        with pytest.raises(AdminExistsError):
+            self.create_admin()
