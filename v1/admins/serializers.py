@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from admins.models import Admin
-from admins.exceptions import AdminAlreadyExists, AdminNotSubscribed
+from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
 
 
 class AdminListSerializer(serializers.ModelSerializer):
@@ -29,11 +29,11 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         try:
             return super().save(**kwargs)
 
-        except AdminAlreadyExists:
+        except AdminExistsError:
             raise serializers.ValidationError("Admin already exists.")
 
-        except AdminNotSubscribed:
+        except AdminNotSubscribedError:
             raise serializers.ValidationError("User hasnt subscribed to the channel yet.")
         
-        except:
-            raise serializers.ValidationError("Permission denied.")
+        except PromotePermissionDenied:
+            raise serializers.ValidationError("You dont have permission to promote admin.")
