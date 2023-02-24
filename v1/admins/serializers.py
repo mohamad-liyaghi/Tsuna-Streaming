@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from admins.models import Admin
+from admins.models import Admin, Permission
 from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
 
 
@@ -41,3 +41,33 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         
         except PromotePermissionDenied:
             raise serializers.ValidationError("You dont have permission to promote admin.")
+        
+
+class PermissionListSerializer(serializers.ModelSerializer):
+    '''Permission list in admin detail page'''
+    class Meta:
+        model = Permission
+        fields = [
+            'get_model_name',
+            'token',
+        ]
+
+class AdminDetailSerializer(serializers.ModelSerializer):
+    '''Admin detail page serializer'''
+    # list of user permission tokens
+    permissions = PermissionListSerializer(many=True)
+
+    user = serializers.StringRelatedField()
+    promoted_by = serializers.StringRelatedField()
+
+    class Meta:
+        model = Admin   
+        fields = [
+            'user',
+            'promoted_by',
+            'date',
+            'change_channel_info',
+            'add_new_admin',
+            'block_user',
+            'permissions',
+        ]

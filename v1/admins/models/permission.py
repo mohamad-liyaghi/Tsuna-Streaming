@@ -31,4 +31,7 @@ class Permission(models.Model):
     def __str__(self) -> str:
         return str(self.admin.user)
 
+    def get_model_name(self):
+        '''A method that returns models name for viewing in serializer'''
+        return self.model.model
     

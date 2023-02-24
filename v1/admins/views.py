@@ -1,13 +1,12 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from admins.models import Admin
-from admins.serializers import AdminListSerializer, AdminCreateSerializer
+from admins.serializers import AdminListSerializer, AdminCreateSerializer, AdminDetailSerializer
 from admins.mixins import AdminPermissionMixin
-from channels.models import Channel
 
 
 
@@ -40,3 +39,21 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
             return AdminListSerializer
 
         return AdminCreateSerializer
+
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="Detail page of an admin."
+    ),
+)
+class AdminDetailView(AdminPermissionMixin,RetrieveUpdateDestroyAPIView):
+
+    serializer_class = AdminDetailSerializer
+    permission_classes = [IsAuthenticated,]
+
+    def get_object(self):
+        return get_object_or_404(
+                    self.channel.admins.prefetch_related('permissions').all(),
+                    token=self.kwargs['admin_token']
+            )
