@@ -6,6 +6,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from admins.models import Admin
 from admins.serializers import AdminListSerializer, AdminCreateSerializer
+from admins.mixins import AdminPermissionMixin
 from channels.models import Channel
 
 
@@ -18,15 +19,10 @@ from channels.models import Channel
         description="Promote a user to admin."
     ),
 )
-class AdminListCreateView(ListCreateAPIView):
+class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
     '''List and Create an Admin for chanenl'''
 
     permission_classes = [IsAuthenticated,]
-
-    def dispatch(self, request, *args, **kwargs):
-        # the given channel
-        self.channel = get_object_or_404(Channel, token=self.kwargs['channel_token'])
-        return super().dispatch(request, *args, **kwargs)
 
     def get_serializer_context(self):
         '''Send context to serializer for creating admin'''
