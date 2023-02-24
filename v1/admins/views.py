@@ -6,7 +6,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from admins.models import Admin
 from admins.serializers import AdminListSerializer, AdminCreateSerializer, AdminDetailSerializer
-from admins.mixins import AdminPermissionMixin
+from admins.mixins import AdminPermissionMixin, UpdateAdminMixin
 
 
 
@@ -47,7 +47,7 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
         description="Detail page of an admin."
     ),
 )
-class AdminDetailView(AdminPermissionMixin,RetrieveUpdateDestroyAPIView):
+class AdminDetailView(AdminPermissionMixin, UpdateAdminMixin, RetrieveUpdateDestroyAPIView):
 
     serializer_class = AdminDetailSerializer
     permission_classes = [IsAuthenticated,]
@@ -57,3 +57,7 @@ class AdminDetailView(AdminPermissionMixin,RetrieveUpdateDestroyAPIView):
                     self.channel.admins.prefetch_related('permissions').all(),
                     token=self.kwargs['admin_token']
             )
+
+    def get_serializer_context(self):
+        '''Send context to serializer for creating admin'''
+        return {'request_user' : self.request.user, 'channel' : self.channel}

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from admins.models import Admin, Permission
+from rest_framework.exceptions import PermissionDenied
 from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
 
 
@@ -55,7 +56,7 @@ class PermissionListSerializer(serializers.ModelSerializer):
 class AdminDetailSerializer(serializers.ModelSerializer):
     '''Admin detail page serializer'''
     # list of user permission tokens
-    permissions = PermissionListSerializer(many=True)
+    permissions = PermissionListSerializer(many=True, read_only=True)
 
     user = serializers.StringRelatedField()
     promoted_by = serializers.StringRelatedField()
