@@ -72,3 +72,13 @@ class AdminDetailSerializer(serializers.ModelSerializer):
             'block_user',
             'permissions',
         ]
+
+
+class AdminPermissionDetailSerializer(serializers.ModelSerializer):
+    '''Detail/Update page of an admins permissions.'''
+    
+    admin = serializers.StringRelatedField()
+
+    class Meta:
+        model = Permission
+        fields = ['admin', 'add_object', 'edit_object', 'delete_object', 'publish_object']

@@ -1,11 +1,16 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from admins.models import Admin
-from admins.serializers import AdminListSerializer, AdminCreateSerializer, AdminDetailSerializer
+from admins.models import Admin, Permission
+from admins.serializers import (
+    AdminListSerializer,
+    AdminCreateSerializer,
+    AdminDetailSerializer,
+    AdminPermissionDetailSerializer
+)
 from admins.mixins import AdminPermissionMixin, UpdateAdminMixin
 
 
@@ -46,6 +51,15 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
     get=extend_schema(
         description="Detail page of an admin."
     ),
+    put=extend_schema(
+        description="Update an admins general permissions."
+    ),
+    patch=extend_schema(
+        description="Update an admins general permissions."
+    ),
+    delete=extend_schema(
+        description="Delete an admin."
+    ),
 )
 class AdminDetailView(AdminPermissionMixin, UpdateAdminMixin, RetrieveUpdateDestroyAPIView):
 
@@ -61,3 +75,21 @@ class AdminDetailView(AdminPermissionMixin, UpdateAdminMixin, RetrieveUpdateDest
     def get_serializer_context(self):
         '''Send context to serializer for creating admin'''
         return {'request_user' : self.request.user, 'channel' : self.channel}
+    
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="Admin permission detail page."
+    ),
+)
+class AdminPermissionDetail(AdminPermissionMixin, RetrieveUpdateAPIView):
+    '''A page for controling admins permissions.'''
+
+    serializer_class = AdminPermissionDetailSerializer
+
+    def get_object(self):
+        admin = get_object_or_404(Admin, token=self.kwargs['admin_token'], channel=self.channel)
+        return get_object_or_404(Permission,admin=admin, token=self.kwargs['permission_token'])
+    
+    
