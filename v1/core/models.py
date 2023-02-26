@@ -16,6 +16,12 @@ class BaseContentModel(models.Model):
         cls = self.__class__
         return ContentType.objects.get_for_model(cls).id if cls else None
 
+    def get_model_content_type(self):
+        '''Return content type instance of a model'''
+
+        cls = self.__class__
+        return ContentType.objects.get_for_model(cls) if cls else None
+
     def get_viewer_count(self):    
         '''Return objects views '''
         return self.viewer.count()
