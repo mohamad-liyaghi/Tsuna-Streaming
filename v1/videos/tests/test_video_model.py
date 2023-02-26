@@ -39,14 +39,14 @@ class TestVideoModel:
         cls = self.video.__class__
         video_content_type_id = ContentType.objects.get_for_model(cls).id
 
-        assert self.video.get_model_content_type_id() == video_content_type_id
+        assert self.video.get_model_content_type_id == video_content_type_id
 
 
     def test_get_video_views(self):
         '''Test the get_viewer_count() placed in BaseContentModel'''
         self.create_video()
 
-        assert self.video.get_viewer_count() == 0
+        assert self.video.get_viewer_count == 0
 
     def test_published_method(self):
         Video.objects.create(
