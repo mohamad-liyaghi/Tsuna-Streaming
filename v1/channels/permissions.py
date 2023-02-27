@@ -1,5 +1,5 @@
 from rest_framework.permissions import BasePermission
-from channels.models import ChannelAdmin
+
 
 class ChannelLimitPermission(BasePermission):
     '''This permission doesnt let users to create channels more than expected amount'''
