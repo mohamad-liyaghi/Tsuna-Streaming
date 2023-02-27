@@ -7,7 +7,6 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from comments.serializers import CommentSerializer, CommentDetailSerializer
 from comments.mixins import CommentObjectMixin
-from channels.models import ChannelAdmin
 from comments.models import Comment
 
 
@@ -129,8 +128,7 @@ class CommentPinView(CommentObjectMixin, APIView):
             # parent comment channel                      
             channel = comment.content_object.channel
 
-            if request.user == channel.owner or \
-                        ChannelAdmin.objects.filter(user=request.user, channel=channel):
+            if request.user.admin.filter(channel=channel):
                         
                     comment.pinned = True if not comment.pinned else False
                     comment.save()
