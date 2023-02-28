@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from channels.models import Channel, ChannelAdmin
+from channels.models import Channel
 from channels.serializers.channel import (ChannelListCreateSerializer, ChannelDetailSerializer)
 from channels.permissions import  ChannelPermission, ChannelLimitPermission
 
@@ -54,7 +54,7 @@ class ChannelViewSet(ModelViewSet):
         owned_channel = Channel.objects.filter(owner=self.request.user)
 
         # channels that user is admin of them
-        user_admin = ChannelAdmin.objects.filter(user=self.request.user).values("channel__id")
+        user_admin = self.request.user.admin.all().values("channel__id")
         channel_admin = Channel.objects.filter(id__in=user_admin)
 
         # return chained queryset

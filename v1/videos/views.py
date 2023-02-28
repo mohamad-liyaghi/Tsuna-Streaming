@@ -95,8 +95,8 @@ class VideoViewSet(ModelViewSet):
     def channel_video_list(self, request, channel_token):
         '''List of a channel video'''
         channel = get_object_or_404(Channel, token=channel_token)
-
-        if request.user.channel_admin.filter(channel=channel):
+        
+        if request.user.admin.filter(channel=channel):
             videos = channel.videos.all()
 
         else:

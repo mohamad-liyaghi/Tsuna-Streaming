@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     # local apps
     'v1.accounts.apps.AccountsConfig',
     'v1.channels.apps.ChannelsConfig',
+    'v1.admins.apps.AdminsConfig',
     'v1.videos.apps.VideosConfig',
     'v1.votes.apps.VotesConfig',
     'v1.comments.apps.CommentsConfig',

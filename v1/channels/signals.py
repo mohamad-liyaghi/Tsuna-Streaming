@@ -1,11 +1,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import pre_save, post_save, post_delete
 from v1.core.tasks import send_email
-from channels.models import Channel, ChannelAdmin, ChannelSubscriber
+from channels.models import Channel, ChannelSubscriber
 from v1.core.receivers import create_token_after_creating_object
 
 pre_save.connect(create_token_after_creating_object, sender=Channel)
-pre_save.connect(create_token_after_creating_object, sender=ChannelAdmin)
 
 @receiver(pre_save, sender=Channel)
 def check_channel_limit_and_notify(sender, **kwargs):
@@ -39,55 +38,9 @@ def check_channel_limit_and_notify(sender, **kwargs):
                 raise ValueError("Normal users can not have more that 5 channels")
 
 
-
-@receiver(pre_save, sender=ChannelAdmin)
-def check_and_notify_after_promoting_admin(sender, **kwargs):
-    instance = kwargs["instance"]
-    
-    if not instance.pk:
-        user = instance.user
-        promoted_by = instance.promoted_by
-        channel = instance.channel
-        
-        if ChannelAdmin.objects.filter(user=user, channel=channel, promoted_by=promoted_by).exists():
-            raise ValueError("Admin already exists")
-
-        # check if user has permission to promote an admin
-        if channel.owner == promoted_by or \
-                promoted_by.channel_admin.filter(user=promoted_by, add_new_admin=True):
-
-                send_email("emails/notify_user_after_promoting.html", email=user.email,
-                            channel=channel.title, first_name=user.first_name, channel_token=channel.token)
-        
-        else:
-            raise ValueError("Permission denied for promoting in this channel.")
-
-
-
 @receiver(post_save, sender=Channel)
 def create_subscriber_after_creating_channel(sender, **kwargs):
     '''Auto subscribe created channel by owner'''
     if kwargs["created"]:
         instance = kwargs["instance"]
         ChannelSubscriber.objects.create(channel=instance, user=instance.owner)
-
-@receiver(post_save, sender=Channel)
-def create_admin_after_creating_channel(sender, **kwargs):
-    '''Auto admin created channel by owner'''
-
-    if kwargs["created"]:
-        instance = kwargs["instance"]
-
-        ChannelAdmin.objects.create(
-            channel=instance, user=instance.owner, promoted_by=instance.owner,
-            change_channel_info=True, add_new_admin=True, block_user=True,
-            add_video=True, edit_video=True, delete_video=True, publish_video=True,
-        )
-
-
-@receiver(post_delete, sender=ChannelSubscriber)
-def delete_admin_after_unsubscribing(sender, **kwargs):
-    instance = kwargs["instance"]
-    
-    if (admin:=ChannelAdmin.objects.filter(user=instance.user, channel=instance.channel)):
-        admin.delete()
