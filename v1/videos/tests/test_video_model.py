@@ -6,6 +6,8 @@ from videos.models import Video
 from votes.models import Vote
 from comments.models import Comment
 from viewers.models import Viewer
+from core.exceptions import AdminNotFound
+
 
 from PIL import Image
 from glob import glob
@@ -93,3 +95,12 @@ class TestVideoModel:
 
         self.video.delete()
         assert self.video.viewer.count() == 0
+
+    def test_video_raise_admin_not_found(self):
+        '''When user is not admin and wants to add video, it gets AdminNotFount'''
+        non_admin_user = Account.objects.create_user(email='nontadmin@not.com', password='1234TEst')
+
+        with pytest.raises(AdminNotFound):
+            self.video = Video.objects.create(title='test', description='new video', 
+                                        video=image, user=non_admin_user, channel=self.channel)
+            

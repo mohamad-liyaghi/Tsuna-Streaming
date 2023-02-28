@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from videos.models import Video
-from channels.models import Channel, ChannelAdmin
+from channels.models import Channel
+from core.exceptions import AdminNotFound, ObjectPermissionDenied
 
 class VideoListSerializer(serializers.ModelSerializer):
     '''A serializer for user latest videos list'''
@@ -18,7 +19,7 @@ class CustomSlugRelatedField(serializers.SlugRelatedField):
 
     def get_queryset(self):
         user = self.context.get("user")
-        user_admin = ChannelAdmin.objects.filter(user=user, add_video=True).values("channel__id")
+        user_admin = user.admin.all().values("channel__id")
         channel_admin = Channel.objects.filter(id__in=user_admin)
         return Channel.objects.filter(owner=user) | channel_admin
 
@@ -41,7 +42,15 @@ class VideoCreateSeriaizer(serializers.ModelSerializer):
     def save(self, **kwargs):
         # set user for video uploader
         kwargs["user"] = self.context['user']
-        return super().save(**kwargs)
+
+        try:
+            return super().save(**kwargs)
+        
+        except ObjectPermissionDenied:
+            raise serializers.ValidationError("Admin does not have permission to add video.")
+    
+        except AdminNotFound:
+            raise serializers.ValidationError("User is not admin.")
 
 
 class VideoDetailSerializer(serializers.ModelSerializer):
