@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponseForbidden
 from rest_framework import status
 from channels.models import Channel
 
+
 class AdminPermissionMixin:
     '''
         Only Admin users can see the list of admins.
@@ -18,22 +19,4 @@ class AdminPermissionMixin:
             return super(AdminPermissionMixin, self).dispatch(request, *args, **kwargs)
         
         return JsonResponse({'permission denied' : 'You can not access this page.'}, status=status.HTTP_403_FORBIDDEN)
-    
-
-class UpdateAdminPermissionMixin:
-    '''
-        A permission for updating admins permission. 
-        Only channel owner and promoted user can update the permissions.
-    '''
-    
-    def dispatch(self, request, *args, **kwargs):
-
-        if request.method in ['PUT', 'PATCH']:
-
-            object = self.get_object()
-
-            if request.user not in [object.admin.promoted_by, object.admin.channel.owner]:
-                return HttpResponseForbidden("Permission denied.", status=status.HTTP_403_FORBIDDEN)
-            
-        return super().dispatch(request, *args, **kwargs)
     

@@ -11,8 +11,8 @@ from admins.serializers import (
     AdminDetailSerializer,
     AdminPermissionDetailSerializer
 )
-from admins.mixins import AdminPermissionMixin, UpdateAdminPermissionMixin
-from admins.permissions import AdminDetailPermission
+from admins.mixins import AdminPermissionMixin
+from admins.permissions import AdminDetailPermission, AdminPermissionUpdate
 
 
 @extend_schema_view(
@@ -89,10 +89,11 @@ class AdminDetailView(AdminPermissionMixin, RetrieveUpdateDestroyAPIView):
         description="Update an admins permissions."
     ),
 )
-class AdminPermissionDetail(AdminPermissionMixin, UpdateAdminPermissionMixin, RetrieveUpdateAPIView):
+class AdminPermissionDetail(AdminPermissionMixin, RetrieveUpdateAPIView):
     '''A page for controling admins permissions.'''
 
     serializer_class = AdminPermissionDetailSerializer
+    permission_classes = [IsAuthenticated, AdminPermissionUpdate]
 
     def get_object(self):
         admin = get_object_or_404(Admin, token=self.kwargs['admin_token'], channel=self.channel)
