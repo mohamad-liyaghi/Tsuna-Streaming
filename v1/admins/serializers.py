@@ -20,8 +20,6 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         model = Admin
         fields = ['user', 'change_channel_info', 'add_new_admin', 'block_user']
 
-    def save(self, **kwargs):
-        return super().save(**kwargs)
 
     def save(self, **kwargs):
         kwargs['promoted_by'] = self.context['request_user']

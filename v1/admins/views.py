@@ -11,8 +11,8 @@ from admins.serializers import (
     AdminDetailSerializer,
     AdminPermissionDetailSerializer
 )
-from admins.mixins import AdminPermissionMixin, UpdateAdminMixin, UpdateAdminPermissionMixin
-
+from admins.mixins import AdminPermissionMixin, UpdateAdminPermissionMixin
+from admins.permissions import AdminDetailPermission
 
 
 @extend_schema_view(
@@ -61,10 +61,10 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
         description="Delete an admin."
     ),
 )
-class AdminDetailView(AdminPermissionMixin, UpdateAdminMixin, RetrieveUpdateDestroyAPIView):
+class AdminDetailView(AdminPermissionMixin, RetrieveUpdateDestroyAPIView):
 
     serializer_class = AdminDetailSerializer
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, AdminDetailPermission]
 
     def get_object(self):
         return get_object_or_404(

@@ -20,23 +20,6 @@ class AdminPermissionMixin:
         return JsonResponse({'permission denied' : 'You can not access this page.'}, status=status.HTTP_403_FORBIDDEN)
     
 
-
-class UpdateAdminMixin:
-    '''Only promoted_user or channel admin can update an admins permissions.'''
-
-    def dispatch(self, request, *args, **kwargs):
-        
-        if request.method in ['PUT', 'PATCH', 'DELETE']:
-            
-            object = self.get_object()
-        
-            if request.user not in [object.promoted_by, object.channel.owner]:
-
-                return HttpResponseForbidden("Permission denied.", status=status.HTTP_403_FORBIDDEN)
-
-        return super().dispatch(request, *args, **kwargs)
-    
-
 class UpdateAdminPermissionMixin:
     '''
         A permission for updating admins permission. 
