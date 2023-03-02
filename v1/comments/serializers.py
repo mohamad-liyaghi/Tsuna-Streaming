@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from comments.models import Comment
+from comments.exceptions import CommentNotAllowed
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -13,6 +14,15 @@ class CommentSerializer(serializers.ModelSerializer):
             "pinned" : {"read_only" : True},
             "token" : {"read_only" : True},
         }
+    
+
+    def save(self, **kwargs):
+        try:
+            return super().save(**kwargs)
+        
+        # user cannot add comment when comments are closed
+        except CommentNotAllowed:
+            raise serializers.ValidationError("Comments are not allowed.")
 
 
 class CommentRepliesSerializer(serializers.Serializer):

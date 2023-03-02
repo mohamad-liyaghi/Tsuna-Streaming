@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from comments.serializers import CommentSerializer, CommentDetailSerializer
 from comments.mixins import CommentObjectMixin
 from comments.models import Comment
+from comments.permissions import CommentPermission
 
 
 @extend_schema_view(
@@ -19,7 +20,7 @@ from comments.models import Comment
     ),
 )
 class CommentView(CommentObjectMixin, APIView):
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, CommentPermission]
     serializer_class = CommentSerializer
 
     def get(self, request, *args, **kwargs):
@@ -32,15 +33,13 @@ class CommentView(CommentObjectMixin, APIView):
 
 
     def post(self, request, *args, **kwargs):
-        # check if comments are allowed for a post
-        if self.object.allow_comment:
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            serializer.save(user=request.user, content_object=self.object)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
         
-        return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
+        serializer.save(user=request.user, content_object=self.object)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
 
 
 @extend_schema_view(
