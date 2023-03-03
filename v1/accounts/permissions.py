@@ -23,3 +23,14 @@ class ProfilePermission(BasePermission):
         if request.method in ["PUT", "PATCH"]:
             return  (obj == request.user) 
         return True
+    
+
+class AllowNonPremiumPermission(BasePermission):
+    '''Allow only non premium users for buying premium plans.'''
+
+    message = 'User is already a premium user.'
+
+    def has_permission(self, request, view):
+        return not (request.user.role in ["a", "p"])
+            
+    

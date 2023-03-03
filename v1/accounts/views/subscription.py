@@ -10,8 +10,12 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from accounts.models import Plan, Subscription
-from accounts.permissions import AllowAdminPermission
-from accounts.serializers.subscription import PlanListSerializer, PlanDetailSerializer, AvailabilitySerializer
+from accounts.permissions import AllowAdminPermission, AllowNonPremiumPermission
+from accounts.serializers.subscription import (
+    PlanListSerializer,
+    PlanDetailSerializer,
+    AvailabilitySerializer
+)
 from accounts.exceptions import PlanInUseError
 
 
@@ -66,8 +70,9 @@ class SubscriptionViewSet(ModelViewSet):
         if self.action in ["list", "retrieve", "availability", "buy_plan"] and self.request.method == "GET":
             permission_classes = [IsAuthenticated]
 
+
         elif self.action in ["buy_plan"] and self.request.method == "POST":
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsAuthenticated, AllowNonPremiumPermission]
 
         else:
             permission_classes = [AllowAdminPermission]
@@ -118,10 +123,6 @@ class SubscriptionViewSet(ModelViewSet):
         if self.request.method == "POST":
             if not self.get_object().is_available:
                 return Response("This item is not currently available", status=status.HTTP_202_ACCEPTED)
-            
-            # TODO add buy plan permission.
-            if request.user.role in ["a","p"]:
-                return Response("You are already a premium user.", status=status.HTTP_403_FORBIDDEN)
             
             # if user isnt premium this will create subscription.
             Subscription.objects.create(user=request.user, plan=self.get_object())
