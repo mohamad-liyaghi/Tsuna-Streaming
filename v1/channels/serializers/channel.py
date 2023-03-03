@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from channels.models import Channel
+from channels.exceptions import ChannelLimitException
 
 
 class ChannelListCreateSerializer(serializers.ModelSerializer):
@@ -30,8 +31,12 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
         '''Set request.user as owner of a channel'''
 
         validated_data["owner"] = self.context["request"].user
-        channel = super().create(validated_data)
-        return channel
+        try:
+            return super().create(validated_data)
+
+        except ChannelLimitException as error:
+            raise serializers.ValidationError(str(error))
+        
 
 
 
