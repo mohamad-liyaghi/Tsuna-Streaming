@@ -12,6 +12,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from accounts.models import Plan, Subscription
 from accounts.permissions import AllowAdminPermission
 from accounts.serializers.subscription import PlanListSerializer, PlanDetailSerializer, AvailabilitySerializer
+from accounts.exceptions import PlanInUseError
+
 
 @extend_schema_view(
     list=extend_schema(
@@ -38,6 +40,7 @@ from accounts.serializers.subscription import PlanListSerializer, PlanDetailSeri
 )
 class SubscriptionViewSet(ModelViewSet):
     '''A Viewset for Creating, retrieving, updating and deleting plans and buy subscriptions.'''
+
     queryset = Plan.objects.all().order_by("-is_available", "active_months")
     lookup_field = "token"
 
@@ -56,6 +59,7 @@ class SubscriptionViewSet(ModelViewSet):
         elif self.action == "buy_plan":
             return AvailabilitySerializer
     
+
     def get_permissions(self):
         '''return the appropriate permission class'''
 
@@ -70,26 +74,32 @@ class SubscriptionViewSet(ModelViewSet):
 
         return [permission() for permission in permission_classes]
     
+
     def destroy(self, request, *args, **kwargs):
         '''Check if there is no subsription with given plan'''
-        subscription = Subscription.objects.filter(plan=self.get_object())
-        if subscription:
-            return Response("You can not delete this plan. {} users are using this plan".format(subscription.count()))
+
+        try:
+            return super().destroy(request, *args, **kwargs)
+        
+        except PlanInUseError as error:
+            return Response(str(error), status=status.HTTP_403_FORBIDDEN)
             
-        return super().destroy(request, *args, **kwargs)
     
 
     @method_decorator(cache_page(5))
     @action(detail=True, methods=["GET", "POST"], url_path="availability")
     def availability(self, request, token):
-    
+
+        # show the objects availability status
         if request.method == "GET":
             object = self.get_object()
             return Response("{}'s availability is set to {}".format(object.title, object.is_available),
             status=status.HTTP_200_OK)
         
+        # change obj availability
         elif request.method == "POST":
             object = self.get_object()
+
             if object.is_available:
                 object.is_available = False
                 object.save()
@@ -101,20 +111,22 @@ class SubscriptionViewSet(ModelViewSet):
             return Response("{}'s availability is set to {}".format(object.title, object.is_available), 
             status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=["POST", "GET"], url_path="buy")
+
+    @action(detail=True, methods=["POST"], url_path="buy")
     def buy_plan(self, request, token):
-        if request.method == "GET":
-            return Response("{} purchase page.".format(self.get_object().title))
 
-        elif self.request.method == "POST":
+        if self.request.method == "POST":
             if not self.get_object().is_available:
-                return Response("This item is not currently available")
-
+                return Response("This item is not currently available", status=status.HTTP_202_ACCEPTED)
+            
+            # TODO add buy plan permission.
             if request.user.role in ["a","p"]:
-                return Response("You are already a premium user.")
-
+                return Response("You are already a premium user.", status=status.HTTP_403_FORBIDDEN)
+            
+            # if user isnt premium this will create subscription.
             Subscription.objects.create(user=request.user, plan=self.get_object())
             return Response("You are now a premium user.", status=status.HTTP_200_OK)
+
 
     @method_decorator(cache_page(5))
     def list(self, request, *args, **kwargs):

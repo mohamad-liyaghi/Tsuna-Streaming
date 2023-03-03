@@ -1,4 +1,5 @@
 from accounts.models import Account, Subscription, Plan
+from accounts.exceptions import PlanInUseError
 from django.utils import timezone
 import datetime
 import pytest
@@ -34,3 +35,10 @@ class TestSubscriptionModel:
         now = timezone.now()   
         one_month_from_now = now + datetime.timedelta(self.plan.active_months * 30)
         assert self.subscription.finish_date.strftime("%m/%d/%Y %H:%M:%S") == one_month_from_now.strftime("%m/%d/%Y %H:%M:%S")
+
+    def test_raise_subscription_deletion(self):
+        '''A plan that is in use by subscription can not be deleted.'''
+
+        with pytest.raises(PlanInUseError):
+            self.plan.delete()
+        

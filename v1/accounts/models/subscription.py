@@ -2,6 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
+from accounts.exceptions import PlanInUseError
+
 
 class Plan(models.Model):
     '''Subscription plan model'''
@@ -23,6 +25,15 @@ class Plan(models.Model):
 
     is_available = models.BooleanField(default=False)
 
+    def delete(self, *args, **kwargs):
+        '''User cannot delete the plan if there are subscriptions for target plan.'''
+
+        if (sub_counts:=self.plans.count()):
+            raise PlanInUseError("Plan is already in use by {} users".format(sub_counts))
+        
+        return super(Subscription, self).delete(*args, **kwargs)
+
+
     def __str__(self) -> str:
         return self.title
 
@@ -32,7 +43,7 @@ class Subscription(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name="subscriptions")
 
-    plan = models.ForeignKey("Plan", on_delete=models.CASCADE)
+    plan = models.ForeignKey("Plan", on_delete=models.CASCADE, related_name='plans')
     
     start_date = models.DateTimeField(auto_now_add=True)
     finish_date = models.DateTimeField(blank=True, null=True)
