@@ -8,11 +8,13 @@ from v1.core.tasks import send_email
 from v1.core.receivers import create_token_after_creating_object
 import datetime
 
+
 # create a unique token for object
 pre_save.connect(create_token_after_creating_object, sender=settings.AUTH_USER_MODEL)
 pre_save.connect(create_token_after_creating_object, sender=Subscription)
 pre_save.connect(create_token_after_creating_object, sender=Token)
 pre_save.connect(create_token_after_creating_object, sender=Plan)
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_token_for_new_user(sender, **kwargs):
@@ -36,7 +38,7 @@ def send_email_when_token_created(sender, **kwargs):
 
 
 @receiver(post_save, sender=Subscription)
-def change_user_status_after_buying_premium_plan(sender, **kwargs):
+def set_subscription_expiration_date(sender, **kwargs):
 
     if kwargs["created"]:
         subscription = kwargs["instance"]
@@ -47,24 +49,16 @@ def change_user_status_after_buying_premium_plan(sender, **kwargs):
 
         subscription.finish_date = finish_date
         subscription.save()
-        
-        if user.role != "a":
-            user.role = "p"
-            user.save()
 
         send_email.delay(template_name="emails/notify_premium.html", email=user.email, first_name=user.first_name, 
                                 plan=subscription.plan.title, finish_date=subscription.finish_date)
 
 
 @receiver(pre_delete, sender=Subscription)
-def change_user_status_after_deleting_subscription(sender, **kwargs):
-    '''Demote user when a subscription is deleted.'''
+def notify_after_deleting_subscription(sender, **kwargs):
+    '''Demote user when a subscription is deleted and notify.'''
+
     subscription = kwargs["instance"]
-    user = subscription.user
-    
-    if user.role != "a":
-        user.role = "n"
-        user.save()
 
     send_email.delay(template_name="emails/notify_unsubscribed_user.html", first_name=subscription.user.first_name,
                                 email=subscription.user.email,

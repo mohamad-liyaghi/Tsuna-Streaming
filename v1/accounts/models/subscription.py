@@ -50,6 +50,24 @@ class Subscription(models.Model):
 
     token = models.CharField(max_length=32, null=True, blank=True)
 
+    def save(self, *args, **kwargs ):
+
+        if not self.pk:
+            if not self.user.role == 'a':
+                self.user.role = 'p'
+                self.user.save()
+
+        return super(Subscription, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        '''Change user status after deleting a subscription'''
+        
+        if not self.user.role == 'a':
+            self.user.role = 'n'
+            self.user.save()
+
+        return super(Subscription, self).delete(*args, **kwargs)
+
     @property
     def is_active(self):     
         now = timezone.now()  

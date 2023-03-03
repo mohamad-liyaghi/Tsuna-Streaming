@@ -42,3 +42,6 @@ class TestSubscriptionModel:
         with pytest.raises(PlanInUseError):
             self.plan.delete()
         
+    def test_change_user_role_after_deleting_sub(self):
+        self.subscription.delete()
+        assert self.premium_user.role == 'n'
