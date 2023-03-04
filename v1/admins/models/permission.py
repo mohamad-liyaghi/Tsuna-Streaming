@@ -20,6 +20,8 @@ class Permission(models.Model):
     delete_object = models.BooleanField(default=False)
     publish_object = models.BooleanField(default=False)
 
+    delete_object_comment = models.BooleanField(default=False)
+
     class Meta:
         constraints = [
             models.UniqueConstraint(

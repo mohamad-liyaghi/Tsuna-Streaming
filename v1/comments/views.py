@@ -4,11 +4,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
 from comments.serializers import CommentSerializer, CommentDetailSerializer
 from comments.mixins import CommentObjectMixin
 from comments.models import Comment
-from comments.permissions import CommentPermission
+from comments.permissions import CommentPermission, CommentDetailPermission
 
 
 @extend_schema_view(
@@ -19,26 +20,13 @@ from comments.permissions import CommentPermission
         description="Add a comment if comments are allowed for an object."
     ),
 )
-class CommentView(CommentObjectMixin, APIView):
+class CommentView(CommentObjectMixin, ListCreateAPIView):
     permission_classes = [IsAuthenticated, CommentPermission]
     serializer_class = CommentSerializer
 
-    def get(self, request, *args, **kwargs):
-
-        comment = Comment.objects.filter(content_type=self.content_type_model, 
+    def get_queryset(self):
+        return Comment.objects.filter(content_type=self.content_type_model, 
                             object_id=self.object.id, parent__isnull=True).order_by("-pinned", "-date")
-
-        serializer = self.serializer_class(comment, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-    def post(self, request, *args, **kwargs):
-
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        
-        serializer.save(user=request.user, content_object=self.object)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
         
 
 
@@ -49,44 +37,27 @@ class CommentView(CommentObjectMixin, APIView):
     put=extend_schema(
         description="Update a comment [Only by its user]."
     ),
+    patch=extend_schema(
+        description="Update a comment [Only by its user]."
+    ),
     delete=extend_schema(
         description="Delete a comment [by its user or channels owner]."
     ),
 )
-class CommentDetailView(CommentObjectMixin, APIView):
-    permission_classes = [IsAuthenticated,]
+class CommentDetailView(CommentObjectMixin, RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, CommentDetailPermission]
     serializer_class = CommentDetailSerializer
 
     def get_object(self):
+        # self.token and self.content_type_model are in mixin        
+
         return get_object_or_404(
-            Comment.objects.prefetch_related("replies", "content_object__channel"), content_type=self.content_type_model, 
+            Comment, content_type=self.content_type_model, 
                       object_id=self.object.id, 
                       token=self.kwargs.get("comment_token"))
 
-
-    def get(self, request, *args, **kwargs):
-        return Response(self.serializer_class(self.get_object()).data)
     
-    
-    def put(self, request, *args, **kwargs):
 
-        if request.user == self.get_object().user:
-            serializer = self.serializer_class(self.get_object(), data=request.data, partial=True)
-            serializer.is_valid(raise_exception=True)
-            serializer.save(edited=True)
-            return Response("comment updated", status=status.HTTP_200_OK)
-        
-        return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
-
-
-    def delete(self, request, *args, **kwargs):
-        if request.user == self.get_object().user or \
-            request.user == self.get_object().content_object.channel.owner:
-            self.get_object().delete()
-            return Response("Comment deleted", status=status.HTTP_200_OK)
-
-        return Response("Permission denied", status=status.HTTP_403_FORBIDDEN)
-    
 @extend_schema_view(
     get=extend_schema(
         description="Reply a comment."
@@ -108,6 +79,7 @@ class CommentReplyView(CommentObjectMixin, APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
+
 
 
 @extend_schema_view(
