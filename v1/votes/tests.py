@@ -29,3 +29,39 @@ class TestVoteModel:
         self.video.delete()
         assert Vote.objects.count() == 0
         assert Vote.objects.count() != 1
+
+
+    def test_create_vote(self):
+        self.create_video()
+
+        assert Vote.objects.count() == 0
+        Vote.objects.create(content_object=self.video, user=self.user)
+
+        assert Vote.objects.count() == 1
+
+
+    def test_delete_vote(self):
+        '''If user request to save vote twice, it means that he wants to remove the vote.'''
+
+        self.create_video()
+
+        assert Vote.objects.count() == 0
+        Vote.objects.create(content_object=self.video, user=self.user)
+        assert Vote.objects.count() == 1
+
+        Vote.objects.create(content_object=self.video, user=self.user)
+        assert Vote.objects.count() == 0
+
+
+    def test_update_vote(self):
+        '''If user save 2 votes with diffrent value, the oldest vote will be updated.'''
+
+        self.create_video()
+
+        assert Vote.objects.count() == 0
+        Vote.objects.create(content_object=self.video, user=self.user)
+        assert Vote.objects.count() == 1
+
+        Vote.objects.create(content_object=self.video, user=self.user, choice=Vote.Choice.DOWNVOTE)
+        assert Vote.objects.count() == 1
+        assert Vote.objects.filter(choice=Vote.Choice.DOWNVOTE).count() == 1
