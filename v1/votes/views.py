@@ -1,16 +1,13 @@
-from django.shortcuts import get_object_or_404
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from votes.models import Vote
 from votes.serializers import VoteSerializer, VoteListSerializer
+from votes.mixins import VoteQuerysetMixin
+
 
 
 @extend_schema_view(
@@ -21,7 +18,7 @@ from votes.serializers import VoteSerializer, VoteListSerializer
         description="Vote or delete or update a vote."
     ),
 )
-class VoteView(APIView):
+class VoteView(VoteQuerysetMixin, APIView):
     '''
         Get: show the upvote and downvotes and also user vote status
         Post: Vote a model
@@ -30,29 +27,14 @@ class VoteView(APIView):
     serializer_class = VoteSerializer
 
 
-    def dispatch(self, request, content_type_id, token, *args, **kwargs):
-        # get the content type model [eg: Video model]
-        self.content_type_model = get_object_or_404(ContentType, id=content_type_id)
-
-        # get the object
-        self.object = get_object_or_404(self.content_type_model.model_class(), token=token)
-
-        # get all votes related to the object
-        self.vote = Vote.objects.filter(content_type=self.content_type_model,
-                                             object_id=self.object.id)
-
-        # check if user has voted this object or not
-        self.user_vote = self.vote.filter(user=request.user).first()
-
-        return super().dispatch(request, content_type_id, *args, **kwargs)
-
     def get(self, request, *args, **kwargs):
 
-        upvotes = self.vote.upvotes()
-        downvotes = self.vote.downvotes()
+        upvotes = self.votes.upvotes()
+        downvotes = self.votes.downvotes()
 
         return Response({"upvotes" : upvotes, "downvotes" : downvotes, "voted" : True if self.user_vote else False,
         "user_vote" : self.user_vote.choice if self.user_vote else None}, status=status.HTTP_200_OK)
+
 
     def post(self, request, *args, **kwargs):
 
@@ -78,21 +60,21 @@ class VoteView(APIView):
         return Response("Invalid information", status=status.HTTP_400_BAD_REQUEST)
 
 
+
 @extend_schema_view(
     get=extend_schema(
         description="List of users that voted an object."
     ),
 )
-class VoteListView(APIView):
+class VoteListView(VoteQuerysetMixin, APIView):
     '''List of users that voted an object'''
-    permission_classes = [IsAuthenticated, ]
-    
-    @method_decorator(cache_page(5))
-    def get(self, request, content_type_id, token, *args, **kwargs):
-        content_type_model = get_object_or_404(ContentType, id=content_type_id)
-        object = get_object_or_404(content_type_model.model_class(), token=token)
-        votes = Vote.objects.filter(content_type=content_type_model, object_id=object.id)
 
-        serializer = VoteListSerializer(votes, many=True)
+    permission_classes = [IsAuthenticated,]
+
+    def get(self, request, *args, **kwargs):
+        '''Get self.vote from the mixin and pass it to serializer'''
+
+        # self.vote is in mixin
+        serializer = VoteListSerializer(self.votes, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
