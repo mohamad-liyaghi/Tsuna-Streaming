@@ -28,5 +28,37 @@ class Vote(models.Model):
             )
         ]
 
+    def save(self, *args, **kwargs):
+
+        if not self.pk:
+            # the voted object
+            object = self.content_object   
+
+            # check if user voted before
+            user_vote = object.vote.filter(user=self.user).first()
+
+            if not user_vote:
+                '''If user hasnt voted yet, vote object will be saved.'''
+
+                return super(Vote, self).save(*args, **kwargs)
+
+
+            if user_vote.choice == self.choice:
+                '''Delete the vote if user sent 2 same values'''
+
+                user_vote.delete()
+                return None
+            
+
+            if user_vote.choice != self.choice:
+                '''Update a vote if the given choice is diffrent from old choice'''
+                
+                user_vote.delete()
+                return super(Vote, self).save(*args, **kwargs)
+            
+        return super(Vote, self).save(*args, **kwargs)
+        
+
+
     def __str__(self) -> str:
         return str(self.user)

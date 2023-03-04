@@ -39,25 +39,12 @@ class VoteView(VoteQuerysetMixin, APIView):
     def post(self, request, *args, **kwargs):
 
         serializer = self.serializer_class(data=request.data)
+
         if serializer.is_valid():
+            serializer.save(user=request.user, content_object=self.object)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-            # if user hasnt voted yet, an object would be created
-            if not self.user_vote:
-                serializer.save(user=request.user, content_object=self.object)
-                return Response("Vote saved", status=status.HTTP_201_CREATED)
-
-            # if user posted a former vote for 2 times, the former vote will be deleted
-            elif serializer.data.get("choice", None) == self.user_vote.choice:
-                self.user_vote.delete()
-                return Response("Vote deleted.", status=status.HTTP_200_OK)
-            
-            # if user post diffrent data in comparison to former vote, it will be updated
-            elif (choice:=serializer.data.get("choice", None)) != self.user_vote.choice:
-                self.user_vote.choice = choice
-                self.user_vote.save()
-                return Response("Vote saved", status=status.HTTP_200_OK)
-
-        return Response("Invalid information", status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
