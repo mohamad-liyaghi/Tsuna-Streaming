@@ -17,12 +17,15 @@ from comments.permissions import CommentPermission, CommentDetailPermission
         description="List of an objects comments."
     ),
     post=extend_schema(
-        description="Add a comment if comments are allowed for an object."
+        description="Add/Reply a comment if comments are allowed for an object."
     ),
 )
-class CommentView(CommentObjectMixin, ListCreateAPIView):
+class CommentListCreateView(CommentObjectMixin, ListCreateAPIView):
     permission_classes = [IsAuthenticated, CommentPermission]
     serializer_class = CommentSerializer
+
+    def get_serializer_context(self):
+        return {'user' : self.request.user, 'object' : self.object}
 
     def get_queryset(self):
         return Comment.objects.filter(content_type=self.content_type_model, 
@@ -55,31 +58,6 @@ class CommentDetailView(CommentObjectMixin, RetrieveUpdateDestroyAPIView):
             Comment, content_type=self.content_type_model, 
                       object_id=self.object.id, 
                       token=self.kwargs.get("comment_token"))
-
-    
-
-@extend_schema_view(
-    get=extend_schema(
-        description="Reply a comment."
-    ),
-)
-class CommentReplyView(CommentObjectMixin, APIView):
-    permission_classes = [IsAuthenticated,] 
-    serializer_class = CommentSerializer
-
-    def post(self, request, *args, **kwargs):
-        if self.object.allow_comment:
-            comment = get_object_or_404(Comment, content_type=self.content_type_model, 
-                      object_id=self.object.id, token=self.kwargs.get("comment_token"))
-
-            serializer = self.serializer_class(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            
-            serializer.save(user=request.user, content_object=self.object, parent=comment)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response("Comments are now allowed.", status=status.HTTP_403_FORBIDDEN)
-
 
 
 @extend_schema_view(
