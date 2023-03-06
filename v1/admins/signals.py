@@ -1,13 +1,11 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, post_delete
-from django.db import transaction
-from django.contrib.contenttypes.models import ContentType
 
 from admins.models import Admin, Permission
 from channels.models import Channel, ChannelSubscriber
 from v1.core.receivers import create_token_after_creating_object
-from v1.core.models import BaseContentModel
 from v1.core.tasks import send_email
+from admins.tasks import create_permission_for_admin
 
 
 pre_save.connect(create_token_after_creating_object, sender=Admin)
@@ -47,32 +45,13 @@ def delete_admin_after_unsubscribing(sender, **kwargs):
 
 
 @receiver(post_save, sender=Admin)
-def create_permission_for_admin(sender, instance, *args, **kwargs):
-    '''Create permissionf or all Content models (Video, community etc...) when a users gets created.'''
+def create_permissions_for_admin(sender, instance, *args, **kwargs):
+    '''
+        Create permission for admin after an admin gets created.
+        Permissions for all Content classes. E.g: Video.
+    '''
 
     if kwargs['created']:
 
-        # content models are Video, Posts and stuff
-        content_models = BaseContentModel.__subclasses__()
-
-        admin = instance    
-    
-        # if user is channels admin, by default all the permissions are given.
-        set_default_permission = lambda: bool(admin.channel.owner == admin.user)
-
-        default_permissions = {
-            "add_object" : set_default_permission(),
-            "edit_object" : set_default_permission(),
-            "delete_object" : set_default_permission(),
-            "publish_object" : set_default_permission(),
-        }
-
-        with transaction.atomic():
-            # create permission for all content models 
-
-            for content_model in content_models:
-                model = ContentType.objects.get(model=content_model.__name__.lower())
-                Permission.objects.create(admin=admin, model=model, **default_permissions)
-
-
-        
+        # call the function to create permissions and pass admin token/
+        create_permission_for_admin.delay(str(instance.token))
