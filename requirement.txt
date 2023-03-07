@@ -20,6 +20,8 @@ djangorestframework==3.14.0
 djangorestframework-simplejwt==5.2.2
 drf-spectacular==0.25.1
 exceptiongroup==1.1.0
+flower==1.2.0
+humanize==4.6.0
 inflection==0.5.1
 iniconfig==1.1.1
 jsonschema==4.17.3
@@ -28,6 +30,7 @@ Markdown==3.4.1
 packaging==22.0
 Pillow==9.4.0
 pluggy==1.0.0
+prometheus-client==0.16.0
 prompt-toolkit==3.0.36
 psycopg2-binary==2.9.5
 PyJWT==2.6.0
@@ -42,6 +45,7 @@ redis==4.4.0
 six==1.16.0
 sqlparse==0.4.3
 tomli==2.0.1
+tornado==6.2
 tzdata==2022.7
 uritemplate==4.1.1
 vine==5.0.0

@@ -96,3 +96,19 @@ services:
       - .:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
+
+  flower:
+
+    build: .
+    command: celery -A config flower
+
+    depends_on:
+      - backend
+      - redis
+      - celery
+
+    ports:
+      - 5555:5555
+
+    environment:
+      *DJANGO_SETTINGS_MODULE
