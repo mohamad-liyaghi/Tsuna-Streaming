@@ -39,8 +39,8 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         except SubscriptionRequiredException:
             raise serializers.ValidationError("User hasnt subscribed to the channel yet.")
         
-        except PermissionDenied:
-            raise serializers.ValidationError("You dont have permission to promote admin.")
+        except PermissionDenied as error:
+            raise serializers.ValidationError(str(error))
 
 
 class PermissionListSerializer(serializers.ModelSerializer):

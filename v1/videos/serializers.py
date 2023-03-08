@@ -1,7 +1,8 @@
+from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
 from videos.models import Video
 from channels.models import Channel
-from core.exceptions import AdminNotFound, ObjectPermissionDenied
+
 
 class VideoListSerializer(serializers.ModelSerializer):
     '''A serializer for user latest videos list'''
@@ -45,12 +46,9 @@ class VideoCreateSeriaizer(serializers.ModelSerializer):
 
         try:
             return super().save(**kwargs)
-        
-        except ObjectPermissionDenied:
-            raise serializers.ValidationError("Admin does not have permission to add video.")
     
-        except AdminNotFound:
-            raise serializers.ValidationError("User is not admin.")
+        except PermissionDenied as error:
+            raise serializers.ValidationError(str(error))
 
 
 class VideoDetailSerializer(serializers.ModelSerializer):

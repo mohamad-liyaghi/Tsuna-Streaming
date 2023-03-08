@@ -1,12 +1,11 @@
 from django.contrib.contenttypes.models import ContentType
-
+from django.core.exceptions import PermissionDenied
 from accounts.models import Account
 from channels.models import Channel
 from videos.models import Video
 from votes.models import Vote
 from comments.models import Comment
 from viewers.models import Viewer
-from core.exceptions import AdminNotFound
 
 
 from PIL import Image
@@ -100,7 +99,7 @@ class TestVideoModel:
         '''When user is not admin and wants to add video, it gets AdminNotFount'''
         non_admin_user = Account.objects.create_user(email='nontadmin@not.com', password='1234TEst')
 
-        with pytest.raises(AdminNotFound):
+        with pytest.raises(PermissionDenied):
             self.video = Video.objects.create(title='test', description='new video', 
                                         video=image, user=non_admin_user, channel=self.channel)
             

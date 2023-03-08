@@ -1,7 +1,9 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import PermissionDenied
 from cached_property import cached_property_with_ttl
-from core.exceptions import AdminNotFound, ObjectPermissionDenied
+
+
 
 
 class BaseContentModel(models.Model):
@@ -66,9 +68,9 @@ class BaseContentModel(models.Model):
                 if admin.permissions.filter(model=self.get_model_content_type, add_object=True).exists():
                     return super(BaseContentModel, self).save(*args, **kwargs)        
                 
-                raise ObjectPermissionDenied("Admin dont have permission to add video.")
+                raise PermissionDenied("Admin dont have permission to add video.")
 
-            raise AdminNotFound("Admin didnt found.")
+            raise PermissionDenied("Admin didnt found.")
 
         return super(BaseContentModel, self).save(*args, **kwargs)
 
