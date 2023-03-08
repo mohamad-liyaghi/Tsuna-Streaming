@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from channels.models import Channel
-from channels.exceptions import ChannelLimitException
+from channels.exceptions import ChannelLimitExceededException
 
 
 class ChannelListCreateSerializer(serializers.ModelSerializer):
@@ -34,10 +34,9 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
         try:
             return super().create(validated_data)
 
-        except ChannelLimitException as error:
+        except ChannelLimitExceededException as error:
             raise serializers.ValidationError(str(error))
         
-
 
 
 class ChannelDetailSerializer(serializers.ModelSerializer):

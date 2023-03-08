@@ -1,6 +1,6 @@
 from accounts.models import Account, Plan, Subscription
 from channels.models import Channel
-from channels.exceptions import ChannelLimitException
+from channels.exceptions import ChannelLimitExceededException
 import pytest
 
 @pytest.mark.django_db
@@ -42,7 +42,7 @@ class TestChannelModel:
         Channel.objects.create(owner=self.simple_user, title="test")
         assert self.simple_user.channels.count() == 5
 
-        with pytest.raises(ChannelLimitException):
+        with pytest.raises(ChannelLimitExceededException):
             Channel.objects.create(owner=self.simple_user, title="test")
 
     def test_channel_limit_for_premium_user(self):
@@ -55,7 +55,7 @@ class TestChannelModel:
 
         assert self.premium_user.channels.count() == 10
 
-        with pytest.raises(ChannelLimitException):
+        with pytest.raises(ChannelLimitExceededException):
             Channel.objects.create(owner=self.premium_user, title="test")
 
 
@@ -74,5 +74,5 @@ class TestChannelModel:
 
         assert self.premium_user.channels.count() == 10 
 
-        with pytest.raises(ChannelLimitException):
+        with pytest.raises(ChannelLimitExceededException):
             Channel.objects.create(owner=self.premium_user, title="test")

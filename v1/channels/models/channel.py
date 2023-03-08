@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from accounts.validators import validate_profile_size
-from channels.exceptions import ChannelLimitException
+from channels.exceptions import ChannelLimitExceededException
 
 
 class Channel(models.Model):
@@ -47,7 +47,7 @@ class Channel(models.Model):
                 if user_channels < 10:
                     return super(Channel, self).save(*args, **kwargs)
                 
-                raise ChannelLimitException("User has reached maximum number of channels to create.")
+                raise ChannelLimitExceededException("User has reached maximum number of channels to create.")
 
             # normal users can create less than 5 channels
             # normal users that had premium sub and created more that 5 channels, now can create less that 10 channels.
@@ -61,7 +61,7 @@ class Channel(models.Model):
                 elif user_channels > 6 and user_channels < 10:
                     return super(Channel, self).save(*args, **kwargs)
                 
-                raise ChannelLimitException("User has reached maximum number of channels to create.")
+                raise ChannelLimitExceededException("User has reached maximum number of channels to create.")
                 
             return super(Channel, self).save(*args, **kwargs)
 

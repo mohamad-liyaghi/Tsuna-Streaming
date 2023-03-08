@@ -1,3 +1,5 @@
-class ChannelLimitException(Exception):
-    '''Raise when a user is going to create more that allowed amounts of channels.'''
+class ChannelLimitExceededException(Exception):
+    '''
+        Raised when the maximum number of channels that can be created has been reached. 
+    '''
     pass
