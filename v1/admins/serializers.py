@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from admins.models import Admin, Permission
-from rest_framework.exceptions import PermissionDenied
-from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
+from django.core.exceptions import PermissionDenied
+from admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
 
 class AdminListSerializer(serializers.ModelSerializer):
@@ -12,6 +12,7 @@ class AdminListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Admin
         fields = ['user', 'promoted_by', 'channel', 'token']
+
 
 class AdminCreateSerializer(serializers.ModelSerializer):
     '''Create an admin serializer'''
@@ -32,15 +33,15 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         try:
             return super().save(**kwargs)
 
-        except AdminExistsError:
+        except DuplicatePromotionException:
             raise serializers.ValidationError("Admin already exists.")
 
-        except AdminNotSubscribedError:
+        except SubscriptionRequiredException:
             raise serializers.ValidationError("User hasnt subscribed to the channel yet.")
         
-        except PromotePermissionDenied:
+        except PermissionDenied:
             raise serializers.ValidationError("You dont have permission to promote admin.")
-        
+
 
 class PermissionListSerializer(serializers.ModelSerializer):
     '''Permission list in admin detail page'''
@@ -50,6 +51,7 @@ class PermissionListSerializer(serializers.ModelSerializer):
             'get_model_name',
             'token',
         ]
+
 
 class AdminDetailSerializer(serializers.ModelSerializer):
     '''Admin detail page serializer'''

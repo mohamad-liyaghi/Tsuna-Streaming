@@ -2,7 +2,8 @@ import pytest
 from accounts.models import Account
 from channels.models import Channel, ChannelSubscriber
 from admins.models import Admin
-from admins.exceptions import AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied
+from django.core.exceptions import PermissionDenied
+from admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
 
 @pytest.mark.django_db
@@ -67,10 +68,10 @@ class TestAdminModel:
         assert admin.add_object == True
 
     def test_raise_permission_denied_for_promoting(self):
-        '''Users that dont have permission to add admin, gets PromotePermissionDenied'''
+        '''Users that dont have permission to add admin, gets PermissionDenied'''
 
         self.create_subscriber()
-        with pytest.raises(PromotePermissionDenied):
+        with pytest.raises(PermissionDenied):
             Admin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.simple_user)
 
     def test_raise_error_promoting_unsubscribed_user(self):
@@ -78,7 +79,7 @@ class TestAdminModel:
 
         assert self.simple_user.admin.count() == 0
 
-        with pytest.raises(AdminNotSubscribedError):
+        with pytest.raises(SubscriptionRequiredException):
             self.create_admin()
 
     def test_raise_error_when_duplicating_admin(self):
@@ -91,5 +92,5 @@ class TestAdminModel:
         self.create_admin()
         assert self.simple_user.admin.count() == 1
 
-        with pytest.raises(AdminExistsError):
+        with pytest.raises(DuplicatePromotionException):
             self.create_admin()

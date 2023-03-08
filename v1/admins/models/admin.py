@@ -1,7 +1,8 @@
 from django.db import models
 from channels.models import Channel
 from accounts.models import Account
-from admins.exceptions import (AdminExistsError, AdminNotSubscribedError, PromotePermissionDenied)
+from django.core.exceptions import PermissionDenied
+from admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
 
 
 
@@ -45,11 +46,11 @@ class Admin(models.Model):
 
             # only subscribed users can be promoted
             if not self.user.subscribed_channels.filter(channel=self.channel):
-                raise AdminNotSubscribedError("User hasnt subscribed to channel.")
+                raise SubscriptionRequiredException("User hasnt subscribed to channel.")
 
             # check admin exists or not
             if self.user.admin.filter(channel=self.channel).exists():
-                raise AdminExistsError("Admin already exists.")
+                raise DuplicatePromotionException("Admin already exists.")
 
 
             if self.user == self.channel.owner:
@@ -57,7 +58,7 @@ class Admin(models.Model):
 
             # user must have permission to promote an admin
             if not self.promoted_by.admin.filter(channel=self.channel, add_new_admin=True):
-                raise PromotePermissionDenied("Permission denied to promote admin.")
+                raise PermissionDenied("Permission denied to promote admin.")
         
             return super(Admin, self).save(*args, **kwargs)    
 
