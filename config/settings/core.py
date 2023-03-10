@@ -10,7 +10,23 @@ SECRET_KEY = config("SECRET_KEY")
 # default v1 application location
 sys.path.insert(0, os.path.join(BASE_DIR, 'v1'))
 
-# Application definition
+
+LOCAL_APPS = [
+    'v1.accounts.apps.AccountsConfig',
+    'v1.channels.apps.ChannelsConfig',
+    'v1.admins.apps.AdminsConfig',
+    'v1.videos.apps.VideosConfig',
+    'v1.votes.apps.VotesConfig',
+    'v1.comments.apps.CommentsConfig',
+    'v1.viewers.apps.ViewersConfig',
+]
+
+THIRD_PARTY_APPS = [
+    'rest_framework',
+    'drf_spectacular',
+    'rest_framework_simplejwt',
+    'django_filters',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -20,20 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # third party 
-    'rest_framework',
-    'drf_spectacular',
-    'rest_framework_simplejwt',
-    'django_filters',
-
-    # local apps
-    'v1.accounts.apps.AccountsConfig',
-    'v1.channels.apps.ChannelsConfig',
-    'v1.admins.apps.AdminsConfig',
-    'v1.videos.apps.VideosConfig',
-    'v1.votes.apps.VotesConfig',
-    'v1.comments.apps.CommentsConfig',
-    'v1.viewers.apps.ViewersConfig',
+    *THIRD_PARTY_APPS,
+    *LOCAL_APPS,
 ]
 
 MIDDLEWARE = [
