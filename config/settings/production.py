@@ -1,7 +1,7 @@
 from .core import *
 
-DEBUG = True
-ALLOWED_HOSTS = []
+DEBUG = False
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 DOMAIN = config("PRODUCTION_DOMAIN")
 
@@ -24,7 +24,7 @@ EMAIL_PORT = config("PRODUCTION_EMAIL_PORT")
 DEFAULT_FROM_EMAIL = config("PRODUCTION_EMAIL_FROM")
 
 
-CELERY_BROKER_URL = config("PRODUCTION_CELERY_BROKER")
+CELERY_BROKER_URL = 'redis://redis:6379/1'
 
 CELERY_BEAT_SCHEDULE = {
     "auto_delete_expired_tokens":{

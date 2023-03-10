@@ -8,8 +8,7 @@ services:
   backend:
 
     build: .
-    command: sh setup-dev.sh
-
+    command: sh docker/setup.dev.sh
 
     container_name: tsuna-streaming-backend
     restart: on-failure
@@ -73,7 +72,6 @@ services:
       - 6379:6379
 
     restart: always
-
 
   celery:
     build: .
