@@ -7,6 +7,8 @@ accounts/profile
 .vscode/* 
 .idea/
 .env
+.env.local
+.env.prod
 venv/
 data/
 .pytest_cache/

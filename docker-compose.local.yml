@@ -1,7 +1,7 @@
 version: '3.9'
 
 x-environment: &DJANGO_SETTINGS_MODULE
-    DJANGO_SETTINGS_MODULE: 'config.settings.development'
+    DJANGO_SETTINGS_MODULE: 'config.settings.local'
 
 services:
 

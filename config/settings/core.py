@@ -1,7 +1,16 @@
 from pathlib import Path
-from decouple import config
+from decouple import Config, RepositoryEnv
 import os, sys
 from datetime import timedelta
+
+
+DJANGO_SETTINGS_MODULE = os.environ.get("DJANGO_SETTINGS_MODULE")
+
+if DJANGO_SETTINGS_MODULE == 'config.settings.local':
+    config = Config(RepositoryEnv('.env.local'))
+
+else:
+    config = Config(RepositoryEnv('.env.prod'))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
