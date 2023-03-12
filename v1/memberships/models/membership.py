@@ -31,9 +31,8 @@ class Membership(models.Model):
     def delete(self, *args, **kwargs):
         '''User cannot delete the plan if there are subscriptions for target plan.'''
 
-        # TODO uncomment this code
-        # if (sub_counts:=self.subscriptions.count()):
-        #     raise ValidationError("Plan is already in use by {} users".format(sub_counts))
+        if (sub_counts:=self.subscriptions.count()):
+            raise ValidationError(f"Plan is already in use by {sub_counts} users")
         
         return super(Membership, self).delete(*args, **kwargs)
 
