@@ -6,11 +6,13 @@ from datetime import timedelta
 
 DJANGO_SETTINGS_MODULE = os.environ.get("DJANGO_SETTINGS_MODULE")
 
+
 if DJANGO_SETTINGS_MODULE == 'config.settings.local':
     config = Config(RepositoryEnv('.env.local'))
 
 else:
     config = Config(RepositoryEnv('.env.prod'))
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -24,6 +26,7 @@ LOCAL_APPS = [
     'v1.accounts.apps.AccountsConfig',
     'v1.channels.apps.ChannelsConfig',
     'v1.admins.apps.AdminsConfig',
+    'v1.memberships.apps.MembershipsConfig',
     'v1.videos.apps.VideosConfig',
     'v1.votes.apps.VotesConfig',
     'v1.comments.apps.CommentsConfig',
