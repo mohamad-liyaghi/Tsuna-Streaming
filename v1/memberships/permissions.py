@@ -7,3 +7,12 @@ class IsAdminUser(BasePermission):
 
     def has_permission(self, request, view):
         return (request.user.role == "a")
+    
+
+class IsNormalUser(BasePermission):
+    '''Only allow normal users to access the page'''
+
+    message = 'You are already a premium user'
+
+    def has_permission(self, request, view):
+        return (request.user.role == 'n')

@@ -3,18 +3,22 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 from django.core.exceptions import ValidationError
 
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView, 
+    RetrieveUpdateDestroyAPIView, 
+    CreateAPIView
+)
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from memberships.models import Membership
-from memberships.permissions import IsAdminUser
-from memberships.serializers.membership import (
+from memberships.models import Membership, Subscription
+from memberships.permissions import IsAdminUser, IsNormalUser
+from memberships.serializers import (
     MembershipSerializer,
-    MembershipDetailSerializer
+    MembershipDetailSerializer, 
+    MembershipSubscribeSerializer
 )
 
 
@@ -54,7 +58,7 @@ class MembershipListCreateView(ListCreateAPIView):
         description="Delete a new Membership Plan [Admin only]."
     ),
 )
-class MembershipDetailAPIView(RetrieveUpdateDestroyAPIView):
+class MembershipDetailView(RetrieveUpdateDestroyAPIView):
 
     serializer_class = MembershipDetailSerializer
 
@@ -82,3 +86,22 @@ class MembershipDetailAPIView(RetrieveUpdateDestroyAPIView):
         # return error message if sth goes wrong
         except ValidationError as error:
             return Response(str(error), status=status.HTTP_403_FORBIDDEN)
+
+
+@extend_schema_view(
+    create=extend_schema(
+        description="Subscribe to a membership plan [Normal users only]."
+    ),
+)
+class MembershipSubscribeView(CreateAPIView):
+    '''Create Subscription for user (Subscribe to a membership plan)'''
+
+    permission_classes = [IsAuthenticated, IsNormalUser]
+    serializer_class  = MembershipSubscribeSerializer
+    
+    def get_object(self):
+        return get_object_or_404(Membership, token=self.kwargs['membership_token'])
+    
+    def get_serializer_context(self):
+        return {"membership" : self.get_object(), 'user' : self.request.user}
+    
