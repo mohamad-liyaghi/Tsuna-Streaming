@@ -1,5 +1,6 @@
-from accounts.models import Account, Plan, Subscription
+from accounts.models import Account
 from channels.models import Channel
+from memberships.models import Subscription, Membership
 from channels.exceptions import ChannelLimitExceededException
 import pytest
 
@@ -13,8 +14,8 @@ class TestChannelModel:
 
     def create_premium_user(self):    
         self.premium_user = Account.objects.create_user(email="user1@simple.com", password="1234USERnormal")
-        plan = Plan.objects.create(title="plan", active_months=1)
-        Subscription.objects.create(user=self.premium_user, plan=plan)
+        membership = Membership.objects.create(title="plan", active_months=1)
+        Subscription.objects.create(user=self.premium_user, membership=membership)
 
 
     def test_create_channel(self):

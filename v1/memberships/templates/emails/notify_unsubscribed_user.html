@@ -6,8 +6,8 @@ Your subscription time has come.
 <h1>Dear {{ kwargs.first_name }}</h1>
 <p>Your {{ kwargs.plan }} plan has just expired.</p>
 
-
-<a href="{{kwargs.domain}}{% url 'v1_accounts:subscription-list' %}">Explore new plans</a>
+{% comment  %}#TODO fix routes {% endcomment %}
+{% comment %} <a href="{{kwargs.domain}}{% url 'v1_accounts:subscription-list' %}">Explore new plans</a> {% endcomment %}
 
 
 {% endblock html_body %}    

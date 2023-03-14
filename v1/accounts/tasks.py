@@ -30,15 +30,3 @@ def auto_delete_deactive_users():
     # deactivated users
     Account.objects.filter(date_joined__lte=a_day_before_now, is_active=False).delete()
 
-
-@shared_task
-def auto_delete_invalid_subscription():
-    '''Auto demote users that dont have premium plan anymore and delete their subscriptions'''
-    # get Subscription model
-    Subscription =  ContentType.objects.get(app_label="accounts", model="subscription").model_class()
-
-    now = timezone.now()
-    invalid_subscriptions = Subscription.objects.select_related('user').filter(finish_date__lte=now)
-
-    for invalid_subscription in invalid_subscriptions:
-        invalid_subscription.delete()

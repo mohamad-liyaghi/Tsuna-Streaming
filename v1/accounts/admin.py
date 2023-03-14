@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import Account, Token, Plan, Subscription
+from accounts.models import Account, Token
 
 
 @admin.register(Account)
@@ -23,12 +23,3 @@ class TokenAdmin(admin.ModelAdmin):
         '''No body can change info in admin panel'''
         return False
     
-
-@admin.register(Plan)
-class PlanAdmin(admin.ModelAdmin):
-    list_display = ["title", "price", "active_months", "is_available"]
-
-
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ["user", "plan", "finish_date", "token"]
