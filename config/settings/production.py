@@ -36,7 +36,7 @@ CELERY_BEAT_SCHEDULE = {
         "schedule" : 1 * 60 * 60 * 24
     }, 
     "auto_delete_invalid_subscription":{
-        "task" : "accounts.tasks.auto_delete_invalid_subscription",
+        "task" : "memberships.tasks.auto_delete_invalid_subscription",
         "schedule" : 1 * 60 * 60 * 24
     }, 
 
