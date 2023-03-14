@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from django.core.exceptions import ValidationError
+from memberships.exceptions import MembershipInUserError
 
 
 class Membership(models.Model):
@@ -32,7 +32,7 @@ class Membership(models.Model):
         '''User cannot delete the plan if there are subscriptions for target plan.'''
 
         if (sub_counts:=self.subscriptions.count()):
-            raise ValidationError(f"Plan is already in use by {sub_counts} users")
+            raise MembershipInUserError(f"Plan is already in use by {sub_counts} users")
         
         return super(Membership, self).delete(*args, **kwargs)
 

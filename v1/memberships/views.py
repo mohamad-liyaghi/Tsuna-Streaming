@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
-from django.core.exceptions import ValidationError
+from memberships.exceptions import MembershipInUserError
 
 from rest_framework.generics import (
     ListCreateAPIView, 
@@ -13,7 +13,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from memberships.models import Membership, Subscription
+from memberships.models import Membership
 from memberships.permissions import IsAdminUser, IsNormalUser
 from memberships.serializers import (
     MembershipSerializer,
@@ -84,7 +84,7 @@ class MembershipDetailView(RetrieveUpdateDestroyAPIView):
             return super().destroy(request, *args, **kwargs)
         
         # return error message if sth goes wrong
-        except ValidationError as error:
+        except MembershipInUserError as error:
             return Response(str(error), status=status.HTTP_403_FORBIDDEN)
 
 
