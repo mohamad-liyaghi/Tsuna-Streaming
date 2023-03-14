@@ -3,13 +3,9 @@ from accounts.views.authentication import (
     RegisterUserView, VerifyUserView, LoginUserView
 )
 from accounts.views.profile import ProfileView
-from accounts.views.subscription import SubscriptionViewSet
-from rest_framework import routers
 
 app_name = "v1_accounts"
-router = routers.DefaultRouter()
 
-router.register("subscription", SubscriptionViewSet, basename="subscription")
 
 urlpatterns = [
     path("register/", RegisterUserView.as_view(), name='register'),
@@ -17,5 +13,3 @@ urlpatterns = [
     path("verify/<str:token>/<str:user_token>/", VerifyUserView.as_view(), name="verify"),
     path("profile/<str:token>/", ProfileView.as_view(), name='profile')
 ] 
-
-urlpatterns += router.urls

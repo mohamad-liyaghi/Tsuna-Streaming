@@ -1,8 +1,14 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .subscription import UserSubscriptionListSerializer
+
 
 USER = get_user_model()
+
+
+class UserSubscriptionListSerializer(serializers.Serializer):
+    plan = serializers.CharField(read_only=True)
+    start_date = serializers.DateTimeField(read_only=True)
+    finish_date = serializers.DateTimeField(read_only=True)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
