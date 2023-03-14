@@ -1,0 +1,13 @@
+{% block subject %}
+Your subscription time has come.
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Dear {{ kwargs.first_name }}</h1>
+<p>Your {{ kwargs.plan }} plan has just expired.</p>
+
+
+<a href="{{kwargs.domain}}{% url 'v1_accounts:subscription-list' %}">Explore new plans</a>
+
+
+{% endblock html_body %}    
