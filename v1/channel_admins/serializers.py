@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from channel_admins.models import Admin, Permission
+from channel_admins.models import ChannelAdmin , ChannelAdminPermission
 from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
@@ -10,7 +10,7 @@ class AdminListSerializer(serializers.ModelSerializer):
     promoted_by = serializers.StringRelatedField()
     
     class Meta:
-        model = Admin
+        model = ChannelAdmin 
         fields = ['user', 'promoted_by', 'channel', 'token']
 
 
@@ -18,7 +18,7 @@ class AdminCreateSerializer(serializers.ModelSerializer):
     '''Create an admin serializer'''
 
     class Meta:
-        model = Admin
+        model = ChannelAdmin 
         fields = ['user', 'change_channel_info', 'add_new_admin', 'block_user']
 
 
@@ -46,7 +46,7 @@ class AdminCreateSerializer(serializers.ModelSerializer):
 class PermissionListSerializer(serializers.ModelSerializer):
     '''Permission list in admin detail page'''
     class Meta:
-        model = Permission
+        model = ChannelAdminPermission
         fields = [
             'get_model_name',
             'token',
@@ -62,7 +62,7 @@ class AdminDetailSerializer(serializers.ModelSerializer):
     promoted_by = serializers.StringRelatedField()
 
     class Meta:
-        model = Admin   
+        model = ChannelAdmin  
         fields = [
             'user',
             'promoted_by',
@@ -80,5 +80,5 @@ class AdminPermissionDetailSerializer(serializers.ModelSerializer):
     admin = serializers.StringRelatedField()
 
     class Meta:
-        model = Permission
+        model = ChannelAdminPermission
         fields = ['admin', 'add_object', 'edit_object', 'delete_object', 'publish_object']

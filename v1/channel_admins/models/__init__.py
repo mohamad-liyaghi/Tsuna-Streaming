@@ -1,7 +1,7 @@
-from channel_admins.models.admin import Admin
-from channel_admins.models.permission import Permission
+from channel_admins.models.admin import ChannelAdmin
+from channel_admins.models.permission import ChannelAdminPermission
 
 __all__ = [
-    'Admin',
-    'Permission',
+    'ChannelAdmin',
+    'ChannelAdminPermission',
 ]

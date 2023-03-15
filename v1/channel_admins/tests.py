@@ -1,7 +1,7 @@
 import pytest
 from accounts.models import Account
 from channels.models import Channel, ChannelSubscriber
-from channel_admins.models import Admin
+from channel_admins.models import ChannelAdmin 
 from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
@@ -10,7 +10,7 @@ from channel_admins.exceptions import DuplicatePromotionException, SubscriptionR
 class TestAdminModel:
 
     def create_admin(self):
-        self.admin = Admin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.super_user)
+        self.admin = ChannelAdmin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.super_user)
 
     def create_subscriber(self):
         self.subscriber = ChannelSubscriber.objects.create(channel=self.channel, user=self.simple_user)
@@ -72,7 +72,7 @@ class TestAdminModel:
 
         self.create_subscriber()
         with pytest.raises(PermissionDenied):
-            Admin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.simple_user)
+            ChannelAdmin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.simple_user)
 
     def test_raise_error_promoting_unsubscribed_user(self):
         '''While user hasnt subscribed to channel, use cannot be promoted'''

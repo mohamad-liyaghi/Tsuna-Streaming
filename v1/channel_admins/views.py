@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from channel_admins.models import Admin, Permission
+from channel_admins.models import ChannelAdmin, ChannelAdminPermission
 from channel_admins.serializers import (
     AdminListSerializer,
     AdminCreateSerializer,
@@ -34,7 +34,7 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
 
     def get_queryset(self):
         # return admins of a channel.
-        return Admin.objects.filter(channel=self.channel)
+        return ChannelAdmin.objects.filter(channel=self.channel)
 
 
     def get_serializer_class(self):
@@ -44,7 +44,6 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
             return AdminListSerializer
 
         return AdminCreateSerializer
-
 
 
 @extend_schema_view(
@@ -96,7 +95,7 @@ class AdminPermissionDetail(AdminPermissionMixin, RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated, AdminPermissionUpdate]
 
     def get_object(self):
-        admin = get_object_or_404(Admin, token=self.kwargs['admin_token'], channel=self.channel)
-        return get_object_or_404(Permission.objects.select_related('admin'), admin=admin, token=self.kwargs['permission_token'])
+        admin = get_object_or_404(ChannelAdmin, token=self.kwargs['admin_token'], channel=self.channel)
+        return get_object_or_404(ChannelAdminPermission.objects.select_related('admin'), admin=admin, token=self.kwargs['permission_token'])
     
     

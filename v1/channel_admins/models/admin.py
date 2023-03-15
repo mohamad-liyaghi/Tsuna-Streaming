@@ -5,8 +5,7 @@ from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
 
 
-
-class Admin(models.Model):
+class ChannelAdmin(models.Model):
     '''Base Channel Admin model'''
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='admin')
@@ -37,7 +36,7 @@ class Admin(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["channel", "user"],
-                name="unique_channel_admins"
+                name="unique_channel_admin"
             )
         ]
 
@@ -54,12 +53,12 @@ class Admin(models.Model):
 
 
             if self.user == self.channel.owner:
-                return super(Admin, self).save(*args, **kwargs)    
+                return super(ChannelAdmin, self).save(*args, **kwargs)    
 
             # user must have permission to promote an admin
             if not self.promoted_by.admin.filter(channel=self.channel, add_new_admin=True):
                 raise PermissionDenied("Permission denied to promote admin.")
         
-            return super(Admin, self).save(*args, **kwargs)    
+            return super(ChannelAdmin, self).save(*args, **kwargs)    
 
-        return super(Admin, self).save(*args, **kwargs)
+        return super(ChannelAdmin, self).save(*args, **kwargs)

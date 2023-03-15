@@ -1,16 +1,16 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from channel_admins.models import Admin
+from channel_admins.models import ChannelAdmin
 
 
-class Permission(models.Model):
+class ChannelAdminPermission(models.Model):
     '''
         Admin permission model.
         After creating admin object, an instance of this model will be created for content models via signals.
         E.g: Permission set wether or not an object can be deleted.
     '''
 
-    admin = models.ForeignKey(Admin, on_delete=models.CASCADE, related_name='permissions')
+    admin = models.ForeignKey(ChannelAdmin, on_delete=models.CASCADE, related_name='permissions')
     model = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='permissions')
 
     token = models.CharField(max_length=32, blank=True, null=True)
@@ -26,7 +26,7 @@ class Permission(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["admin", "model"],
-                name="unique_admin_model"
+                name="unique_admin_permission"
             )
         ]
 

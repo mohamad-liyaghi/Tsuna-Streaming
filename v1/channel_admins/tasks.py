@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import BooleanField
 from celery import shared_task
 from v1.core.models import BaseContentModel
-from channel_admins.models import Admin, Permission
+from channel_admins.models import ChannelAdmin , ChannelAdminPermission
 
 
 
@@ -16,14 +16,14 @@ def create_permission_for_admin(admin_token, *args, **kwargs):
     permission_boolean_fields = list(
                                     # filter fields that are BooleanField.
                                     # boolean fields are all permissions like add_object.
-                                    filter(lambda x: type(x) == BooleanField, Permission._meta.get_fields())
+                                    filter(lambda x: type(x) == BooleanField, ChannelAdminPermission._meta.get_fields())
                                 )
 
     # all content models (e.g: Video, etc.)
     content_models = BaseContentModel.__subclasses__()
 
     # get the admin that got created.
-    if (admin:= Admin.objects.filter(token=admin_token).first()):
+    if (admin:= ChannelAdmin .objects.filter(token=admin_token).first()):
 
         # By default channel owmers have all the permissions.
         # if user is owner, this funntion returns True by default.
@@ -41,5 +41,5 @@ def create_permission_for_admin(admin_token, *args, **kwargs):
                 boolean_field = {field.name:check_user_ownership() for (field) in permission_boolean_fields}
 
                 # create permission for the admin and the channel.
-                Permission.objects.create(admin=admin, model=Klass, **boolean_field)
+                ChannelAdminPermission.objects.create(admin=admin, model=Klass, **boolean_field)
 
