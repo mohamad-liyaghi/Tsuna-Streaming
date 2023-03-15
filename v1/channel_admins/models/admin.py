@@ -2,7 +2,7 @@ from django.db import models
 from channels.models import Channel
 from accounts.models import Account
 from django.core.exceptions import PermissionDenied
-from admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
+from channel_admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
 
 
 

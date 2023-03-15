@@ -1,5 +1,5 @@
 from django.contrib import admin
-from admins.models import Admin, Permission
+from channel_admins.models import Admin, Permission
 
 @admin.register(Admin)
 class ChannelAdminAdmin(admin.ModelAdmin):

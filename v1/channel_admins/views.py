@@ -4,15 +4,15 @@ from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from admins.models import Admin, Permission
-from admins.serializers import (
+from channel_admins.models import Admin, Permission
+from channel_admins.serializers import (
     AdminListSerializer,
     AdminCreateSerializer,
     AdminDetailSerializer,
     AdminPermissionDetailSerializer
 )
-from admins.mixins import AdminPermissionMixin
-from admins.permissions import AdminDetailPermission, AdminPermissionUpdate
+from channel_admins.mixins import AdminPermissionMixin
+from channel_admins.permissions import AdminDetailPermission, AdminPermissionUpdate
 
 
 @extend_schema_view(

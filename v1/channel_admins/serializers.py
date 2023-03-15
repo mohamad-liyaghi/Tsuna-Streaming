@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from admins.models import Admin, Permission
+from channel_admins.models import Admin, Permission
 from django.core.exceptions import PermissionDenied
-from admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
+from channel_admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
 
 class AdminListSerializer(serializers.ModelSerializer):

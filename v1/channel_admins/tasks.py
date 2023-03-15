@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import BooleanField
 from celery import shared_task
 from v1.core.models import BaseContentModel
-from admins.models import Admin, Permission
+from channel_admins.models import Admin, Permission
 
 
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
-from admins.models import Admin
+from channel_admins.models import Admin
 
 
 class Permission(models.Model):

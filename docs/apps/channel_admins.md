@@ -1,4 +1,4 @@
-# Admins Application Docs
+# Channel Admins Application Docs
 
 <h3>
 The "Admin" application of the "Tsuna Streaming" project handles the management of channels and content for administrators.

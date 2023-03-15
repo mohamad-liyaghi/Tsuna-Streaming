@@ -12,7 +12,7 @@ urlpatterns = [
     # v1 app urls
     path("v1/accounts/", include("v1.accounts.urls")),
     path("v1/channels/", include("v1.channels.urls")),
-    path("v1/admins/", include("v1.admins.urls")),
+    path("v1/channel-admins/", include("v1.channel_admins.urls")),
     path("v1/memberships/", include("v1.memberships.urls")),
     path("v1/videos/", include("v1.videos.urls")),
     path("v1/votes/", include("v1.votes.urls")),

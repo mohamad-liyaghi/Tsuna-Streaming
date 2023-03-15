@@ -1,11 +1,11 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, post_delete
 
-from admins.models import Admin, Permission
+from channel_admins.models import Admin, Permission
 from channels.models import Channel, ChannelSubscriber
 from v1.core.receivers import create_token_after_creating_object
 from v1.core.tasks import send_email
-from admins.tasks import create_permission_for_admin
+from channel_admins.tasks import create_permission_for_admin
 
 
 pre_save.connect(create_token_after_creating_object, sender=Admin)

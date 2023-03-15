@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('admins', '0001_initial'),
+        ('channel_admins', '0001_initial'),
     ]
 
     operations = [

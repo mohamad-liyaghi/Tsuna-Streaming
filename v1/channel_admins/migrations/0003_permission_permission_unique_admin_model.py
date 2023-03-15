@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('contenttypes', '0002_remove_content_type_name'),
-        ('admins', '0002_alter_admin_promoted_by'),
+        ('channel_admins', '0002_alter_admin_promoted_by'),
     ]
 
     operations = [
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('edit_object', models.BooleanField(default=False)),
                 ('delete_object', models.BooleanField(default=False)),
                 ('publish_object', models.BooleanField(default=False)),
-                ('admin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='admins.admin')),
+                ('admin', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='channel_admins.admin')),
                 ('model', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='contenttypes.contenttype')),
             ],
         ),

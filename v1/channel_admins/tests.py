@@ -1,9 +1,9 @@
 import pytest
 from accounts.models import Account
 from channels.models import Channel, ChannelSubscriber
-from admins.models import Admin
+from channel_admins.models import Admin
 from django.core.exceptions import PermissionDenied
-from admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
+from channel_admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
 
 
 @pytest.mark.django_db
