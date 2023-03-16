@@ -74,7 +74,7 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
         if channel.owner == user:
             return "owner"
 
-        if user.admin.filter(channel=channel).exists():
+        if user.channel_admins.filter(channel=channel).exists():
             return "Admin"
             
         return None

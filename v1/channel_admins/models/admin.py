@@ -8,9 +8,9 @@ from channel_admins.exceptions import (DuplicatePromotionException, Subscription
 class ChannelAdmin(models.Model):
     '''Base Channel Admin model'''
 
-    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='admin')
-    promoted_by = models.ForeignKey(Account, on_delete=models.CharField, blank=True, null=True,
-                                             related_name='promoted_admin')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='channel_admins')
+    promoted_by = models.ForeignKey(Account, on_delete=models.CASCADE, blank=True, null=True,
+                                             related_name='promoted_admins')
 
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name='admins')
 
@@ -48,7 +48,7 @@ class ChannelAdmin(models.Model):
                 raise SubscriptionRequiredException("User hasnt subscribed to channel.")
 
             # check admin exists or not
-            if self.user.admin.filter(channel=self.channel).exists():
+            if self.user.channel_admins.filter(channel=self.channel).exists():
                 raise DuplicatePromotionException("Admin already exists.")
 
 
@@ -56,7 +56,7 @@ class ChannelAdmin(models.Model):
                 return super(ChannelAdmin, self).save(*args, **kwargs)    
 
             # user must have permission to promote an admin
-            if not self.promoted_by.admin.filter(channel=self.channel, add_new_admin=True):
+            if not self.promoted_by.channel_admins.filter(channel=self.channel, add_new_admin=True):
                 raise PermissionDenied("Permission denied to promote admin.")
         
             return super(ChannelAdmin, self).save(*args, **kwargs)    

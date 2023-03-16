@@ -33,7 +33,7 @@ class CommentDetailPermission(BasePermission):
             
             else:
                 # check if user is admin
-                admin = request.user.admin.filter(channel=object.content_object.channel).first()
+                admin = request.user.channel_admins.filter(channel=object.content_object.channel).first()
 
                 if admin:
                     # if user is admin, check if user has permission to delete comment.

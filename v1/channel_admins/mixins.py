@@ -15,7 +15,7 @@ class AdminPermissionMixin:
         self.channel = get_object_or_404(Channel, token=self.kwargs['channel_token'])
         
         # check if user is admin of the given channel
-        if request.user.admin.filter(channel=self.channel).exists():
+        if request.user.channel_admins.filter(channel=self.channel).exists():
             return super(AdminPermissionMixin, self).dispatch(request, *args, **kwargs)
         
         return JsonResponse({'permission denied' : 'You can not access this page.'}, status=status.HTTP_403_FORBIDDEN)

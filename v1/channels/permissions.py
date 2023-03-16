@@ -46,6 +46,6 @@ class ChannelPermission(BasePermission):
         # check permission for updating channel
         elif request.method in ["PUT", "PATCH"]:
 
-            return (request.user.admin.filter(channel=object, change_channel_info=True).exists())
+            return (request.user.channel_admins.filter(channel=object, change_channel_info=True).exists())
 
         return True

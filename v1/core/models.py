@@ -61,7 +61,7 @@ class BaseContentModel(models.Model):
         
         if not self.pk: 
             # get the object channels admin
-            admin = self.user.admin.filter(channel=self.channel).first()
+            admin = self.user.channel_admins.filter(channel=self.channel).first()
 
             if admin:
                 # check if user has permission

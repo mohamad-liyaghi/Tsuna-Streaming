@@ -77,7 +77,7 @@ class CommentPinView(CommentObjectMixin, APIView):
             # parent comment channel                      
             channel = comment.content_object.channel
 
-            if request.user.admin.filter(channel=channel):
+            if request.user.channel_admins.filter(channel=channel):
                         
                     comment.pinned = True if not comment.pinned else False
                     comment.save()

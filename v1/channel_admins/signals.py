@@ -41,7 +41,7 @@ def create_admin_after_creating_channel(sender, **kwargs):
 def delete_admin_after_unsubscribing(sender, **kwargs):
     instance = kwargs["instance"]
     
-    if (admin:=instance.user.admin.filter(channel=instance.channel)):
+    if (admin:=instance.user.channel_admins.filter(channel=instance.channel)):
         admin.delete()
 
 

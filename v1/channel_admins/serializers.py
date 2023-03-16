@@ -27,7 +27,7 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         kwargs['channel'] = self.context['channel']
 
         # only admins with add_new_admin permission can add admins.
-        if not kwargs['promoted_by'].admin.filter(channel=kwargs['channel'], add_new_admin=True).exists():
+        if not kwargs['promoted_by'].channel_admins.filter(channel=kwargs['channel'], add_new_admin=True).exists():
             raise serializers.ValidationError("You dont have permission to promote admin.")
 
         try:

@@ -22,18 +22,18 @@ class TestAdminModel:
         self.channel = Channel.objects.create(owner=self.super_user, title="test")    
 
     def test_create_admin_after_creating_channel(self):
-        assert self.super_user.admin.count() == 1
+        assert self.super_user.channel_admins.count() == 1
 
     def test_add_admin(self):
 
-        assert self.simple_user.admin.count() == 0
+        assert self.simple_user.channel_admins.count() == 0
 
         # create a subscriber instance
         self.create_subscriber()
         # create an admin
         self.create_admin()
 
-        assert self.simple_user.admin.count() == 1
+        assert self.simple_user.channel_admins.count() == 1
     
     def test_delete_admin_after_unsubscribing(self):
         '''When a user unsubscribe a channel, the admin instance will be deleted.'''
@@ -64,7 +64,7 @@ class TestAdminModel:
     def test_default_admin_permission_for_super_user(self):
         '''By default Chanenl owner has all the permissions'''
 
-        admin = self.super_user.admin.first().permissions.first()
+        admin = self.super_user.channel_admins.first().permissions.first()
         assert admin.add_object == True
 
     def test_raise_permission_denied_for_promoting(self):
@@ -77,7 +77,7 @@ class TestAdminModel:
     def test_raise_error_promoting_unsubscribed_user(self):
         '''While user hasnt subscribed to channel, use cannot be promoted'''
 
-        assert self.simple_user.admin.count() == 0
+        assert self.simple_user.channel_admins.count() == 0
 
         with pytest.raises(SubscriptionRequiredException):
             self.create_admin()
@@ -85,12 +85,12 @@ class TestAdminModel:
     def test_raise_error_when_duplicating_admin(self):
         '''user cannot be promoted for 2 times'''
 
-        assert self.simple_user.admin.count() == 0
+        assert self.simple_user.channel_admins.count() == 0
         # create a subscriber instance
         self.create_subscriber()
         # create an admin
         self.create_admin()
-        assert self.simple_user.admin.count() == 1
+        assert self.simple_user.channel_admins.count() == 1
 
         with pytest.raises(DuplicatePromotionException):
             self.create_admin()

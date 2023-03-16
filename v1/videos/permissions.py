@@ -9,7 +9,7 @@ class VideoPermission(BasePermission):
         # the given object
         object = view.get_object()
 
-        admin = request.user.admin.filter(channel=object.channel).first()
+        admin = request.user.channel_admins.filter(channel=object.channel).first()
 
         # only channel owner and some admins can update a video
         if request.method in ["PUT", "PATCH"]:
@@ -25,6 +25,6 @@ class VideoPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
 
         if not obj.is_published:
-            return (request.user.admin.filter(channel=obj.channel).first())
+            return (request.user.channel_admins.filter(channel=obj.channel).first())
         
         return True
