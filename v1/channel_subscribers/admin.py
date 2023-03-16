@@ -1,3 +1,6 @@
 from django.contrib import admin
+from channel_subscribers.models import ChannelSubscriber
 
-# Register your models here.
+@admin.register(ChannelSubscriber)
+class ChannelSubscriberAdmin(admin.ModelAdmin):
+    list_display = ["user", "channel", "date"]

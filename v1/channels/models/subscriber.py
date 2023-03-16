@@ -6,9 +6,9 @@ from django.conf import settings
 class ChannelSubscriber(models.Model):
     '''Channel Subscriber model'''
     
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="subscribers")
+    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="subscriber")
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                             related_name="subscribed_channels")
+                             related_name="subscribed_channel")
 
     date = models.DateTimeField(auto_now_add=True)
     is_blocked = models.BooleanField(default=False)
