@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.cache import cache
 from accounts.validators import validate_profile_size
 from channels.exceptions import ChannelLimitExceededException
 
@@ -26,11 +27,38 @@ class Channel(models.Model):
 
     @property
     def subscribers_count(self):
-        return self.subscribers.all().count()
+        key = f'subscriber_count:{self.token}'
+        cache_subscribers_count = cache.get(key)
 
-    @property
-    def videos_count(self):
-        return self.videos.all().count()
+        # If subscriber count in cache return that
+        if cache_subscribers_count is not None:
+            return cache_subscribers_count.get("count", 0)
+            
+        # If subscriber count not in cache
+        # Get all subscribers from cache
+        cached_subscribers = [cache.get(key) for key in cache.keys(f"subscriber:{self.token}:*")]
+        
+        # Get subscribers count from db
+        db_subscribers_count = self.subscribers.count()
+
+        # If there are subs in cache
+        if cached_subscribers:   
+            # Give len of subscribers that have subscription subscribed and source in cache 
+            cached_subscriber_count = sum(
+            1 for sub in cached_subscribers
+            if sub.get('subscription_status') == 'subscribed' and sub.get('source') == 'cache')
+
+            # Total of subscribers
+            total_subscribers = db_subscribers_count + cached_subscriber_count
+            # Set the count in cache for other requests
+            cache.set(key=key, value={'count' : total_subscribers}, timeout=5 * 60)
+            # Return total subs
+            return total_subscribers
+
+        # If no subscriber in cache, save the subs count of db in cache and return it
+        cache.set(key=key, value={'count' : db_subscribers_count}, timeout=5 * 60)
+        return db_subscribers_count
+
 
     def save(self, *args, **kwargs):
         
