@@ -8,6 +8,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
+from channel_subscribers.permissions import SubscriberPermission
 
 
 @extend_schema_view(
@@ -23,9 +24,10 @@ from channel_subscribers.models import ChannelSubscriber
 )
 class SubscriberView(APIView):
     # Only authenticated users can access this view
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, SubscriberPermission]
 
     def dispatch(self, request, *args, **kwargs):
+        # Check if the given channel exists
         self.channel = get_object_or_404(Channel, token=self.kwargs['channel_token'])
         return super().dispatch(request, *args, **kwargs)
 

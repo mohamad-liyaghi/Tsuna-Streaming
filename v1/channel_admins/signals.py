@@ -42,11 +42,8 @@ def delete_admin_after_unsubscribing(sender, **kwargs):
     instance = kwargs["instance"]
     
     if (admin:=instance.user.channel_admins.filter(channel=instance.channel)):
-        print("na")
-        print(admin)
         admin.delete()
 
-    print("Executed")
 
 
 @receiver(post_save, sender=ChannelAdmin )
