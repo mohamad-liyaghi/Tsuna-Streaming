@@ -1,5 +1,6 @@
 from django.db import models
 from channels.models import Channel
+from channel_subscribers.models import ChannelSubscriber
 from accounts.models import Account
 from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
@@ -44,7 +45,8 @@ class ChannelAdmin(models.Model):
         if not self.pk:
 
             # only subscribed users can be promoted
-            if not self.user.subscribed_channels.filter(channel=self.channel):
+            
+            if not ChannelSubscriber.get_subscriber(channel_token=self.channel.token, user_token=self.user.token):
                 raise SubscriptionRequiredException("User hasnt subscribed to channel.")
 
             # check admin exists or not

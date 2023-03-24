@@ -2,7 +2,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, post_delete
 
 from channel_admins.models import ChannelAdmin , ChannelAdminPermission
-from channels.models import ChannelSubscriber
 from channel_subscribers.models import ChannelSubscriber
 from v1.core.receivers import create_token_after_creating_object
 from v1.core.tasks import send_email
