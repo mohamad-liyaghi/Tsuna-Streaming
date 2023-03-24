@@ -57,6 +57,10 @@ CELERY_BEAT_SCHEDULE = {
         "task" : "channel_subscribers.tasks.insert_subscriber_from_cache_into_db",
         "schedule" : 1 * 60 
     }, 
+    "delete_unsubscribed_from_db":{
+        "task" : "channel_subscribers.tasks.delete_unsubscribed_from_db",
+        "schedule" : 1 * 60 
+    }, 
 
 }
 
