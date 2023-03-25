@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save, post_delete
 
 from channel_admins.models import ChannelAdmin , ChannelAdminPermission
-from channels.models import Channel, ChannelSubscriber
+from channel_subscribers.models import ChannelSubscriber
 from v1.core.receivers import create_token_after_creating_object
 from v1.core.tasks import send_email
 from channel_admins.tasks import create_permission_for_admin
@@ -24,7 +24,6 @@ def notify_after_promoting_admin_admin(sender, **kwargs):
                     channel=channel.title, first_name=user.first_name, channel_token=channel.token)
         
 
-@receiver(post_save, sender=Channel)
 def create_admin_after_creating_channel(sender, **kwargs):
     '''Auto admin created channel by owner'''
 
@@ -43,6 +42,7 @@ def delete_admin_after_unsubscribing(sender, **kwargs):
     
     if (admin:=instance.user.channel_admins.filter(channel=instance.channel)):
         admin.delete()
+
 
 
 @receiver(post_save, sender=ChannelAdmin )

@@ -26,6 +26,7 @@ LOCAL_APPS = [
     'v1.accounts.apps.AccountsConfig',
     'v1.channels.apps.ChannelsConfig',
     'v1.channel_admins.apps.ChannelAdminsConfig',
+    'v1.channel_subscribers.apps.ChannelSubscribersConfig',
     'v1.memberships.apps.MembershipsConfig',
     'v1.videos.apps.VideosConfig',
     'v1.votes.apps.VotesConfig',

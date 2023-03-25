@@ -57,7 +57,6 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
             "is_verified", 
             "role", 
             "subscribers_count", 
-            "videos_count",            
             ]
 
         extra_kwargs = {

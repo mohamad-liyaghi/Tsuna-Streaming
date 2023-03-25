@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
-from channels.serializers.channel import (ChannelListCreateSerializer, ChannelDetailSerializer)
+from channels.serializers import (ChannelListCreateSerializer, ChannelDetailSerializer)
 from channels.permissions import  ChannelPermission, ChannelLimitPermission
 
 @extend_schema_view(
