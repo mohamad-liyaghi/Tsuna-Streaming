@@ -3,13 +3,8 @@ from django.db.models.signals import post_save, pre_save, post_delete
 
 from channel_admins.models import ChannelAdmin , ChannelAdminPermission
 from channel_subscribers.models import ChannelSubscriber
-from v1.core.receivers import create_token_after_creating_object
 from v1.core.tasks import send_email
 from channel_admins.tasks import create_permission_for_admin
-
-
-pre_save.connect(create_token_after_creating_object, sender=ChannelAdmin)
-pre_save.connect(create_token_after_creating_object, sender=ChannelAdminPermission)
 
 
 @receiver(pre_save, sender=ChannelAdmin )

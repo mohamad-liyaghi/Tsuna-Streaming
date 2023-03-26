@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from cached_property import cached_property_with_ttl
-
+from core.utils import unique_token_generator
 
 class BaseTokenModel(models.Model):
     '''
@@ -13,6 +13,14 @@ class BaseTokenModel(models.Model):
 
     class Meta:
         abstract = True
+    
+    def save(self, *args, **kwargs):
+
+        if not self.pk:
+            self.token = unique_token_generator(self)
+            return super(BaseTokenModel, self).save(*args, **kwargs)
+        
+        return super(BaseTokenModel, self).save(*args, **kwargs)
         
 
 

@@ -5,13 +5,6 @@ from django.utils import timezone
 
 from accounts.models import Token
 from v1.core.tasks import send_email
-from v1.core.receivers import create_token_after_creating_object
-import datetime
-
-
-# create a unique token for object
-pre_save.connect(create_token_after_creating_object, sender=settings.AUTH_USER_MODEL)
-pre_save.connect(create_token_after_creating_object, sender=Token)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

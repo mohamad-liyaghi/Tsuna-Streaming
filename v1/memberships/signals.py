@@ -1,12 +1,7 @@
 from django.db.models.signals import pre_save, post_save, pre_delete
 from django.dispatch import receiver
 from memberships.models import Membership, Subscription
-from v1.core.receivers import create_token_after_creating_object
 from v1.core.tasks import send_email
-
-# create unique token for each object
-pre_save.connect(create_token_after_creating_object, sender=Membership)
-pre_save.connect(create_token_after_creating_object, sender=Subscription)
 
 
 @receiver(post_save, sender=Subscription)
