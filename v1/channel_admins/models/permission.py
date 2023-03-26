@@ -1,9 +1,10 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from channel_admins.models import ChannelAdmin
+from core.models import BaseTokenModel
 
 
-class ChannelAdminPermission(models.Model):
+class ChannelAdminPermission(BaseTokenModel):
     '''
         Admin permission model.
         After creating admin object, an instance of this model will be created for content models via signals.
@@ -13,7 +14,6 @@ class ChannelAdminPermission(models.Model):
     admin = models.ForeignKey(ChannelAdmin, on_delete=models.CASCADE, related_name='permissions')
     model = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='permissions')
 
-    token = models.CharField(max_length=32, blank=True, null=True)
 
     add_object = models.BooleanField(default=False)
     edit_object = models.BooleanField(default=False)

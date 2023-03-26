@@ -1,9 +1,10 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from memberships.exceptions import MembershipInUserError
+from core.models import BaseTokenModel
 
 
-class Membership(models.Model):
+class Membership(BaseTokenModel):
     '''Membership plans for users to buy'''
 
     title = models.CharField(max_length=210)
@@ -13,9 +14,7 @@ class Membership(models.Model):
         MaxValueValidator(1000),
         MinValueValidator(10)
     ])
-    
-    # Gets filled by create_token_after_creating_object signal
-    token = models.CharField(max_length=32, null=True, blank=True)
+
 
     active_months = models.PositiveBigIntegerField(default=0,validators=[
         MaxValueValidator(24),

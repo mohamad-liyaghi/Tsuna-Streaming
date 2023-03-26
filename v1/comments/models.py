@@ -5,9 +5,10 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 
 from votes.models import Vote
 from comments.exceptions import CommentNotAllowed
+from core.models import BaseTokenModel
 
 
-class Comment(models.Model):
+class Comment(BaseTokenModel):
     '''Generic comment model'''
 
     parent = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True,
@@ -20,8 +21,6 @@ class Comment(models.Model):
 
     edited = models.BooleanField(default=False)
     pinned = models.BooleanField(default=False)
-
-    token = models.CharField(max_length=32, null=True, blank=True)
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()

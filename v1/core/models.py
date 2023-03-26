@@ -4,13 +4,23 @@ from django.core.exceptions import PermissionDenied
 from cached_property import cached_property_with_ttl
 
 
+class BaseTokenModel(models.Model):
+    '''
+        Most of the models has a token field.
+        They can simply inherit from this model and use the unique token creation privileges
+    '''
+    token = models.CharField(max_length=32, blank=True, null=True, editable=False)
+
+    class Meta:
+        abstract = True
+        
 
 
-class BaseContentModel(models.Model):
+class BaseContentModel(BaseTokenModel):
     '''
         The base content model of content models (video, broadcast etc...).
         This model contains some common fields.
-        The only diffrence between this model and models.Model is the methods.
+        The only diffrence between this model and BaseTokenModel is the methods.
     '''
 
     class Visibility(models.TextChoices):

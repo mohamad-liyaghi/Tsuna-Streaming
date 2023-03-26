@@ -3,9 +3,10 @@ from django.conf import settings
 from django.core.cache import cache
 from accounts.validators import validate_profile_size
 from channels.exceptions import ChannelLimitExceededException
+from core.models import BaseTokenModel
 
 
-class Channel(models.Model):
+class Channel(BaseTokenModel):
     
     title = models.CharField(max_length=240)
     description = models.TextField(max_length=500, default="A new channel on Tsuna Streaming.")
@@ -20,7 +21,6 @@ class Channel(models.Model):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                 related_name="channels")
 
-    token = models.CharField(max_length=32, null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     is_verified = models.BooleanField(default=False)

@@ -4,7 +4,6 @@ from django.core.exceptions import ValidationError
 from django.contrib.contenttypes.fields import GenericRelation
 from v1.core.models import BaseContentModel
 from channels.models import Channel
-from videos.utils import video_token_generator
 from videos.managers import VideoManager
 from votes.models import Vote
 from comments.models import Comment
@@ -18,7 +17,6 @@ class Video(BaseContentModel):
     video = models.FileField(upload_to="videos/user_video/")
     thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="assets/images/default-video-thumbnail.jpg")
 
-    token = models.CharField(max_length=32, default=video_token_generator)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="videos")
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="videos")   

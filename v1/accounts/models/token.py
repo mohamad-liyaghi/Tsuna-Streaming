@@ -2,8 +2,10 @@ from django.db import models
 from django.conf import settings
 import datetime
 from django.utils import timezone
+from core.models import BaseTokenModel
 
-class Token(models.Model):
+
+class Token(BaseTokenModel):
     '''
         A 32 char token for email verification stuff.
         Token is valid for 10 mins and only can be tried for 5 times.
@@ -11,8 +13,6 @@ class Token(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name="tokens")
-
-    token = models.CharField(max_length=32, null=True, blank=True)
     
     date_created = models.DateTimeField(auto_now_add=True)
     retry = models.PositiveIntegerField(default=0)

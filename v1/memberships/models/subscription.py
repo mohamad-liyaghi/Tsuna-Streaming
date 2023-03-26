@@ -3,9 +3,10 @@ from django.conf import settings
 from django.utils import timezone
 from memberships.models import Membership
 import datetime
+from core.models import BaseTokenModel
 
 
-class Subscription(models.Model):
+class Subscription(BaseTokenModel):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name="subscription")
@@ -14,8 +15,6 @@ class Subscription(models.Model):
     
     start_date = models.DateTimeField(auto_now_add=True)
     finish_date = models.DateTimeField(blank=True, null=True)
-
-    token = models.CharField(max_length=32, null=True, blank=True)
 
 
     class Meta:

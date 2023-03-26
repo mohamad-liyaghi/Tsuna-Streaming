@@ -4,9 +4,10 @@ from channel_subscribers.models import ChannelSubscriber
 from accounts.models import Account
 from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
+from core.models import BaseTokenModel
 
 
-class ChannelAdmin(models.Model):
+class ChannelAdmin(BaseTokenModel):
     '''Base Channel Admin model'''
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='channel_admins')
@@ -16,7 +17,6 @@ class ChannelAdmin(models.Model):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name='admins')
 
     date = models.DateTimeField(auto_now_add=True)
-    token = models.CharField(max_length=32, null=True, blank=True)
 
     # Basic channel permissions
     change_channel_info = models.BooleanField(default=False)
