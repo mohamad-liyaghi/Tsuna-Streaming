@@ -16,8 +16,10 @@ class BaseTokenModel(models.Model):
     
     def save(self, *args, **kwargs):
 
+        # If object is not saved yet
         if not self.pk:
-            self.token = unique_token_generator(self)
+            # Create a unique token for object
+            self.token = unique_token_generator(self, BaseContentModel)
             return super(BaseTokenModel, self).save(*args, **kwargs)
         
         return super(BaseTokenModel, self).save(*args, **kwargs)

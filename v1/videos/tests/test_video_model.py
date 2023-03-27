@@ -102,4 +102,8 @@ class TestVideoModel:
         with pytest.raises(PermissionDenied):
             self.video = Video.objects.create(title='test', description='new video', 
                                         video=image, user=non_admin_user, channel=self.channel)
-            
+    
+    def test_video_token(self):
+        '''Test that video is in the video token'''
+        self.create_video()
+        assert self.video.token.split('-')[0] == self.video.__class__.__name__.lower()
