@@ -16,7 +16,7 @@ class TestChannelSubscriber:
         self.channel = Channel.objects.create(owner=self.user, title="channel")
 
     def create_subscriber(self):
-        self.subscriber = ChannelSubscriber.create_subscriber(self.channel.token, self.subscriber_user.token)
+        self.subscriber = ChannelSubscriber.objects.subscribe_in_cache(self.channel.token, self.subscriber_user.token)
 
     def test_auto_create_sub_for_channel_owner(self):
         """Ensure that a new channel automatically subscribes its owner."""
@@ -35,16 +35,16 @@ class TestChannelSubscriber:
 
     def test_get_subscriber(self):
         """Ensure that a subscriber can be retrieved from the cache."""
-        assert ChannelSubscriber.get_subscriber(self.channel.token, self.subscriber_user.token) is None
+        assert ChannelSubscriber.objects.get_from_cache(self.channel.token, self.subscriber_user.token) is None
         self.create_subscriber()
-        assert ChannelSubscriber.get_subscriber(self.channel.token, self.subscriber_user.token) is not None
+        assert ChannelSubscriber.objects.get_from_cache(self.channel.token, self.subscriber_user.token) is not None
 
     def test_delete_subscriber(self):
         """Ensure that a subscriber can be deleted and marked as unsubscribed."""
         assert cache.get(f'subscriber:{self.channel.token}:{self.subscriber_user.token}') is None
         self.create_subscriber()
         assert cache.get(f'subscriber:{self.channel.token}:{self.subscriber_user.token}') is not None    
-        ChannelSubscriber.delete_subscriber(self.channel.token, self.subscriber_user.token)
+        ChannelSubscriber.objects.unsubscribe_in_cache(self.channel.token, self.subscriber_user.token)
         assert cache.get(f'subscriber:{self.channel.token}:{self.subscriber_user.token}')['subscription_status'] == 'unsubscribed'
 
     def test_get_channel_subscriber_count(self):

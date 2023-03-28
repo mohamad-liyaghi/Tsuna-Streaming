@@ -10,7 +10,7 @@ class SubscriberPermission(BasePermission):
         channel_token = view.kwargs.get('channel_token')
 
         # Get subscriber from cache or db
-        subscriber = ChannelSubscriber.get_subscriber(
+        subscriber = ChannelSubscriber.objects.get_from_cache(
                 channel_token=channel_token, 
                 user_token=request.user.token
             )

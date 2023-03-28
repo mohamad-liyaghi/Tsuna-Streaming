@@ -46,7 +46,7 @@ class ChannelAdmin(BaseTokenModel):
 
             # only subscribed users can be promoted
             
-            if not ChannelSubscriber.get_subscriber(channel_token=self.channel.token, user_token=self.user.token):
+            if not ChannelSubscriber.objects.get_from_cache(channel_token=self.channel.token, user_token=self.user.token):
                 raise SubscriptionRequiredException("User hasnt subscribed to channel.")
 
             # check admin exists or not

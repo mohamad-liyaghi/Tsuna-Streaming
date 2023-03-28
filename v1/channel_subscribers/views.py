@@ -37,7 +37,7 @@ class SubscriberView(APIView):
         '''
 
         # Get the subscription status from the database and cache
-        subscriber = ChannelSubscriber.get_subscriber(channel_token, request.user.token)
+        subscriber = ChannelSubscriber.objects.get_from_cache(channel_token, request.user.token)
 
         # Return True if subscribed, else return False
         return Response(True if subscriber else False, status=status.HTTP_200_OK)
@@ -49,7 +49,7 @@ class SubscriberView(APIView):
         If the user has already subscribed to the channel, the permission class prevents them from performing this action. 
         '''
 
-        ChannelSubscriber.create_subscriber(
+        ChannelSubscriber.objects.subscribe_in_cache(
             channel_token=channel_token, user_token=request.user.token
         )
         return Response('OK', status=status.HTTP_201_CREATED)
@@ -63,7 +63,7 @@ class SubscriberView(APIView):
         '''
 
         # Delete the subscriber
-        ChannelSubscriber.delete_subscriber(
+        ChannelSubscriber.objects.unsubscribe_in_cache(
             channel_token=channel_token, user_token=request.user.token
         )  
         
