@@ -35,7 +35,7 @@ class Vote(models.Model):
             object = self.content_object   
 
             # check if user voted before
-            user_vote = object.vote.filter(user=self.user).first()
+            user_vote = object.votes.filter(user=self.user).first()
 
             if not user_vote:
                 '''If user hasnt voted yet, vote object will be saved.'''

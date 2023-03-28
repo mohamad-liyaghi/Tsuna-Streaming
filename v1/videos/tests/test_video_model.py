@@ -61,39 +61,39 @@ class TestVideoModel:
     def test_delete_vote_after_deleting_video(self):
         '''There is a signal that deletes all votes related to a deleted object'''
         self.create_video()
-        assert self.video.vote.count() == 0
+        assert self.video.votes.count() == 0
 
         Vote.objects.create(user=self.user, choice=Vote.Choice.UPVOTE, content_object=self.video)
-        assert self.video.vote.count() == 1
+        assert self.video.votes.count() == 1
 
         self.video.delete()
-        assert self.video.vote.count() == 0
+        assert self.video.votes.count() == 0
     
     def test_delete_comment_after_deleting_video(self):
         '''There is a signal that deletes all comments related to a deleted object'''
 
         self.create_video()
-        assert self.video.comment.count() == 0
+        assert self.video.comments.count() == 0
 
         Comment.objects.create(user=self.user, content_object=self.video, body="Test comment")
 
-        assert self.video.comment.count() == 1
+        assert self.video.comments.count() == 1
 
         self.video.delete()
-        assert self.video.comment.count() == 0
+        assert self.video.comments.count() == 0
     
     def test_delete_viewer_after_deleting_video(self):
         '''There is a signal that deletes all comments related to a deleted object'''
 
         self.create_video()
-        assert self.video.viewer.count() == 0
+        assert self.video.viewers.count() == 0
 
         Viewer.objects.create(user=self.user, content_object=self.video)
 
-        assert self.video.viewer.count() == 1
+        assert self.video.viewers.count() == 1
 
         self.video.delete()
-        assert self.video.viewer.count() == 0
+        assert self.video.viewers.count() == 0
 
     def test_video_raise_admin_not_found(self):
         '''When user is not admin and wants to add video, it gets AdminNotFount'''

@@ -10,7 +10,7 @@ class CommentParentQueryset(serializers.SlugRelatedField):
         # get the object that is sent from serializer
         object = self.context.get('object', None)
         # return comments of an object
-        return object.comment.filter(parent__isnull=True)
+        return object.comments.filter(parent__isnull=True)
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
@@ -66,4 +66,4 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     def vote_counts(self, comment):
         '''return count of vote of a comment''' 
-        return {"upvotes" : comment.vote.upvotes(), "downvotes" : comment.vote.downvotes()}
+        return {"upvotes" : comment.votes.upvotes(), "downvotes" : comment.votes.downvotes()}

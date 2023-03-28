@@ -22,5 +22,5 @@ class ViewerListView(APIView):
     def get(self, request, content_type_id, token, *args, **kwargs):
         content_type_model = get_object_or_404(ContentType, id=content_type_id)
         object = get_object_or_404(content_type_model.model_class(), token=token)
-        serializer = ViewerListSerializer(object.viewer.all(), many=True)
+        serializer = ViewerListSerializer(object.viewers.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

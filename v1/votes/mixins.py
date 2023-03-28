@@ -17,9 +17,9 @@ class VoteQuerysetMixin:
         self.object = get_object_or_404(self.content_type_model.model_class(), token=object_token)
 
         # get all votes related to the object
-        self.votes = self.object.vote.all()
+        self.votes = self.object.votes.all()
 
-        # users vote.
+        # users votes.
         self.user_vote = self.votes.filter(user=request.user).first()
     
         return super().dispatch(request, *args, **kwargs)

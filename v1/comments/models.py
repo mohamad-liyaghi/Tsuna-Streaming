@@ -26,7 +26,7 @@ class Comment(BaseTokenModel):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    vote = GenericRelation(Vote)
+    votes = GenericRelation(Vote)
 
     def save(self, *args, **kwargs):
     

@@ -1,8 +1,12 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from django.contrib.contenttypes.fields import GenericRelation
+
 from cached_property import cached_property_with_ttl
+
 from core.utils import unique_token_generator
+
 
 class BaseTokenModel(models.Model):
     '''
@@ -45,6 +49,10 @@ class BaseContentModel(BaseTokenModel):
 
     date = models.DateTimeField(auto_now_add=True)
 
+    votes = GenericRelation('votes.Vote')
+    comments = GenericRelation('comments.Comment')
+    viewers = GenericRelation('viewers.Viewer')
+
 
     @cached_property_with_ttl(ttl=60 * 60 * 24)
     def get_model_content_type_id(self):
@@ -66,7 +74,7 @@ class BaseContentModel(BaseTokenModel):
     def get_viewer_count(self):    
         '''Return objects viewers cout'''
 
-        return self.viewer.count()
+        return self.viewers.count()
 
 
     class Meta:

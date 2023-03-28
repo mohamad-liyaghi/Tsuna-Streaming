@@ -11,7 +11,7 @@ from viewers.models import Viewer
 
 class Video(BaseContentModel):
 
-    title = models.CharField( max_length=100)
+    title = models.CharField(max_length=100)
     description = models.TextField(max_length=300)
 
     video = models.FileField(upload_to="videos/user_video/")
@@ -22,10 +22,6 @@ class Video(BaseContentModel):
     channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="videos")   
 
     objects = VideoManager()
-    
-    vote = GenericRelation(Vote)
-    comment = GenericRelation(Comment)
-    viewer = GenericRelation(Viewer)
 
     @property
     def is_published(self):
