@@ -2,7 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from votes.managers import VoteQueryset
+from votes.managers import VoteManager
 
 class Vote(models.Model):
     '''Generic vote model'''
@@ -18,7 +18,7 @@ class Vote(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    objects = VoteQueryset.as_manager()
+    objects = VoteManager()
 
     class Meta:
         constraints = [
