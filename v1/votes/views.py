@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from votes.serializers import VoteSerializer, VoteListSerializer
 from votes.mixins import VoteQuerysetMixin
+from votes.models import Vote
 
 
 
@@ -28,12 +29,15 @@ class VoteView(VoteQuerysetMixin, APIView):
 
 
     def get(self, request, *args, **kwargs):
-
-        upvotes = self.votes.upvotes()
-        downvotes = self.votes.downvotes()
-
-        return Response({"upvotes" : upvotes, "downvotes" : downvotes, "voted" : True if self.user_vote else False,
-        "user_vote" : self.user_vote.choice if self.user_vote else None}, status=status.HTTP_200_OK)
+        # users votes.
+        user_vote = Vote.objects.get_from_cache(self.object, request.user)
+        return Response(
+            {
+                "voted" : True if user_vote else False,
+                "user_vote" : user_vote.get('choice', None) if user_vote else None
+            }, 
+            status=status.HTTP_200_OK
+        )
 
 
     def post(self, request, *args, **kwargs):
@@ -41,11 +45,23 @@ class VoteView(VoteQuerysetMixin, APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(user=request.user, content_object=self.object)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            vote = Vote.objects.create_in_cache(
+                    user=request.user, 
+                    object=self.object, 
+                    choice=serializer.validated_data['choice']
+                )
+            if vote:
+                return Response(
+                {
+                    "voted" : True if vote else False,
+                    "user_vote" : vote.get('choice', None) if vote else None
+                }, 
+                status=status.HTTP_201_CREATED)
+            
+            return Response(vote, status=status.HTTP_204_NO_CONTENT)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 @extend_schema_view(

@@ -55,22 +55,24 @@ class VoteManager(models.Manager):
         
         # if user has already voted
         if cached_vote:
-
             # delete the vote if cache is getting saved twice (eg: user likes a video twice)
-            if cached_vote.get('choice') == choice:
-                # set a cache for deleting object from cache with celery
-                if cached_vote.get('source') == 'database':
-                    cache.set(
-                        key=key,
-                        value={
-                            'source' : 'cache',
-                            'choice' : choice,
-                            'deleted' : True
-                        },
-                        timeout= 60 * 60 * 60 * 24 
-                    ) 
 
+            if cached_vote.get('choice') == choice:
+                # create a record that says user has deleted a vote
+                # celery will delete the vote from db
+                cache.delete()
+                if (cached_vote:=self.get_from_cache(object, user)) and cached_vote.get('source') == 'database':
+                    cache.set(
+                            key=key,
+                            value={
+                                'source' : 'database',
+                                'choice' : choice,
+                                'deleted' : True
+                            },
+                            timeout= 60 * 60 * 60 * 24 
+                        ) 
                 return None
+            
             
             # Update a vote if user voted with different val
             elif cached_vote.get('choice') != choice:
@@ -84,6 +86,7 @@ class VoteManager(models.Manager):
                     },
                     timeout= 60 * 60 * 60 * 24 
                 ) 
+                return cache.get(key)
                   
         # if cache does not exist create a vote cache
         else:    
@@ -96,3 +99,4 @@ class VoteManager(models.Manager):
                 },
                 timeout= 60 * 60 * 60 * 24 
             ) 
+            return cache.get(key)
