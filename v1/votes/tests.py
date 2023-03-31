@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from channels.models import Channel
 from videos.models import Video
 from accounts.models import Account
@@ -65,3 +66,15 @@ class TestVoteModel:
         Vote.objects.create(content_object=self.video, user=self.user, choice=Vote.Choice.DOWNVOTE)
         assert Vote.objects.count() == 1
         assert Vote.objects.filter(choice=Vote.Choice.DOWNVOTE).count() == 1
+
+    def test_get_object_votes_count(self):
+        '''test get video votes count'''
+        self.create_video()
+
+        assert cache.get(f"vote_count:{self.video.token}") is None
+        assert self.video.get_votes_count()['upvotes'] == 0
+
+        Vote.objects.create(content_object=self.video, user=self.user, choice='u')
+        assert cache.get(f"vote_count:{self.video.token}") is not None
+        cache.delete(f"vote_count:{self.video.token}")
+        assert self.video.get_votes_count()['upvotes'] == 1

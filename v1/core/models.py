@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.fields import GenericRelation
-
+from django.core.cache import cache
 from cached_property import cached_property_with_ttl
 
 from core.utils import unique_token_generator
@@ -53,6 +53,9 @@ class BaseContentModel(BaseTokenModel):
     comments = GenericRelation('comments.Comment')
     viewers = GenericRelation('viewers.Viewer')
 
+    class Meta:
+        abstract = True
+
 
     @cached_property_with_ttl(ttl=60 * 60 * 24)
     def get_model_content_type_id(self):
@@ -77,8 +80,49 @@ class BaseContentModel(BaseTokenModel):
         return self.viewers.count()
 
 
-    class Meta:
-        abstract = True
+    def get_votes_count(self):
+        '''Get count of up/down votes of an object'''
+
+        key = f"vote_count:{self.token}"
+        cached_vote_count = cache.get(key)
+
+        if cached_vote_count:
+            # if votes count exists in cache
+            return cached_vote_count
+
+        # if not exist in cache
+        votes_in_db = self.votes.all()
+        upvotes_in_db = votes_in_db.filter(choice="u").count()
+        downvotes_in_db = votes_in_db.filter(choice="d").count()
+
+        votes_in_cache = [
+            cache.get(vote) for vote in cache.keys(f"vote:{self.token}:*")
+        ]
+
+        upvotes_in_cache = sum(
+            1
+            for upvote in votes_in_cache
+            if upvote.get("source") == "cache" and upvote.get("choice") == "u"
+        )
+
+        downvotes_in_cache = sum(
+            1
+            for downvote in votes_in_cache
+            if downvote.get("source") == "cache" and downvote.get("choice") == "d"
+        )
+
+        # set votes count in cache
+        cache.set(
+            key,
+            {
+                "upvotes": upvotes_in_cache + upvotes_in_db,
+                "downvotes": downvotes_in_cache + downvotes_in_db,
+            },
+            timeout=120,  # Use seconds instead of minutes
+        )
+
+        return cache.get(key)
+
 
     def save(self, *args, **kwargs):
 

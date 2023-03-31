@@ -34,7 +34,8 @@ class VoteView(VoteQuerysetMixin, APIView):
         return Response(
             {
                 "voted" : True if user_vote else False,
-                "user_vote" : user_vote.get('choice', None) if user_vote else None
+                "user_vote" : user_vote.get('choice', None) if user_vote else None,
+                "status" : self.object.get_votes_count(),
             }, 
             status=status.HTTP_200_OK
         )

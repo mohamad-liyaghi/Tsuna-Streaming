@@ -3,15 +3,7 @@ from django.core.cache import cache
 
 
 class VoteManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset()
-    
-    def upvotes(self):
-        return self.get_queryset().filter(choice="u").count()
-    
-    def downvotes(self):
-        return self.get_queryset().filter(choice="d").count()
-    
+
     def get_from_cache(self, object, user):
         '''
             Check cache and db to find a vote
@@ -60,7 +52,7 @@ class VoteManager(models.Manager):
             if cached_vote.get('choice') == choice:
                 # create a record that says user has deleted a vote
                 # celery will delete the vote from db
-                cache.delete()
+                cache.delete(key)
                 if (cached_vote:=self.get_from_cache(object, user)) and cached_vote.get('source') == 'database':
                     cache.set(
                             key=key,
