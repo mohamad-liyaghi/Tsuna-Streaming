@@ -30,18 +30,24 @@ class VoteView(VoteQuerysetMixin, APIView):
     serializer_class = VoteSerializer
 
     def get(self, request, *args, **kwargs):
+
+        object = self.get_object()
+
         # users votes.
-        user_vote = Vote.objects.get_from_cache(self.object, request.user)
+        user_vote = Vote.objects.get_from_cache(object, request.user)
+
         return Response(
             {
                 "voted": True if user_vote else False,
                 "user_vote": user_vote.get('choice', None) if user_vote else None,
-                "status": self.object.get_votes_count(),
+                "status": object.get_votes_count(),
             },
             status=status.HTTP_200_OK
         )
 
     def post(self, request, *args, **kwargs):
+        
+        object = self.get_object()
 
         serializer = self.serializer_class(data=request.data)
 
@@ -49,7 +55,7 @@ class VoteView(VoteQuerysetMixin, APIView):
 
             vote = Vote.objects.create_in_cache(
                 user=request.user,
-                object=self.object,
+                object=object,
                 choice=serializer.validated_data['choice']
             )
             if vote:
@@ -82,8 +88,9 @@ class VoteListView(VoteQuerysetMixin, APIView):
         """
         Get list of people who have voted from the database and cache.
         """
+        object = self.get_object()
 
-        pattern = f"vote:{self.object.token}:*"
+        pattern = f"vote:{object.token}:*"
 
         # get all votes keys
         keys = cache.keys(pattern)
@@ -94,7 +101,7 @@ class VoteListView(VoteQuerysetMixin, APIView):
         ]
 
         # get all the votes in db
-        votes_in_db = list(self.object.votes.all())
+        votes_in_db = list(object.votes.all())
 
         votes = []
         votes += votes_in_cache
