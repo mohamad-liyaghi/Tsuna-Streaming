@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from votes.serializers import VoteSerializer, VoteListSerializer
-from votes.mixins import VoteQuerysetMixin
+from v1.core.mixins import ContentObjectMixin
 from votes.models import Vote
 
 
@@ -21,7 +21,7 @@ from votes.models import Vote
         description="Vote or delete or update a vote."
     ),
 )
-class VoteView(VoteQuerysetMixin, APIView):
+class VoteView(ContentObjectMixin, APIView):
     '''
         Get: show the upvote and downvotes and also user vote status
         Post: Vote a model
@@ -31,23 +31,19 @@ class VoteView(VoteQuerysetMixin, APIView):
 
     def get(self, request, *args, **kwargs):
 
-        object = self.get_object()
-
         # users votes.
-        user_vote = Vote.objects.get_from_cache(object, request.user)
+        user_vote = Vote.objects.get_from_cache(self.object, request.user)
 
         return Response(
             {
                 "voted": True if user_vote else False,
                 "user_vote": user_vote.get('choice', None) if user_vote else None,
-                "status": object.get_votes_count(),
+                "status": self.object.get_votes_count(),
             },
             status=status.HTTP_200_OK
         )
 
     def post(self, request, *args, **kwargs):
-        
-        object = self.get_object()
 
         serializer = self.serializer_class(data=request.data)
 
@@ -55,7 +51,7 @@ class VoteView(VoteQuerysetMixin, APIView):
 
             vote = Vote.objects.create_in_cache(
                 user=request.user,
-                object=object,
+                object=self.object,
                 choice=serializer.validated_data['choice']
             )
             if vote:
@@ -76,7 +72,7 @@ class VoteView(VoteQuerysetMixin, APIView):
         description="List of users that voted an object."
     ),
 )
-class VoteListView(VoteQuerysetMixin, APIView):
+class VoteListView(ContentObjectMixin, APIView):
     """
     List of users that voted for an object.
     """
@@ -88,9 +84,8 @@ class VoteListView(VoteQuerysetMixin, APIView):
         """
         Get list of people who have voted from the database and cache.
         """
-        object = self.get_object()
 
-        pattern = f"vote:{object.token}:*"
+        pattern = f"vote:{self.object.token}:*"
 
         # get all votes keys
         keys = cache.keys(pattern)
@@ -101,7 +96,7 @@ class VoteListView(VoteQuerysetMixin, APIView):
         ]
 
         # get all the votes in db
-        votes_in_db = list(object.votes.all())
+        votes_in_db = list(self.object.votes.all())
 
         votes = []
         votes += votes_in_cache
