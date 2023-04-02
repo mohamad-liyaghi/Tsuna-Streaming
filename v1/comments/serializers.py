@@ -12,9 +12,10 @@ class CommentParentQueryset(serializers.SlugRelatedField):
         # return comments of an object
         return object.comments.filter(parent__isnull=True)
 
+
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
-    parent = CommentParentQueryset(slug_field='token', required=False)
+    parent = CommentParentQueryset(slug_field='token', required=False, allow_null=True)
 
     class Meta:
         model = Comment
@@ -46,11 +47,10 @@ class CommentRepliesSerializer(serializers.Serializer):
 class CommentDetailSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     replies = serializers.SerializerMethodField(method_name="reply_list")
-    vote_count = serializers.SerializerMethodField(method_name="vote_counts")
 
     class Meta:
         model = Comment
-        fields = ["user", "body", "date", "edited", "pinned", "token", "vote_count", "replies"]
+        fields = ["user", "body", "date", "edited", "pinned", "token", "replies"]
         extra_kwargs = {
             "edited" : {"read_only" : True},
             "pinned" : {"read_only" : True},
@@ -60,10 +60,5 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     def reply_list(self, comment):
         '''return list of comment list'''
-        serializer = CommentRepliesSerializer(instance=comment.replies.all(), many=True)
+        serializer = CommentRepliesSerializer(instance=comment.replies.select_related('user').all(), many=True)
         return serializer.data
-    
-
-    def vote_counts(self, comment):
-        '''return count of vote of a comment''' 
-        return {"upvotes" : comment.votes.upvotes(), "downvotes" : comment.votes.downvotes()}

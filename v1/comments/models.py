@@ -1,9 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
 
-from votes.models import Vote
 from comments.exceptions import CommentNotAllowed
 from core.models import BaseTokenModel
 
@@ -26,7 +25,6 @@ class Comment(BaseTokenModel):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    votes = GenericRelation(Vote)
 
     def save(self, *args, **kwargs):
     
