@@ -61,6 +61,10 @@ CELERY_BEAT_SCHEDULE = {
         "task" : "channel_subscribers.tasks.delete_unsubscribed_from_db",
         "schedule" : 1 * 60 
     }, 
+    "insert_vote_to_db":{
+        "task" : "votes.tasks.insert_vote_into_db",
+        "schedule" : 1 * 60 
+    }, 
 
 }
 
