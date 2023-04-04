@@ -1,12 +1,13 @@
 {% block subject %}
-Your channel on Tsuna Streaming
+You've created a new Channel on Tsuna Streaming!
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Hello dear {{ kwargs.first_name }}</h1>
-<p>Your channel successfully created.  <br> Channel Title: '{{ kwargs.channel_title }}', token: '{{ kwargs.channel_token }}'</p>
+<h1>Hello {{ kwargs.first_name }},</h1>
+<p>You have successfully created a channel on our platform!</p>
 
-
-<a href="{{kwargs.domain}}{% url 'v1_channels:channel-detail' kwargs.channel_token %}">Channel Profile</a>
+<a href="{{kwargs.domain}}{% url 'v1_channels:channel-detail' kwargs.channel_token %}">
+    {{ kwargs.channel_title }}'s profile
+</a>
 
 {% endblock html_body %}    

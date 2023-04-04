@@ -54,7 +54,7 @@ class ChannelViewSet(ModelViewSet):
         owned_channel = Channel.objects.filter(owner=self.request.user)
 
         # channels that user is admin of them
-        user_admin = self.request.user.admin.all().values("channel__id")
+        user_admin = self.request.user.channel_admins.all().values("channel__id")
         channel_admin = Channel.objects.filter(id__in=user_admin)
 
         # return chained queryset

@@ -1,10 +1,14 @@
 {% block subject %}
-Premium account on tsuna streaming
+Your subscription has started!
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Dear {{ kwargs.first_name }}</h1>
-<p>Thanks for your choice, you have purchased "{{ kwargs.plan }}" and from now until {{ kwargs.finish_date }} your account remains Premium.</p>
+<h1>Dear {{ kwargs.first_name }},</h1>
+<p>
+    Thank you for subscribing to {{ kwargs.membership_title }}! We're pleased to inform you that your subscription has now started.
+    From now on, you are a premium user until {{ kwargs.finish_date }}.
+</p>
+
 
 
 {% endblock html_body %}    

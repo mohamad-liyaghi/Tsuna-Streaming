@@ -20,7 +20,7 @@ class CustomSlugRelatedField(serializers.SlugRelatedField):
 
     def get_queryset(self):
         user = self.context.get("user")
-        user_admin = user.admin.all().values("channel__id")
+        user_admin = user.channel_admins.all().values("channel__id")
         channel_admin = Channel.objects.filter(id__in=user_admin)
         return Channel.objects.filter(owner=user) | channel_admin
 

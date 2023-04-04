@@ -21,7 +21,7 @@ class Account(AbstractUser, BaseTokenModel):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50, blank=True, null=True)
 
-    bio = models.TextField(max_length=250, blank=True)
+    bio = models.TextField(max_length=250, blank=True, default="Hey there, i am using tsuna streaming.")
 
     is_active = models.BooleanField(default=False)
     role = models.CharField(max_length=1, choices=Role.choices, default=Role.NORMAL)

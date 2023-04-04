@@ -5,24 +5,32 @@ from v1.core.tasks import send_email
 
 
 @receiver(post_save, sender=Subscription)
-def notify_user_subscription(sender, **kwargs):
+def notify_user_subscription(sender, created, instance, **kwargs):
+    '''Notify a user by email that the subscription has just started'''
 
-    if kwargs["created"]:
-        subscription = kwargs["instance"]
+    if created:
+
+        subscription = instance
         user = subscription.user
 
-        send_email.delay(template_name="emails/notify_premium.html", email=user.email, first_name=user.first_name, 
-                                plan=subscription.membership.title, finish_date=subscription.finish_date)
+        send_email.delay(
+            template_name="emails/notify_premium.html", 
+            email=user.email, 
+            first_name=user.first_name, 
+            membership_title=subscription.membership.title, 
+            finish_date=subscription.finish_date
+        )
 
 
 @receiver(pre_delete, sender=Subscription)
-def notify_after_deleting_subscription(sender, **kwargs):
+def notify_user_plan_expiration(sender, instance, **kwargs):
     '''Notify after deleting subscription'''
 
-    subscription = kwargs["instance"]
+    subscription = instance
 
-    send_email.delay(template_name="emails/notify_unsubscribed_user.html", first_name=subscription.user.first_name,
-                                email=subscription.user.email,
-                                plan=subscription.membership.title, 
-                                start_date=subscription.start_date)
+    send_email.delay(
+        template_name="emails/notify_plan_expiration.html", 
+        first_name=subscription.user.first_name,
+        email=subscription.user.email, 
+    )
 

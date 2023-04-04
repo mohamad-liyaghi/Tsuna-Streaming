@@ -1,7 +1,6 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_delete, pre_save
+from django.db.models.signals import post_save
 from django.conf import settings
-from django.utils import timezone
 
 from accounts.models import Token
 from v1.core.tasks import send_email
@@ -14,16 +13,19 @@ def create_token_for_new_user(sender, **kwargs):
 
 
 @receiver(post_save, sender=Token)
-def send_email_when_token_created(sender, **kwargs):
-    '''
-        After creating a user, a token gets created.
-        After that this signal emails that token.
-    '''
+def send_token_via_email(sender, **kwargs):
+    '''Signal to send token to user when the token created.'''
 
     if kwargs["created"]:
+
         token = kwargs["instance"]
         user = token.user
 
-        send_email.delay(template_name="emails/verification.html", email=user.email, first_name=user.first_name, 
-                                        user_token=user.token, token=token.token)
+        send_email.delay(
+            template_name="emails/token.html", 
+            email=user.email, 
+            first_name=user.first_name, 
+            user_token=user.token, 
+            token=token.token
+        )
 

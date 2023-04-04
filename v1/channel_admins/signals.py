@@ -7,16 +7,23 @@ from v1.core.tasks import send_email
 from channel_admins.tasks import create_permission_for_admin
 
 
-@receiver(pre_save, sender=ChannelAdmin )
-def notify_after_promoting_admin_admin(sender, **kwargs):
+@receiver(post_save, sender=ChannelAdmin)
+def send_admin_promotion_email(sender, **kwargs):
+    '''Notify a user when has been promoted'''
+
     instance = kwargs["instance"]
     
-    if not instance.pk:
+    if kwargs['created']:
         user = instance.user
         channel = instance.channel
 
-        send_email("emails/notify_user_after_promoting.html", email=user.email,
-                    channel=channel.title, first_name=user.first_name, channel_token=channel.token)
+        send_email(
+            "emails/promotion_notification.html", 
+            email=user.email,
+            channel_title=channel.title, 
+            first_name=user.first_name, 
+            channel_token=channel.token
+        )
         
 
 def create_admin_after_creating_channel(sender, **kwargs):
