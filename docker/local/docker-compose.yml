@@ -7,8 +7,11 @@ services:
 
   backend:
 
-    build: .
-    command: sh docker/setup.dev.sh
+    build:
+      context: ../../
+      dockerfile: ./docker/local/Dockerfile
+
+    command: sh docker/local/setup.local.sh
 
     container_name: tsuna-streaming-backend
     restart: on-failure
