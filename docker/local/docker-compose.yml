@@ -11,7 +11,7 @@ services:
       context: ../../
       dockerfile: ./docker/local/Dockerfile
 
-    command: sh docker/local/setup.local.sh
+    command: sh docker/local/setup.sh
 
     container_name: tsuna-streaming-backend
     restart: on-failure
@@ -20,7 +20,7 @@ services:
       - 8000:8000
 
     volumes:
-      - .:/backend
+      - ../../:/backend
 
     environment:
       *DJANGO_SETTINGS_MODULE
@@ -77,7 +77,10 @@ services:
     restart: always
 
   celery:
-    build: .
+    build:
+      context: ../../
+      dockerfile: ./docker/local/Dockerfile
+
     container_name: tsuna-streaming-celery
     command: celery -A config worker --loglevel=info
     depends_on:
@@ -88,7 +91,9 @@ services:
       *DJANGO_SETTINGS_MODULE
 
   celery-beat:
-    build: .
+    build:
+      context: ../../
+      dockerfile: ./docker/local/Dockerfile
     container_name: tsuna-streaming-celery-beat
     command: celery -A config beat --loglevel=info
     depends_on:
@@ -100,7 +105,9 @@ services:
 
   flower:
 
-    build: .
+    build:
+      context: ../../
+      dockerfile: ./docker/local/Dockerfile
     command: celery -A config flower
 
     depends_on:

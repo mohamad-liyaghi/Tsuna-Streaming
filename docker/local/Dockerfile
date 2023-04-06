@@ -12,4 +12,6 @@ RUN pip install -r requirement.txt
 
 COPY . /backend
 
+RUN mv .env.local.sample .env.local
+
 EXPOSE 8000
