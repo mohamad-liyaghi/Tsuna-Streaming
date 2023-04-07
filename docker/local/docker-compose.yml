@@ -86,7 +86,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/backend
+      - ../../:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
@@ -99,7 +99,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/backend
+      - ../../:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
@@ -117,6 +117,9 @@ services:
 
     ports:
       - 5555:5555
+      
+    volumes:
+      - ../../:/backend
 
     environment:
       *DJANGO_SETTINGS_MODULE

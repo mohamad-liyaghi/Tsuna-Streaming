@@ -20,7 +20,7 @@ services:
       - 8000:8000
 
     volumes:
-      - .:/backend
+      - ../../:/backend
 
     environment:
       *DJANGO_SETTINGS_MODULE
@@ -86,7 +86,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/backend
+      - ../../:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
@@ -99,7 +99,7 @@ services:
     depends_on:
       - redis
     volumes:
-      - .:/backend
+      - ../../:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
@@ -114,6 +114,9 @@ services:
       - backend
       - redis
       - celery
+      
+    volumes:
+      - ../../:/backend
 
     ports:
       - 5555:5555
