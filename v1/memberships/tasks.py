@@ -1,6 +1,6 @@
-from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from celery import shared_task
+from memberships.models import Subscription
 
 
 @shared_task
@@ -8,9 +8,6 @@ def auto_delete_invalid_subscription():
     '''
         Deletes invalid subscriptions where finish_date <= current date/time
     '''
-
-    # get Subscription model
-    Subscription =  ContentType.objects.get(app_label="memberships", model="subscription").model_class()
 
     now = timezone.now()
 
