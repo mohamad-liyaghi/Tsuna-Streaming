@@ -38,7 +38,7 @@ class CommentDetailPermission(BasePermission):
                 if admin:
                     # if user is admin, check if user has permission to delete comment.
                     if admin.permissions.filter(
-                            model=object.get_model_content_type,
+                            model=object.get_model_content_type(),
                             channel=object.content_object.channel,
                             delete_object_comment=True):
                         

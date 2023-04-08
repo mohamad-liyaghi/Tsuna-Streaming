@@ -13,12 +13,12 @@ class VideoPermission(BasePermission):
 
         # only channel owner and some admins can update a video
         if request.method in ["PUT", "PATCH"]:
-            return (admin and admin.permissions.filter(model=object.get_model_content_type, edit_object=True))
+            return (admin and admin.permissions.filter(model=object.get_model_content_type(), edit_object=True))
 
 
         # only channel owner and some admins can delete a video
         elif request.method == "DELETE":
-            return (admin and admin.permissions.filter(model=object.get_model_content_type, delete_object=True))
+            return (admin and admin.permissions.filter(model=object.get_model_content_type(), delete_object=True))
 
         return True
 

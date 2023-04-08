@@ -72,7 +72,6 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "visibility", 
             "is_updated", 
             "is_published", 
-            "get_model_content_type_id", 
             "allow_comment", 
             "get_viewer_count"
             ]

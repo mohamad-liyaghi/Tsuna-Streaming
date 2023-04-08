@@ -40,11 +40,23 @@ class TestVideoModel:
         cls = self.video.__class__
         video_content_type_id = ContentType.objects.get_for_model(cls).id
 
-        assert self.video.get_model_content_type_id == video_content_type_id
+        assert self.video.get_model_content_type_id() == video_content_type_id
+
+
+    def test_get_video_content_type_model(self):
+
+        self.create_video()
+        cls = self.video.__class__
+        video_content_type = ContentType.objects.get_for_model(cls)
+        assert self.video.get_model_content_type() == video_content_type
+
+        # second time, get from cache
+        video_content_type = ContentType.objects.get_for_model(cls)
+        assert self.video.get_model_content_type() == video_content_type
 
 
     def test_get_video_views(self):
-        '''Test the get_viewer_count() placed in BaseContentModel'''
+        '''Test the get_viewer_count placed in BaseContentModel'''
         self.create_video()
 
         assert self.video.get_viewer_count == 0
