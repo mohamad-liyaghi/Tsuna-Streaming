@@ -13,7 +13,7 @@ def check_viewer_status(view):
             return view(self, request, *args, **kwargs)
 
         # create a user view for an object if does not exist            
-        Viewer.objects.create(user=request.user, content_object=object)
+        Viewer.objects.create_in_cache(user_token=request.user.token, object_token=object.token)
 
         return view(self, request, *args, **kwargs)
 

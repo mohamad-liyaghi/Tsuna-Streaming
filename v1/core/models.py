@@ -82,7 +82,7 @@ class BaseContentModel(BaseTokenModel):
                 key=f'content_type:{cls}', 
                 value={'id': content_type.id, 'model': content_type}
             )
-            return cache.get(f'content_type:{cls}')
+            return cache.get(f'content_type:{cls}').get('model')
         
         return None
     
