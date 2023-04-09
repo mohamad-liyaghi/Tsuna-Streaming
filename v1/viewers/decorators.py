@@ -7,7 +7,7 @@ def check_viewer_status(view):
         object = self.get_object()
 
         # check is there a view for the object
-        viewer = object.viewers.filter(user=request.user)
+        viewer = Viewer.objects.get_from_cache(obj=object, user=request.user)
 
         if viewer:
             return view(self, request, *args, **kwargs)
