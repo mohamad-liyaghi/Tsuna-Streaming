@@ -65,6 +65,10 @@ CELERY_BEAT_SCHEDULE = {
         "task" : "votes.tasks.insert_vote_into_db",
         "schedule" : 1 * 60 
     }, 
+    "insert_viewer_to_db":{
+        "task" : "viewers.tasks.insert_viewer_into_db",
+        "schedule" : 1 * 60
+    }, 
 
 }
 
