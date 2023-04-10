@@ -59,7 +59,7 @@ class TestVideoModel:
         '''Test the get_viewer_count placed in BaseContentModel'''
         self.create_video()
 
-        assert self.video.get_viewer_count == 0
+        assert self.video.get_viewer_count() == 0
 
     def test_published_method(self):
         Video.objects.create(

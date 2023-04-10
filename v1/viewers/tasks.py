@@ -31,6 +31,7 @@ def insert_viewer_into_db():
                     Viewer.objects.create(                        
                         user = Account.objects.get(token=user_token),
                         content_object = object_model.objects.get(token=object_token),
+                        date = viewer.get('date'),
                     )
 
                     # change viewer status from cache to database

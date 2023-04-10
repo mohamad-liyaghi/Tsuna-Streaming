@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.cache import cache
+from django.utils import timezone
 
 class ViewerManager(models.Manager):
 
@@ -15,11 +16,12 @@ class ViewerManager(models.Manager):
             return cached_viewer
         
         # Return viewer and set it in cache, if viewer exists in db
-        elif obj.viewers.filter(user=user).exists():
+        elif (viewer:=obj.viewers.filter(user=user).first()):
             cache.set(
                 key=key,
                 value={
                     'source': 'database',
+                    'date' : viewer.date
                 }
             )
             return cache.get(key)
@@ -50,6 +52,7 @@ class ViewerManager(models.Manager):
                 key=key,
                 value={
                     'source': 'cache',
+                    'date' : timezone.now(),
                 }
             )
             return True

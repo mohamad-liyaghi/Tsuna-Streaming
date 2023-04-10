@@ -87,11 +87,29 @@ class BaseContentModel(BaseTokenModel):
         return None
     
 
-    @property
     def get_viewer_count(self):    
-        '''Return objects viewers cout'''
-        #TODO cache this 
-        return self.viewers.count()
+        '''Return objects viewers count'''
+        # get object viewer count from cache
+        db_viewers_count = cache.get(f'db_viewer_count:{self.token}')   
+
+        # if cache not exist, calculate from db
+        if not db_viewers_count :   
+            db_viewers_count = self.viewers.count()
+            # set viewers count in cache
+            cache.set(f'db_viewer_count:{self.token}', db_viewers_count, timeout=10 * 60)
+        
+        viewers_in_cache = [
+            cache.get(viewer) for viewer in cache.keys("viewer:*:*")
+        ]
+        
+        # total of those caches with source == cache
+        cache_viewers_count = sum(
+            1
+            for viewer in viewers_in_cache
+            if viewer.get("source") == "cache"
+        )
+
+        return db_viewers_count + cache_viewers_count
 
 
     def get_votes_count(self):
