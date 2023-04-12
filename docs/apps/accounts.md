@@ -1,59 +1,57 @@
-# Accounts Application Docs
+# Accounts Application Documentation
+## Overview
 
-<h3>The "Accounts" application of the "Tsuna Streaming" project handles 2things in the project.<br><br>
-<ol>    
-    <li>Authentication</li>
-    <li>Token verification</li>
-</ol><hr>
+The accounts application is an essential part of the project, which handles user registration, account activation, authentication, and user roles. The application ensures that the user's are authenticated, and only verified users can perform actions.
 
+## User Registration
 
-First, users should register on website, then verify their accounts via the link that has been sent by email. 
-<br>
-After verifying they can Login via JWT token.<br>
-<br>
+Creating an account is a smooth and straightforward process for users. Once the user submits the registration form, their account will be temporarily deactivated until they verify it using the token sent to their email address.
 
-</h3>
+## Account Verification
 
-<hr>
+A token is generated and sent to the user's email address after successful registration. The user must verify their account using the token to activate their account.
 
-<h2>Authentication</h2>
-<p>
-There is a custom Account model that inherits from AbstractUser model of Django.
-This model is the main account model of this project.
-<br>
-When users register to website, they have 24 hours to verify their accounts, otherwise their account would be deleted by celery task.
-</p>
+## Authentication
 
-<ol>
-    <li>Register</li>
-    <li>Verify by Token.</li>
-    <li>Login via jwt</li>
-    <li>User Profile Page and update Profile.</li>
-    <li>Create unique user token [Signals].</li>
-    <li>Delete extra deactivated users from the database. [Celery]</li>
-    <li>Profile size validator.</li>
-    <li>Throttling.</li>
-</ol>
-<hr>
-
-<h2>Token Verification</h2>
-<p>
-When a user registers to website, a unique token will be created and sent by email. User can verify and activate their account by this token. Token gets expired and deleted after a while, so user can alway request for a new one.
-<br> Users can only enter 5 invalid tokens at a time. After that they should wait until their token expires. This avoids spam requests.
-</p>
-
-<ol>
-    <li>Auto create token after registering. [Signals]</li>
-    <li>Send the token by email.</li>
-    <li>Auto delete invalid tokens [celery]</li>
-    <li>Token retry.</li>
-</ol>
-<hr>
-
-
+After account verification, the user can log in using the JWT (JSON Web Token) authentication method, which ensures the user's privacy and security.
 
 <hr>
-<h3>Also there are some tests that you can run them by typing this command:</h3>
+
+## Models
+
+This application is comprised of two models:
+
+1. Account - This is the primary model for user accounts within the project. It inherits from the AbstractUser model in Django and includes custom fields for role management and informations.
+
+2. Token - This model is responsible for generating and storing verification tokens for new user accounts. When a user registers, a unique token is generated and sent to their email address. The user must then use this token to verify their account and activate it.
+
+Together, these two models provide a robust framework for user registration and account management within the project.
+
+## User Roles
+
+By default, new users are assigned the 'n' (normal) role, while superusers are assigned the 'a' (admin) role. Superusers have more privileges and access to the system.
+
+## Throttling
+
+To avoid spamming, there is throttling in place. Users are restricted from sending multiple requests within a specified time.
+
+
+## Token Expiration
+
+To keep the system secure, the application uses celery-beat to remove all expired tokens and deactivated users automatically.
+
+
+## Signals
+
+In the user registration process, the application will generate a unique token for each newly registered user, which will be stored in the database. This is achieved by using a signal that listens for the post_save event on the Account model.
+
+Once the token has been generated and saved, another signal will be triggered, this time to send the token to the user via email. This email will include instructions for the user to verify their account by clicking on a link, which will confirm their identity as the owner of the email address used during registration.
+
+By utilizing these signals, the application ensures that the user registration process is secure and streamlined, with minimal input required from the user to activate their account.
+
+## Tests
+
+There are some tests that you can run by typing this command: 
 
 ```
 $ pytest v1/accounts
