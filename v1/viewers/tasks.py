@@ -20,26 +20,27 @@ def insert_viewer_into_db():
             _, object_token, user_token = key.split(':') # viewer:model-obj:user_token
             
             if (viewer and viewer.get('source', '') == 'cache'):
+                object_model = BaseContentModel.get_content_model_by_name(((object_token.split('-')[0]).capitalize()))
 
-                try:
-                    # the content model (Eg: video)
-                    object_model = next(
-                        model for model in BaseContentModel.__subclasses__() \
-                        if model.__name__.lower() == object_token.split('-')[0]
-                    )
-                    
-                    Viewer.objects.create(                        
-                        user = Account.objects.get(token=user_token),
-                        content_object = object_model.objects.get(token=object_token),
-                        date = viewer.get('date'),
-                    )
+                if object_model:
+                    try:
+                        
+                        Viewer.objects.create(                        
+                            user = Account.objects.get(token=user_token),
+                            content_object = object_model.objects.get(token=object_token),
+                            date = viewer.get('date'),
+                        )
 
-                    # change viewer status from cache to database
-                    viewer['source'] = 'database'
-                    cache.set(key, viewer)
-            
-                except:
-                    # if the object were not found
+                        # change viewer status from cache to database
+                        viewer['source'] = 'database'
+                        cache.set(key, viewer)
+                
+                    except:
+                        # if the object were not found
+                        cache.delete(key)
+
+                else:
+                    # if content model does not exist
                     cache.delete(key)
 
 

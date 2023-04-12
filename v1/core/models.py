@@ -55,7 +55,17 @@ class BaseContentModel(BaseTokenModel):
     class Meta:
         abstract = True
 
-    
+    @classmethod
+    def get_content_model_by_name(cls, name):
+        '''Return the subclass content model'''
+
+        for subclass in cls.__subclasses__():
+            if subclass.__name__ == name:
+                return subclass
+            
+        return None
+
+
     def get_model_content_type_id(self):
         '''Return content type id of the model (Eg: Video)'''
         

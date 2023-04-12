@@ -12,7 +12,7 @@ def unique_token_generator(instance, BaseContentModel):
 
     # If the class inherits from content model (e.g. video), 
     # the model name will come first in the token due to the vote and comment functionalities.
-    if klass in BaseContentModel.__subclasses__():
+    if BaseContentModel.get_content_model_by_name(klass.__name__):
         token = f'{klass.__name__.lower()}-{token [len(klass.__name__.lower()) + 1:]}' # eg: 'video-27b0f...'
 
     if klass.objects.filter(token=token).exists():

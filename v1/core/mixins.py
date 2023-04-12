@@ -24,16 +24,14 @@ class ContentObjectMixin:
 
         # Look up the content model by name if not exist in cache.
         if not content_model:
-            try:
-                # check if given content model is subclass of BaseContentModel
-                content_model = next(
-                    subclass for subclass in BaseContentModel.__subclasses__() if subclass.__name__.lower() == model_name
-                    )
-                
+            # check if given content model is subclass of BaseContentModel
+            content_model = BaseContentModel.get_content_model_by_name(model_name.capitalize())
+            
+            if content_model:
                 # set the model in cache
                 cache.set(key=f'content_model:{model_name}', value=content_model)
-                
-            except StopIteration:
+
+            else:    
                 raise Http404('Content model does not exist.')
             
         # The object given by URL

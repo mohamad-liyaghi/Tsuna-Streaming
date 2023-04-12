@@ -23,36 +23,39 @@ def insert_vote_into_db():
 
     if vote_keys:
         for key in vote_keys:
+
             vote = cache.get(key)
             _, object_token, user_token = key.split(':') # vote:model-obj:user_token
             
             if (vote and vote.get('source', '') == 'cache' or \
                 vote and vote.get('source', '') == 'database' and vote.get('deleted', '') == True):
 
-                try:
+                object_model = BaseContentModel.get_content_model_by_name((object_token.split('-')[0]).capitalize())
 
-                    object_model = next(
-                        model for model in BaseContentModel.__subclasses__() \
-                        if model.__name__.lower() == object_token.split('-')[0]
-                    )
+                if object_model:
 
-                    # Object to vote
-                    object = object_model.objects.get(token=object_token)
+                    try:
+                        # Object to vote
+                        object = object_model.objects.get(token=object_token)
 
-                    # if vote is getting created twice, it will be deleted in process
-                    # otherwise create a vote
-                    db_vote = Vote.objects.create(                        
-                        user = Account.objects.get(token=user_token),
-                        content_object = object,
-                        choice = vote.get('choice')
-                    )
-                    # change vote status from cache to database
-                    if db_vote:
-                        vote['source'] = 'database'
-                        cache.set(key, vote)
-                    else:
+                        # if vote is getting created twice, it will be deleted in process
+                        # otherwise create a vote
+                        db_vote = Vote.objects.create(                        
+                            user = Account.objects.get(token=user_token),
+                            content_object = object,
+                            choice = vote.get('choice')
+                        )
+                        # change vote status from cache to database
+                        if db_vote:
+                            vote['source'] = 'database'
+                            cache.set(key, vote)
+                        else:
+                            cache.delete(key)
+                
+
+                    except:
                         cache.delete(key)
-            
 
-                except:
+                else:
+                    # if content model does not exist
                     cache.delete(key)
