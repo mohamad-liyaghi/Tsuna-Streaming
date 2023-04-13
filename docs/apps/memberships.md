@@ -1,54 +1,37 @@
-# Memberships Application Documentation
+## Introduction
+The "Memberships" application is responsible for managing user subscriptions and memberships in the Tsuna Streaming project.
+<br>
+There are three types of users in this project: Admin, Premium, and Normal.<br>
+ Superusers are assigned to the "admin" role by default, while normal users are assigned to the "normal" role. Users can upgrade their membership by subscribing to a premium plan, which grants them additional privileges and features and become "premium".
 
-<h3>
-The "Memberships" application is an integral part of the "Tsuna Streaming" project, responsible for managing user subscriptions and membership roles. By default we have three types of users in this project: Admin, Premium, and Normal.
-<br><br>
-By default, Superusers are assigned to the Admin role, while normal users are assigned to the Normal role. However, normal users have the ability to upgrade their membership by subscribing to a premium plan, which grants them additional privileges and features.
-<br><br>
-</h3>
+## Models
+The Memberships application has two models:
 
-<hr> <br>
+1. Membership - represents the different types of membership plans that users can subscribe to.
+2. Subscription - contains information about a user's subscription to a membership plan.
 
-<h3>
-This application has 2 models. 
-<ol>    
-    <li>Membership</li>
-    <li>Subscription</li>
-    
-</ol><hr>
-</h3>
+## Views
+The following views are available in the Memberships application:
 
+1. Create Membership - allows admins to create new membership plans.
+2. List of Memberships - displays a list of all available membership plans.
+3. Update Membership and Delete - allows admins to update and delete existing membership plans.
+4. Subscribe to Membership - allows users to subscribe to a membership plan.
 
-<h2>Membership</h2>
-<p>
-The Membership model represents the different types of membership plans that users can subscribe to. Admins have the ability to create, update, and delete different membership plans, and users can subscribe to them based on their needs.
-</p>
+## Features
 
-<ol>
-    <li>Allow admins to create, update, and delete membership plans.</li>
-    <li>Provide a list of available memberships for users to choose from.</li>
-    <li>Prevent deletion of memberships that are currently in use.</li>
-    <li>IsAdmin permission for adding, updating, and deleting memberships.</li>
-</ol>
-<hr>
+### Deleting In-Use Memberships
+An Exceptaion will be raised if an admin tries to delete a membership that is currently in use by users. 
 
+### Email Notifications
+Users will receive email notifications upon successful subscription to a membership plan. They will also be notified when their subscription has expired.
 
-<h2>Subscription</h2>
-<p>
-When a user subscribes to a membership plan, a new subscription is created containing relevant information such as the expiration date. The user's role is upgraded to premium upon successful subscription. When the subscription token expires, Celery will automatically delete the subscription and notify the user. Additionally, the user's role will be changed back to normal.
-</p>
+### Removing Invalid Memberships with Celery
+A Celery task runs periodically to remove invalid memberships. An invalid membership is one that has expired and is no longer active.
 
-<ol>
-    <li>Allow users to subscribe to a membership plan.</li>
-    <li>Notify users upon successful subscription.</li>
-    <li>Notify users when their subscription has expired.</li>
-    <li>Automatically delete invalid subscriptions using Celery.</li>
-    <li>A permission system to check whether a user is currently subscribed to a premium plan or not.</li>
-</ol>
-<hr>
-
-<h3>Also there are some tests that you can run them by typing this command:</h3>
+## Tests
+The Memberships application includes automated tests that you can run them by typing this command:
 
 ```
-$ pytest v1/memberships
-```
+$ pytest memberships/
+``` 
