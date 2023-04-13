@@ -9,18 +9,17 @@ class ChannelLimitPermission(BasePermission):
     def has_permission(self, request, view):
         user = request.user
 
-        if user.is_authenticated:
-            if user.role in ["a", "p"]:
-                return not bool(user.channels.count() >= 10)
-            
-            elif user.role == 'n':
-                if user.channels.count() > 5 and user.channels.count() < 10:
-                    return True
+        if user.role in ["a", "p"]:
+            return not bool(user.channels.count() >= 10)
+        
+        elif user.role == 'n':
+            if user.channels.count() > 5 and user.channels.count() < 10:
+                return True
 
-                elif user.channels.count() < 5:
-                    return True
-                    
-                return False
+            elif user.channels.count() < 5:
+                return True
+                
+            return False
                 
         return False    
 
