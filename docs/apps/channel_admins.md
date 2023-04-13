@@ -1,55 +1,43 @@
-# Channel Admins Application Docs
+# Introduction:
+The "Channel Admins" application is a part of the "Tsuna Streaming" project that handles the management of channels and content for administrators. By default, the channel owner has full permission and can perform any kind of action within the channel. However, as owners are not always available, they can promote other users to be admins with customized access permissions.
 
-<h3>
-The "Admin" application of the "Tsuna Streaming" project handles the management of channels and content for administrators.
-<br><br>
-By default, the channel owner has full permission and can perform any kind of action within the channel. However, as owners are not always available, they can promote other users to be admins with customized access permissions.
-<br><br>
-When a channel gets created, an admin object will be created with full accesses. <br><br>
+# Models:
+The app uses two models - `ChannelAdmin` and `ChannelAdminPermission`. 
 
-After creating an admin object, signals will automatically create new permissions for that admin based on the BaseContentModel subclasses. <br>
-For example, when a user is promoted to an admin, a corresponding permission for the Video model will be created.
-<br>
+- `ChannelAdmin` model is the main admin model for each channel. When a user creates a channel, an admin object with full permissions will automatically be created for the channel owner. The channel owner or admins with the 'add_admin' permission can promote other users to become admins.
 
-This Application has 2 models.
-<ol>
-    <li>Admin</li>
-    <li>Permission</li>
-</ol>
-</h3>
+- `ChannelAdminPermission` model stores information about the permission assigned to the admin. It contains a foreign key to the `ChannelAdmin` model as well as fields to store the permission type and the time when the permission was granted.
 
-<h2>Admin</h2>
-<p>
-The main Admin model of each channel. <br>
-When a user creates a channel, an admin object with full permissions will automatically be created for the channel owner. The channel owner or admins with the 'add_admin' permission can promote other users to become admins.
-</p>
+# Views:
+- `add_admin` Admins can promote other users with this view
 
-<ol>
-    <li>Add/Update/Delete Admin</li>
-    <li>Avoid Promotion duplication</li>
-    <li>Permission for retrieving list of Admins</li>
-    <li>Admin permission mixin</li>
-    <li>Notify after promoting [Signal]</li>
-    <li>Delete admin after ubsubscribing [Signal]</li>
-    <li>Create full permission admin after creating channel [Signal]</li>
-    <li>SubscriptionRequiredException will be raised when attempting to promote a user who has not subscribed to the channel</li>
-</ol>
+- `list_admins` List of admins of a channel.
 
+- `update_admin` Update an admins common permissions.
 
-<h2>Permission</h2>
-<p>
-All admins have general permissions that relate to channels, rather than specific Contents. After being promoted to an admin, signals create new permissions for that user to control each content model. <br>
-For instance, a permission fro 'Video' model is created which checks whether users are allowed to perform certain actions on a videos.
-</p>
+- `update_admin_permission` Update an admins specific permissions.
 
-<ol>
-    <li>Update Admin permissions</li>
-    <li>Create permission for admin [Signal]</li>
-    <li>Create permission for admin task [celery]</li>
-</ol>
+- `delete_admin` Delete an admin.
 
-<h3>Also there are some tests that you can run them by typing this command:</h3>
+# Signals:
+The app uses signals to perform certain actions. 
+
+- When a new channel admin is added, the app sends a notification to the admin user. 
+
+- When a user unsubscribes from a channel, the app removes their corresponding entries from the `ChannelAdmin` and `ChannelAdminPermission` models.
+
+- When an admin object or channel gets created, signal creates permission for each ContentModel.
+
+# Exceptions:
+The app has one exception: `SubscriptionRequiredException`.
+
+`SubscriptionRequiredException` exception is raised if the user trying to add an admin is not a subscribed member of the channel.
+
+`DuplicatePromotionException` exception is raised if the user is getting promoted twice.
+
+## Tests
+The application's tests can be run using the following command: 
 
 ```
-$ pytest v1/admins
+$ pytest v1/channel_admins
 ```
