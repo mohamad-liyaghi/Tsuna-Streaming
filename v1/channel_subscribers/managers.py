@@ -77,13 +77,14 @@ class ChannelSubscriberManager(models.Manager):
             
         # If subscriber is not in cache and it is in db it sets the user in cache and return None
         # Cuz user has Subscribed the channel
-        elif self.model.objects.filter(user__token=user_token, channel__token=channel_token).exists():
+        elif (sub:=self.model.objects.filter(user__token=user_token, channel__token=channel_token)).exists():
 
             # Set the subscriber in cache for subsequent requests
             cache.set(
                 key=key,
                 value={
                     'subscription_status': 'subscribed',
+                    'date' : sub.date,
                     'source': 'database'
                 },
                 timeout=60 * 60 * 24
@@ -102,6 +103,7 @@ class ChannelSubscriberManager(models.Manager):
                     key=key,
                     value={
                         'subscription_status' : 'subscribed', 
+                        'date' : timezone.now(),
                         'source' : 'cache'
                     }, 
                     timeout=60 * 60 * 24

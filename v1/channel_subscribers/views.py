@@ -1,14 +1,17 @@
 from django.shortcuts import get_object_or_404
+from django.core.cache import cache
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
 from channel_subscribers.permissions import SubscriberPermission
+from channel_subscribers.serializers import SubscriberListSerializer
 
 
 @extend_schema_view(
@@ -68,3 +71,36 @@ class SubscriberView(APIView):
         )  
         
         return Response('OK', status=status.HTTP_204_NO_CONTENT)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="List of subscribers of a channel."
+    ),
+)
+class SubscriberListView(ListAPIView):
+
+    serializer_class = SubscriberListSerializer
+
+    def get_queryset(self):
+
+        subscriber_keys = cache.keys(f'subscriber:{self.kwargs["channel_token"]}:*')
+
+        subscribers_in_database = list(ChannelSubscriber.objects.filter(channel__token=self.kwargs['channel_token']))
+
+        subscribers_in_cache = [
+            {
+                "user": key.split(":")[2],
+                "date": cache_value.get('date', None),
+                "source": cache_value['source']
+            }
+
+            for key in subscriber_keys
+            if (cache_value := cache.get(key)) and
+            # get those subscribers that are only in cache and they are marked as subscribed
+            cache_value['source'] == 'cache' and
+            cache_value.get('subscription_status') == 'subscribed'
+        ]
+
+        return subscribers_in_cache + subscribers_in_database
+    

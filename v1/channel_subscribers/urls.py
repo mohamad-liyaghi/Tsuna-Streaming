@@ -1,8 +1,9 @@
 from django.urls import path
-from . import views
+from .views import SubscriberListView, SubscriberView
 
 app_name = 'v1_channel_subscribers'
 
 urlpatterns = [
-    path('<str:channel_token>/', views.SubscriberView.as_view(), name='subscriber_view')
+    path('<str:channel_token>/', SubscriberView.as_view(), name='subscriber'),
+    path('<str:channel_token>/list', SubscriberListView.as_view(), name='subscriber_list')
 ]
