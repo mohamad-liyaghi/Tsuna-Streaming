@@ -1,7 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
 from videos.models import Video
-from channels.models import Channel
 
 
 class VideoListSerializer(serializers.ModelSerializer):
@@ -14,26 +13,13 @@ class VideoListSerializer(serializers.ModelSerializer):
         fields = ["title", "thumbnail", "token", "channel", "date", "user", "is_published"]
 
 
-
-class CustomSlugRelatedField(serializers.SlugRelatedField):
-    '''Get channels that user owns or they are admin and can add video'''
-
-    def get_queryset(self):
-        user = self.context.get("user")
-        user_admin = user.channel_admins.all().values("channel__id")
-        channel_admin = Channel.objects.filter(id__in=user_admin)
-        return Channel.objects.filter(owner=user) | channel_admin
-
-
 class VideoCreateSeriaizer(serializers.ModelSerializer):
     '''Serializer for adding new video'''
 
-    # get queryset custom for foreign key
-    channel = CustomSlugRelatedField(queryset=Channel.objects.all(), slug_field='title')
 
     class Meta:
         model = Video
-        fields = ["title", "description", "video", "thumbnail", "allow_comment", "channel", "visibility", "date", "token"]
+        fields = ["title", "description", "video", "thumbnail", "allow_comment", "visibility", "date", "token"]
 
         extra_kwargs = {
             "date" : {'read_only' : True},
@@ -43,6 +29,7 @@ class VideoCreateSeriaizer(serializers.ModelSerializer):
     def save(self, **kwargs):
         # set user for video uploader
         kwargs["user"] = self.context['user']
+        kwargs["channel"] = self.context['channel']
 
         try:
             return super().save(**kwargs)

@@ -1,14 +1,9 @@
 from django.urls import path
-from rest_framework.routers import SimpleRouter
-from videos.views import VideoViewSet
+from videos.views import VideoListCreateView, VideoDetailView
 
 app_name = "v1_videos"
-router = SimpleRouter()
-
-router.register("video",VideoViewSet, basename="video")
 
 urlpatterns = [
-    
+    path('<str:channel_token>/', VideoListCreateView.as_view(), name='video_list_create'),
+    path('<str:channel_token>/<str:video_token>/', VideoDetailView.as_view(), name='video_detail'),
 ]
-
-urlpatterns += router.urls
