@@ -69,14 +69,13 @@ class BaseContentModel(BaseTokenModel):
     def get_model_content_type_id(self):
         '''Return content type id of the model (Eg: Video)'''
         
-        content_model = self.get_model_content_type()
+        content_model = self.__class__.get_model_content_type()
         return content_model.id if content_model else None
 
-
-    def get_model_content_type(self):
+    @classmethod
+    def get_model_content_type(cls):
         '''Return the content type object of the model'''
 
-        cls = self.__class__
         # get from cache
         cached_content_type_model = cache.get(f'content_type:{cls}')
         
@@ -179,7 +178,7 @@ class BaseContentModel(BaseTokenModel):
 
             if admin:
                 # check if user has permission
-                if admin.permissions.filter(model=self.get_model_content_type(), add_object=True).exists():
+                if admin.permissions.filter(model=self.__class__.get_model_content_type(), add_object=True).exists():
                     return super(BaseContentModel, self).save(*args, **kwargs)        
                 
                 raise PermissionDenied("Admin dont have permission to add video.")

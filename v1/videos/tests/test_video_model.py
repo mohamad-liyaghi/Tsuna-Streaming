@@ -48,11 +48,11 @@ class TestVideoModel:
         self.create_video()
         cls = self.video.__class__
         video_content_type = ContentType.objects.get_for_model(cls)
-        assert self.video.get_model_content_type() == video_content_type
+        assert Video.get_model_content_type() == video_content_type
 
         # second time, get from cache
         video_content_type = ContentType.objects.get_for_model(cls)
-        assert self.video.get_model_content_type() == video_content_type
+        assert Video.get_model_content_type() == video_content_type
 
 
     def test_get_video_views(self):

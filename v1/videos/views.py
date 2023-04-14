@@ -33,6 +33,7 @@ class VideoListCreateView(ChannelObjectMixin, ListCreateAPIView):
     throttle_classes = [VideoThrottle,]
     permission_classes = [IsAuthenticated, CreateVideoPermission]
 
+
     def get_serializer_context(self):
         return {'user' : self.request.user, 'channel' : self.channel}
 
@@ -72,7 +73,7 @@ class VideoDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = VideoDetailSerializer
 
     def get_object(self):
-        video = get_object_or_404(Video.objects.select_related("channel"), 
+        video = get_object_or_404(Video.objects.select_related("channel", "user"), 
                                     token=self.kwargs["video_token"], channel=self.channel)
         self.check_object_permissions(self.request, video)
         return video
