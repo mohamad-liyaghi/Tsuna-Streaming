@@ -11,7 +11,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from votes.serializers import VoteSerializer, VoteListSerializer
 from v1.core.mixins import ContentObjectMixin
 from votes.models import Vote
-
+from core.permissions import IsChannelAdmin
 
 @extend_schema_view(
     get=extend_schema(
@@ -77,7 +77,7 @@ class VoteListView(ContentObjectMixin, APIView):
     List of users that voted for an object.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsChannelAdmin]
 
     @method_decorator(cache_page(60 * 2))
     def get(self, request, *args, **kwargs):

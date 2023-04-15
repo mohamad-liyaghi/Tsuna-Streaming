@@ -3,9 +3,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+
 from drf_spectacular.utils import extend_schema, extend_schema_view
+
 from viewers.serializers import ViewerListSerializer
 from core.mixins import ContentObjectMixin
+from core.permissions import IsChannelAdmin
 
 
 @extend_schema_view(
@@ -13,7 +16,7 @@ from core.mixins import ContentObjectMixin
 )
 class ViewerListView(ContentObjectMixin, APIView):
     '''List of an objects viewers'''
-    permission_classes = [IsAuthenticated,]
+    permission_classes = [IsAuthenticated, IsChannelAdmin]
 
     def get(self, request, *args, **kwargs):
         viewers = []
