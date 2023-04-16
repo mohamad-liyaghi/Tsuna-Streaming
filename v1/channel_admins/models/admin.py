@@ -43,16 +43,20 @@ class ChannelAdmin(BaseTokenModel):
 
     def save(self, *args, **kwargs):
         if not self.pk:
+            subscriber = ChannelSubscriber.objects.get_from_cache(
+                    channel_token=self.channel.token, user_token=self.user.token
+                )
 
-            # only subscribed users can be promoted
-            
-            if not ChannelSubscriber.objects.get_from_cache(channel_token=self.channel.token, user_token=self.user.token):
+            # Raise error if use hasnt subscribed to channel
+            if not subscriber:
                 raise SubscriptionRequiredException("User hasnt subscribed to channel.")
+            
+            if subscriber and not ChannelSubscriber.objects.filter(channel=self.channel, user=self.user):
+                raise SubscriptionRequiredException("User must be subscribed to channel for at least 24 hours to get promoted.")
 
             # check admin exists or not
             if self.user.channel_admins.filter(channel=self.channel).exists():
                 raise DuplicatePromotionException("Admin already exists.")
-
 
             if self.user == self.channel.owner:
                 return super(ChannelAdmin, self).save(*args, **kwargs)    

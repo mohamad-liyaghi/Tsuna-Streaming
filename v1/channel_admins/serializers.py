@@ -36,8 +36,8 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         except DuplicatePromotionException:
             raise serializers.ValidationError("Admin already exists.")
 
-        except SubscriptionRequiredException:
-            raise serializers.ValidationError("User hasnt subscribed to the channel yet.")
+        except SubscriptionRequiredException as e:
+            raise serializers.ValidationError(str(e))
         
         except PermissionDenied as error:
             raise serializers.ValidationError(str(error))

@@ -82,6 +82,15 @@ class TestAdminModel:
 
         with pytest.raises(SubscriptionRequiredException):
             self.create_admin()
+    
+    def test_raise_error_promoting_new_subscribed_user(self):
+        '''Users must be at least 24 hours subscribed to channel in order to get promoted'''
+
+        assert self.simple_user.channel_admins.count() == 0
+        ChannelSubscriber.objects.subscribe_in_cache(self.channel.token, self.simple_user.token)
+
+        with pytest.raises(SubscriptionRequiredException):
+            self.admin = ChannelAdmin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.super_user)
 
     def test_raise_error_when_duplicating_admin(self):
         '''user cannot be promoted for 2 times'''
