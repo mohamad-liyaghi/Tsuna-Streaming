@@ -1,3 +1,6 @@
 from django.contrib import admin
+from musics.models import Music
 
-# Register your models here.
+@admin.register(Music)
+class MusicAdmin(admin.ModelAdmin):
+    list_display = ['title', 'channel', 'date', 'token']

@@ -1,0 +1,10 @@
+from django.db.models.signals import post_delete
+from musics.models import Music
+from votes.signals import delete_object_votes_after_deleting
+from comments.signals import delete_object_comments_after_deleting
+from viewers.signals import delete_object_viewers_after_deleting
+
+
+post_delete.connect(delete_object_votes_after_deleting, sender=Music)
+post_delete.connect(delete_object_comments_after_deleting, sender=Music)
+post_delete.connect(delete_object_viewers_after_deleting, sender=Music)

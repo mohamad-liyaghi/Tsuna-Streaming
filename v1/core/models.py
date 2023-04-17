@@ -36,6 +36,10 @@ class BaseContentModel(BaseTokenModel):
         The only diffrence between this model and BaseTokenModel is the methods.
     '''
 
+    title = models.CharField(max_length=100)
+    description = models.TextField(max_length=300)
+
+
     class Visibility(models.TextChoices):
         PRIVATE = ("pr", "Private")
         PUBLISHED = ("pu", "Public")
@@ -54,6 +58,10 @@ class BaseContentModel(BaseTokenModel):
 
     class Meta:
         abstract = True
+
+    @property
+    def is_published(self):
+        return self.visibility == "pu"
 
     @classmethod
     def get_content_model_by_name(cls, name):
@@ -181,7 +189,7 @@ class BaseContentModel(BaseTokenModel):
                 if admin.permissions.filter(model=self.__class__.get_model_content_type(), add_object=True).exists():
                     return super(BaseContentModel, self).save(*args, **kwargs)        
                 
-                raise PermissionDenied("Admin dont have permission to add video.")
+                raise PermissionDenied("Admin dont have permission to add object.")
 
             raise PermissionDenied("Admin didnt found.")
 
