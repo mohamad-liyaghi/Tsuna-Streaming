@@ -14,20 +14,22 @@ post_delete.connect(delete_object_viewers_after_deleting, sender=Video)
 
 
 @receiver(post_save, sender=Video)
-def notify_video_creation(sender, **kwargs):
+def notify_video_creation(sender, instance, created, **kwargs):
     
-    instance = kwargs["instance"]
-    if not instance.pk:
+    if created:
             
         if instance.user == instance.channel.owner:
             send_email(template_name="emails/notify_video_creation.html", first_name=instance.user.first_name,
-                        email=instance.user.email, channel_title=instance.title, video_token=instance.token)
+                        email=instance.user.email, channel_title=instance.title, video_token=instance.token,
+                        channel_token=instance.channel.token,)
 
         else:
             # send email to both admin and owner
             send_email(template_name="emails/notify_video_creation.html", first_name=instance.user.first_name,
-                        email=instance.user.email, channel_title=instance.title, video_token=instance.token)
+                        email=instance.user.email, channel_title=instance.title, video_token=instance.token, 
+                        channel_token=instance.channel.token,)
 
             send_email(template_name="emails/notify_video_creation.html", first_name=instance.user.first_name,
-                        email=instance.channel.owner.email, channel_title=instance.title, video_token=instance.token)
+                        email=instance.channel.owner.email, channel_title=instance.title, video_token=instance.token,
+                        channel_token=instance.channel.token,)
 
