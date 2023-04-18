@@ -22,3 +22,31 @@ class CreateMusicPermission(BasePermission):
         
         return True
     
+
+
+class MusicDetailPermission(BasePermission):
+    message = 'Permission denied.'
+    
+    def has_permission(self, request, view):
+
+        if request.method == "GET":
+            return True
+        
+        admin = request.user.channel_admins.filter(channel=view.channel).first()
+
+        # only channel owner and some admins can update a music
+        if request.method in ["PUT", "PATCH"]:
+            return (admin and admin.permissions.filter(model=Music.get_model_content_type(), edit_object=True))
+
+
+        # only channel owner and some admins can delete a music
+        elif request.method == "DELETE":
+            return (admin and admin.permissions.filter(model=Music.get_model_content_type(), delete_object=True))
+
+
+    def has_object_permission(self, request, view, obj):
+        # only admin of channels can view unpublished musics
+        if not obj.is_published:
+            return (request.user.channel_admins.filter(channel=obj.channel).first())
+        
+        return True
