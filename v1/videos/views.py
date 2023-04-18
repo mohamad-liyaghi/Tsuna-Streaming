@@ -48,8 +48,13 @@ class VideoListCreateView(ChannelObjectMixin, ListCreateAPIView):
     def get_queryset(self):
         '''List of users videos'''
 
-        return Video.objects.select_related('user', 'channel')\
+        queryset =  Video.objects.select_related('user', 'channel')\
             .filter(channel=self.channel).order_by("-date")
+        
+        if self.request.user.channel_admins.filter(channel=self.channel):
+            return queryset
+
+        return queryset.filter(visibility='pu')
     
 
 @extend_schema_view(    
