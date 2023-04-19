@@ -1,6 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 from memberships.exceptions import MembershipInUserError
 
 from rest_framework.generics import (
@@ -41,11 +39,6 @@ class MembershipListCreateView(ListCreateAPIView):
         else:
             return [IsAuthenticated(),]
     
-    @method_decorator(cache_page(60 * 5))
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
-
-
 
 @extend_schema_view(
     retrieve=extend_schema(
@@ -61,10 +54,6 @@ class MembershipListCreateView(ListCreateAPIView):
 class MembershipDetailView(RetrieveUpdateDestroyAPIView):
 
     serializer_class = MembershipDetailSerializer
-
-    @method_decorator(cache_page(60 * 5))
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
 
     def get_permissions(self):
         # Only admins can update/Delete a plan

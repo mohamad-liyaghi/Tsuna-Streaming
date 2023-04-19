@@ -9,10 +9,10 @@ from memberships.views import (
 app_name = 'memberships'
 
 urlpatterns = [
-    path("membership/", MembershipListCreateView.as_view(), name='membership'),
-    path("membership/<str:membership_token>/", MembershipDetailView.as_view(), name='membership_detail'),
+    path("", MembershipListCreateView.as_view(), name='membership'),
+    path("<str:membership_token>/", MembershipDetailView.as_view(), name='membership_detail'),
     path(
-            "membership/<str:membership_token>/subscribe/",
+            "<str:membership_token>/subscribe/",
             MembershipSubscribeView.as_view(),
             name='membership_detail'
         ),
