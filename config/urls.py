@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 admin.site.site_header = "Tsuna Streaming Admin"
@@ -22,6 +23,8 @@ LOCAL_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    path('', lambda request: HttpResponse("HI! <br> v1 docs: <a href='v1/docs/'>Click me.</a>")),
+
     # Django Debug Toolbar
     path('__debug__/', include('debug_toolbar.urls')),
     
