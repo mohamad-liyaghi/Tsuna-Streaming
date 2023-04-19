@@ -39,5 +39,5 @@ The app has one exception: `SubscriptionRequiredException`.
 The application's tests can be run using the following command: 
 
 ```
-$ pytest v1/channel_admins
+$ pytest apps/channel_admins
 ```

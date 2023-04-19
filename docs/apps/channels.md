@@ -25,5 +25,5 @@ Normal users can create up to 5 channels, while premium and admin users can crea
 The application's tests can be run using the following command: 
 
 ```
-$ pytest v1/channels
+$ pytest apps/channels
 ```

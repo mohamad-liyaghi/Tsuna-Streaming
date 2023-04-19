@@ -46,5 +46,5 @@ The application's tests can be run using the following command:
 
 
 ```
-$ pytest v1/channel_subscribers
+$ pytest apps/channel_subscribers
 ```

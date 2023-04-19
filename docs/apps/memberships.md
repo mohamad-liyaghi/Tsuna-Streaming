@@ -33,5 +33,5 @@ A Celery task runs periodically to remove invalid memberships. An invalid member
 The Memberships application includes automated tests that you can run them by typing this command:
 
 ```
-$ pytest memberships/
+$ pytest apps/memberships/
 ``` 

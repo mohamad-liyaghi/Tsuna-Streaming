@@ -28,5 +28,5 @@ The application uses a mixin to get the channel object before executing a view. 
 The Musics application includes automated tests that you can run them by typing this command:
 
 ```
-$ pytest v1/musics/
+$ pytest apps/musics/
 ``` 

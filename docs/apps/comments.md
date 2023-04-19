@@ -34,5 +34,5 @@ If commenting is disabled for a particular content model, attempting to add a co
 The application's tests can be run using the following command: 
 
 ```
-$ pytest v1/comments
+$ pytest apps/comments
 ```

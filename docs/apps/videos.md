@@ -33,5 +33,5 @@ The application includes a manager method that retrieves only published videos.
 The Videos application includes automated tests that you can run them by typing this command:
 
 ```
-$ pytest v1/videos/
+$ pytest apps/videos/
 ``` 

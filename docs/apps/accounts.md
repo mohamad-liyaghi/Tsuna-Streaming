@@ -54,5 +54,5 @@ By utilizing these signals, the application ensures that the user registration p
 There are some tests that you can run by typing this command: 
 
 ```
-$ pytest v1/accounts
+$ pytest apps/accounts
 ```

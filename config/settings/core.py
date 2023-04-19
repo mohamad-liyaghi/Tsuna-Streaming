@@ -18,24 +18,24 @@ else:
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
-# default v1 application location
-sys.path.insert(0, os.path.join(BASE_DIR, 'v1'))
+# default fodler app
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 
 LOCAL_APPS = [
-    'v1.accounts.apps.AccountsConfig',
-    'v1.memberships.apps.MembershipsConfig',
+    'apps.accounts.apps.AccountsConfig',
+    'apps.memberships.apps.MembershipsConfig',
 
-    'v1.channels.apps.ChannelsConfig',
-    'v1.channel_admins.apps.ChannelAdminsConfig',
-    'v1.channel_subscribers.apps.ChannelSubscribersConfig',
+    'apps.channels.apps.ChannelsConfig',
+    'apps.channel_admins.apps.ChannelAdminsConfig',
+    'apps.channel_subscribers.apps.ChannelSubscribersConfig',
 
-    'v1.videos.apps.VideosConfig',
-    'v1.musics.apps.MusicsConfig',
+    'apps.videos.apps.VideosConfig',
+    'apps.musics.apps.MusicsConfig',
     
-    'v1.votes.apps.VotesConfig',
-    'v1.comments.apps.CommentsConfig',
-    'v1.viewers.apps.ViewersConfig',
+    'apps.votes.apps.VotesConfig',
+    'apps.comments.apps.CommentsConfig',
+    'apps.viewers.apps.ViewersConfig',
 ]
 
 THIRD_PARTY_APPS = [
@@ -148,13 +148,13 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 
     'DEFAULT_THROTTLE_CLASSES': [
-        'v1.accounts.throttling.AuthenticationThrottle',
-        'v1.videos.throttling.VideoThrottle',
+        'apps.accounts.throttling.AuthenticationThrottle',
+        'apps.videos.throttling.VideoThrottle',
     ], 
 
     'DEFAULT_THROTTLE_RATES': {
-        'authentication' : '5/minute',
-        'video' : '40/minute',
+        'authentication' : '2/second',
+        'video' : '5/second',
     }
 }
 

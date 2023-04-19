@@ -31,5 +31,5 @@ The "Votes" application's manager is responsible for handling interactions with 
 This application includes automated tests that you can run them by typing this command:
 
 ```
-$ pytest v1/votes/
+$ pytest apps/votes/
 ``` 
