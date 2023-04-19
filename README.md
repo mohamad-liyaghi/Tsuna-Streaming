@@ -19,41 +19,60 @@ To ensure the smooth functioning of this streaming system, <a href="docs.celeryq
 
 ## Authentication and Memberships on Tsuna Streaming
 
-### Accounts
+## Accounts
 The `Accounts` application in this project is responsible for authentication purposes. When users register, their accounts remain inactive until they verify them using a token sent to their email. Once activated, users can authorize themselves using a JWT token. You can find more information on the `Accounts` application in the <a href="https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/accounts.md">Accounts Docs</a>.<br>
 
-### Memberships
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/profile-page.jpg' alt='sample profile page'>
+<br>
+
+## Memberships
 The `Memberships` application in this project is responsible for managing user subscriptions and memberships. Once users register, they are limited in performing some actions. For example, they can only create up to 5 channels. They can view the membership plans that admins have created beforehand and subscribe to one of them to take advantage of the benefits. Once the plan expires, a celery task demotes and notifies the user. For more information, refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/memberships.md'>Documentation</a>.
+
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/membership-list-page.jpg' alt='sample membership list'>
+<br>
 
 <hr>
 
 ## Channel Management on Tsuna Streaming
 
-### Channels
+## Channels
 The `Channels` application plays a crucial role in the Tsuna Streaming project by facilitating the management of user-generated channels. This application allows users to create, edit, and delete their own channels, as well as browse through a comprehensive list of all available channels. 
 
 While regular users can create up to 5 channels, premium users are granted the ability to create up to 10 channels, providing them with greater flexibility and control. For more details on the features and functionalities of this application, please refer to the <a href="https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channels.md">documentation</a>.
 
-### Channel Subscribers
+
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-list-page.jpg' alt='sample channel list'>
+
+
+## Channel Subscribers
 The `Channel Subscribers` application another component of the Tsuna Streaming project. Users have the ability to subscribe to channels, which are initially saved in cache and then inserted into the database using Celery. The ChannelSubscriber model is implemented for this application, with several views available for subscribing and displaying the list of subscribers.
 
 For more detailed information regarding the features and functionalities of this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channel_subscribers.md'>documentation</a>.
 
-### Channel Admins
+
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-subscriber-list-page.jpg' alt='sample subscriber list'>
+<br>
+
+## Channel Admins
 The `Channel Admin` application is a vital component of the Tsuna Streaming project, which enables administrators to efficiently manage channels and content. Once a user creates a channel, administrators can promote subscribers as admins with customized permission levels for accessing or altering content details.
 
 Upon being promoted, a background task automatically generates permissions for each content model, such as `videos` and `music`, for that particular admin. For more in-depth information regarding the features and functionalities of this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channel_admins.md'>documentation</a>.
 
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-admin-list-page.jpg' alt='sample channel admin list'>
+<br>
 <hr>
 
 ## Managing Content on Tsuna Streaming
 
 Tsuna Streaming's <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/core.md'>Core</a> module has a base model called `BaseTokenModel` that serves as the foundation for all content models. It contains common fields and methods.
 
-### Videos
+## Videos
 The `Videos` application is responsible for managing user-uploaded videos. The main model used is `Video`, which inherits from `BaseContentModel` providing all necessary functionalities. Admins can add, update, and delete videos for a channel based on their permissions, while users can view published videos. For more details, check out the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/videos.md'>documentation</a>.
 
-### Music
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/video-list-page.jpg' alt='sample channel video list'>
+<br>
+
+## Music
 Similar to the `Videos` application, the `Music` application uses a model that inherits from `BaseContentModel`. All functionalities are the same as those of the `Videos` application. You can refer to the official <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/musics.md'>documentation</a>  for more information.
 
 <hr>
@@ -61,7 +80,7 @@ Similar to the `Videos` application, the `Music` application uses a model that i
 
 ## Votes, Views and Comments
 
-### Vote
+## Vote
 The `Votes` application manages the essential functionality of Upvoting/Downvoting for all content models through a single, generic `Vote` model. This application implements a caching mechanism to store votes temporarily before inserting them into the database via a celery task.
 
 The application provides several methods for retrieving votes from both cache and the database while also allowing for the insertion of new votes into cache. For more detailed information about this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/votes.md'>documentation</a>.
@@ -71,7 +90,10 @@ The `Comments` application within the "Tsuna Streaming" project enables users to
 
 By utilizing this application, users can add comments to different content models with ease. For more information about the "Comments" application, including usage instructions and available methods, please see the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/comments.md'>documentation</a>.
 
-### Viewers
+<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/comment-list-page.jpg' alt='sample comment list'>
+<br>
+
+## Viewers
 The `Viewers` application of the Tsuna Streaming project serves the purpose of tracking viewers of an object. It stores viewer information in cache before inserting it into the database. Admins can access the list of all viewers of an object.
 
 The application includes a decorator that is used to decorate detail pages for adding viewing purposes.
