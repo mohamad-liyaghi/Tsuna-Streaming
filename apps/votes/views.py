@@ -1,6 +1,4 @@
 from django.core.cache import cache
-from django.views.decorators.cache import cache_page
-from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -79,36 +77,45 @@ class VoteListView(ContentObjectMixin, APIView):
 
     permission_classes = [IsAuthenticated, IsChannelAdmin]
 
-    @method_decorator(cache_page(60 * 2))
     def get(self, request, *args, **kwargs):
         """
         Get list of people who have voted from the database and cache.
         """
 
-        pattern = f"vote:{self.object.token}:*"
-
-        # get all votes keys
-        keys = cache.keys(pattern)
-
-        # Extract user and choice values for each key and create a list of dictionaries.
+        # Create a dict from all users who has voted in cache
         votes_in_cache = [
-            {"user": key.split(":")[2], "choice": cache.get(key)["choice"]} for key in keys
+            {
+            "user": key.split(":")[2], 
+            "choice": cache.get(key)["choice"],
+            }
+            for key in cache.keys(f"vote:{self.object.token}:*")
+            if cache.get(key)['source'] == 'cache' 
         ]
 
-        # get all the votes in db
-        votes_in_db = list(self.object.votes.all())
+        # Get votes that are in db [from cache]
+        votes_in_db = cache.get(f'db_vote:{self.object.token}')
 
+        if votes_in_db is None:
+                
+                # Get all votes from database
+                database_vote = [
+                    (db_vote.user.token, db_vote.choice)
+                    for db_vote in list(self.object.votes.select_related('user').all())
+                ]
+
+                # Check if they are not saved in cache
+                votes_in_db = [
+                    {"user": user_token, "choice": choice}
+                    for user_token, choice in database_vote
+                    if not any(vote["user"] == user_token for vote in votes_in_cache)
+                ]
+
+                # Set in cache            
+                cache.set(key=f'db_vote:{self.object.token}', value=votes_in_db, timeout=5)
+
+        # all votes
         votes = []
-        votes += votes_in_cache
-
-        # get token of users that voted in cache
-        cache_votes_user_tokens = set(vote["user"] for vote in votes_in_cache)
-
-        # if cache in db, does not exist in db, append it to votes list
-        for db_vote in votes_in_db:
-            if db_vote.user.token not in cache_votes_user_tokens:
-                votes.append({'user': db_vote.user.token, 'choice': db_vote.choice})
-
+        votes += votes_in_cache + votes_in_db
 
         serializer = VoteListSerializer(votes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
