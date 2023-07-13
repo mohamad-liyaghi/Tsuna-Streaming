@@ -1,26 +1,24 @@
 version: '3.9'
 
 x-environment: &DJANGO_SETTINGS_MODULE
-    DJANGO_SETTINGS_MODULE: 'config.settings.production'
+    DJANGO_SETTINGS_MODULE: 'config.settings.local'
 
 services:
-
   backend:
-
     build:
-      context: ../../
-      dockerfile: ./docker/production/Dockerfile
+      context: .
+      dockerfile: ./docker/local/Dockerfile
 
-    command: sh docker/production/setup.sh
+    command: sh docker/local/commands/setup.sh
 
     container_name: tsuna-streaming-backend
     restart: on-failure
 
     ports:
-      - 8000:8000
+      - "8000:8000"
 
     volumes:
-      - ../../:/backend
+      - .:/backend
 
     environment:
       *DJANGO_SETTINGS_MODULE
@@ -28,6 +26,10 @@ services:
     depends_on:
       - db
       - redis
+      - smtp4dev
+      - celery
+      - celery-beat
+      - flower
 
   db:
     image: postgres:11
@@ -56,14 +58,16 @@ services:
 
       volumes: 
           - /data/pgadmin:/var/lib/pgadmin/data
-    
+      depends_on:
+        - db
+
   smtp4dev:
     image: rnwood/smtp4dev:v3
     container_name: tsuna-streaming-smtp4dev
 
     ports:
-      - 5000:80
-      - 25:25
+      - "5000:80"
+      - "25:25"
       
     restart: always
 
@@ -72,54 +76,52 @@ services:
     container_name: tsuna-streaming-redis
     
     ports:
-      - 6379:6379
+      - "6379:6379"
 
     restart: always
 
   celery:
     build:
-      context: ../../
-      dockerfile: ./docker/production/Dockerfile
+      context: .
+      dockerfile: ./docker/local/Dockerfile
 
     container_name: tsuna-streaming-celery
-    command: celery -A config worker --loglevel=info
+    command: sh docker/local/commands/celery.sh
     depends_on:
       - redis
     volumes:
-      - ../../:/backend
+      - .:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
   celery-beat:
     build:
-      context: ../../
-      dockerfile: ./docker/production/Dockerfile
+      context: .
+      dockerfile: ./docker/local/Dockerfile
     container_name: tsuna-streaming-celery-beat
-    command: celery -A config beat --loglevel=info
+    command: sh docker/local/commands/celery-beat.sh
     depends_on:
       - redis
     volumes:
-      - ../../:/backend
+      - .:/backend
     environment:
       *DJANGO_SETTINGS_MODULE
 
   flower:
-
     build:
-      context: ../../
-      dockerfile: ./docker/production/Dockerfile
-    command: celery -A config flower
+      context: .
+      dockerfile: ./docker/local/Dockerfile
+    command: sh docker/local/commands/flower.sh
 
     depends_on:
-      - backend
       - redis
       - celery
-      
-    volumes:
-      - ../../:/backend
 
     ports:
-      - 5555:5555
+      - "5555:5555"
+      
+    volumes:
+      - .:/backend
 
     environment:
       *DJANGO_SETTINGS_MODULE
