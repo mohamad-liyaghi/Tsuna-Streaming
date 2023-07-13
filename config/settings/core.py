@@ -1,18 +1,8 @@
+import os
+import sys
 from pathlib import Path
-from decouple import Config, RepositoryEnv
-import os, sys
 from datetime import timedelta
-
-
-DJANGO_SETTINGS_MODULE = os.environ.get("DJANGO_SETTINGS_MODULE")
-
-
-if DJANGO_SETTINGS_MODULE == 'config.settings.local':
-    config = Config(RepositoryEnv('.env.local'))
-
-else:
-    config = Config(RepositoryEnv('.env.prod'))
-
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -136,7 +126,7 @@ REST_FRAMEWORK = {
     
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
-    'DEFAULT_AUTHENTICATION_CLASSES':[
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 
@@ -153,8 +143,8 @@ REST_FRAMEWORK = {
     ], 
 
     'DEFAULT_THROTTLE_RATES': {
-        'authentication' : '2/second',
-        'video' : '5/second',
+        'authentication': '2/second',
+        'video': '5/second',
     }
 }
 

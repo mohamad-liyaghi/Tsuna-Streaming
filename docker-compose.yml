@@ -1,49 +1,47 @@
 version: '3.9'
 
-x-environment: &DJANGO_SETTINGS_MODULE
+x-environment: &COMMON_VARS
     DJANGO_SETTINGS_MODULE: 'config.settings.local'
 
 services:
   backend:
+    container_name: tsuna-streaming-backend
+
     build:
       context: .
       dockerfile: ./docker/local/Dockerfile
 
     command: sh docker/local/commands/setup.sh
-
-    container_name: tsuna-streaming-backend
     restart: on-failure
-
+    env_file:
+      - .env.local
     ports:
       - "8000:8000"
-
     volumes:
       - .:/backend
-
+      - .env.local:/backend/.env
     environment:
-      *DJANGO_SETTINGS_MODULE
-    
+      *COMMON_VARS
     depends_on:
-      - db
+      - postgres
       - redis
       - smtp4dev
       - celery
       - celery-beat
       - flower
 
-  db:
+  postgres:
     image: postgres:11
 
     container_name: tsuna-streaming-database
     restart: on-failure
+    env_file:
+      - .env.local
 
     ports: 
           - "5432:5432"
     volumes:
-            - /var/lib/docker/basedata:/var/lib/postgresql/data
-          
-    environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - postgres-data:/var/lib/postgresql/data
 
   pgadmin:
       image: dpage/pgadmin4
@@ -59,7 +57,7 @@ services:
       volumes: 
           - /data/pgadmin:/var/lib/pgadmin/data
       depends_on:
-        - db
+        - postgres
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
@@ -77,8 +75,8 @@ services:
     
     ports:
       - "6379:6379"
-
     restart: always
+
 
   celery:
     build:
@@ -91,8 +89,10 @@ services:
       - redis
     volumes:
       - .:/backend
+    env_file:
+      - .env.local
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
 
   celery-beat:
     build:
@@ -104,24 +104,27 @@ services:
       - redis
     volumes:
       - .:/backend
+    env_file:
+      - .env.local
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
 
   flower:
     build:
       context: .
       dockerfile: ./docker/local/Dockerfile
     command: sh docker/local/commands/flower.sh
-
+    env_file:
+      - .env.local
     depends_on:
       - redis
       - celery
-
     ports:
       - "5555:5555"
-      
     volumes:
       - .:/backend
-
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
+
+volumes:
+  postgres-data:

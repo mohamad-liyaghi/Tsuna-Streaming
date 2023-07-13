@@ -1,38 +1,39 @@
 version: '3.9'
 
-x-environment: &DJANGO_SETTINGS_MODULE
+x-environment: &COMMON_VARS
     DJANGO_SETTINGS_MODULE: 'config.settings.production'
 
 services:
   backend:
-
+    container_name: tsuna-streaming-backend
     build:
       context: .
       dockerfile: ./docker/production/Dockerfile
 
     command: sh docker/production/commands/setup.sh
-
-    container_name: tsuna-streaming-backend
     restart: on-failure
+    env_file:
+      - .env.prod
 
     ports:
       - "8000:8000"
 
     volumes:
       - .:/backend
+      - .env.prod:/backend/.env
 
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
     
     depends_on:
-      - db
+      - postgres
       - redis
       - smtp4dev
       - celery
       - celery-beat
       - flower
 
-  db:
+  postgres:
     image: postgres:11
 
     container_name: tsuna-streaming-database
@@ -41,10 +42,9 @@ services:
     ports: 
           - "5432:5432"
     volumes:
-            - /var/lib/docker/basedata:/var/lib/postgresql/data
-          
-    environment:
-      - "POSTGRES_HOST_AUTH_METHOD=trust"
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - .env.prod
 
   pgadmin:
       image: dpage/pgadmin4
@@ -76,8 +76,9 @@ services:
     
     ports:
       - "6379:6379"
-
     restart: always
+    env_file:
+      - .env.prod
 
   celery:
     build:
@@ -91,7 +92,9 @@ services:
     volumes:
       - .:/backend
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
+    env_file:
+      - .env.prod
 
   celery-beat:
     build:
@@ -104,7 +107,9 @@ services:
     volumes:
       - .:/backend
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
+    env_file:
+      - .env.prod
 
   flower:
 
@@ -116,12 +121,18 @@ services:
     depends_on:
       - redis
       - celery
-      
     volumes:
       - .:/backend
-
     ports:
       - "5555:5555"
+    env_file:
+      - .env.prod
 
     environment:
-      *DJANGO_SETTINGS_MODULE
+      *COMMON_VARS
+
+networks:
+  main:
+
+volumes:
+  postgres-data:
