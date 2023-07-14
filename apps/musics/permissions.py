@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from core.utils import get_content_type_model
 from musics.models import Music
 
 
@@ -16,7 +17,7 @@ class CreateMusicPermission(BasePermission):
             # Check if user is admin
             if (admin:=channel.admins.filter(user=request.user).first()):
                 # If user is admin, check if user has permission to add music
-                return (admin and admin.permissions.filter(model=Music.get_model_content_type(), add_object=True))
+                return (admin and admin.permissions.filter(model=get_content_type_model(Music), add_object=True))
             
             return False
         
@@ -36,12 +37,12 @@ class MusicDetailPermission(BasePermission):
 
         # only channel owner and some admins can update a music
         if request.method in ["PUT", "PATCH"]:
-            return (admin and admin.permissions.filter(model=Music.get_model_content_type(), edit_object=True))
+            return (admin and admin.permissions.filter(model=get_content_type_model(Music, return_id=True), edit_object=True))
 
 
         # only channel owner and some admins can delete a music
         elif request.method == "DELETE":
-            return (admin and admin.permissions.filter(model=Music.get_model_content_type(), delete_object=True))
+            return (admin and admin.permissions.filter(model=get_content_type_model(Music, return_id=True), delete_object=True))
 
 
     def has_object_permission(self, request, view, obj):

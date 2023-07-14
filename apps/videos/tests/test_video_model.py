@@ -1,5 +1,6 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+from core.utils import get_content_type_model
 from accounts.models import Account
 from channels.models import Channel
 from videos.models import Video
@@ -34,13 +35,14 @@ class TestVideoModel:
     
 
     def test_get_video_content_type_id(self):
-        '''Test the get_model_content_type_id() placed in BaseContentModel'''
 
         self.create_video()
         cls = self.video.__class__
         video_content_type_id = ContentType.objects.get_for_model(cls).id
 
-        assert self.video.get_model_content_type_id() == video_content_type_id
+        assert get_content_type_model(
+            self.video.__class__, return_id=True
+        ) == video_content_type_id
 
 
     def test_get_video_content_type_model(self):
@@ -48,11 +50,11 @@ class TestVideoModel:
         self.create_video()
         cls = self.video.__class__
         video_content_type = ContentType.objects.get_for_model(cls)
-        assert Video.get_model_content_type() == video_content_type
+        assert get_content_type_model(Video) == video_content_type
 
         # second time, get from cache
         video_content_type = ContentType.objects.get_for_model(cls)
-        assert Video.get_model_content_type() == video_content_type
+        assert get_content_type_model(Video) == video_content_type
 
 
     def test_get_video_views(self):

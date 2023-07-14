@@ -1,12 +1,14 @@
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
+import pytest
 from accounts.models import Account
 from channels.models import Channel
 from musics.models import Music
 from votes.models import Vote
 from comments.models import Comment
 from viewers.models import Viewer
-import pytest
+from core.utils import get_content_type_model
+
 
 @pytest.mark.django_db
 class TestMusicModel:
@@ -27,25 +29,25 @@ class TestMusicModel:
     
 
     def test_get_music_content_type_id(self):
-        '''Test the get_model_content_type_id() placed in BaseContentModel'''
-
         self.create_music()
         cls = self.music.__class__
         music_content_type_id = ContentType.objects.get_for_model(cls).id
 
-        assert self.music.get_model_content_type_id() == music_content_type_id
+        assert get_content_type_model(
+            model=self.music.__class__,
+            return_id=True
+        ) == music_content_type_id
 
 
     def test_get_music_content_type_model(self):
-
         self.create_music()
         cls = self.music.__class__
         music_content_type = ContentType.objects.get_for_model(cls)
-        assert Music.get_model_content_type() == music_content_type
+        assert get_content_type_model(model=Music) == music_content_type
 
         # second time, get from cache
         music_content_type = ContentType.objects.get_for_model(cls)
-        assert Music.get_model_content_type() == music_content_type
+        assert get_content_type_model(model=Music) == music_content_type
 
 
     def test_get_music_views(self):

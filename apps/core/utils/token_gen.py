@@ -1,6 +1,7 @@
 import uuid
 
 
+# TODO: remove this
 def unique_token_generator(instance, BaseContentModel):
     '''Creates a unique token for each instance'''
 

@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.cache import cache
 
-from core.utils import unique_token_generator
+from core.utils import unique_token_generator, get_content_type_model
+
 
 
 class BaseTokenModel(models.Model):
@@ -73,36 +73,6 @@ class BaseContentModel(BaseTokenModel):
             
         return None
 
-
-    def get_model_content_type_id(self):
-        '''Return content type id of the model (Eg: Video)'''
-        
-        content_model = self.__class__.get_model_content_type()
-        return content_model.id if content_model else None
-
-    @classmethod
-    def get_model_content_type(cls):
-        '''Return the content type object of the model'''
-
-        # get from cache
-        cached_content_type_model = cache.get(f'content_type:{cls}')
-        
-        if cached_content_type_model:
-            return cached_content_type_model.get('model')
-        
-        # if not exist in cache, get from db
-        content_type = ContentType.objects.get_for_model(cls)
-        
-        if content_type:
-            
-            cache.set(
-                key=f'content_type:{cls}', 
-                value={'id': content_type.id, 'model': content_type}
-            )
-            return cache.get(f'content_type:{cls}').get('model')
-        
-        return None
-    
 
     def get_viewer_count(self):    
         '''Return objects viewers count'''
@@ -186,7 +156,10 @@ class BaseContentModel(BaseTokenModel):
 
             if admin:
                 # check if user has permission
-                if admin.permissions.filter(model=self.__class__.get_model_content_type(), add_object=True).exists():
+                if admin.permissions.filter(
+                    model=get_content_type_model(model=self.__class__),
+                    add_object=True
+                ).exists():
                     return super(BaseContentModel, self).save(*args, **kwargs)        
                 
                 raise PermissionDenied("Admin dont have permission to add object.")

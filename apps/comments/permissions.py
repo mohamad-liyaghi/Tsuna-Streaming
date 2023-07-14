@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from core.utils import get_content_type_model
 
 class CommentPermission(BasePermission):
     
@@ -38,7 +39,7 @@ class CommentDetailPermission(BasePermission):
                 if admin:
                     # if user is admin, check if user has permission to delete comment.
                     if admin.permissions.filter(
-                            model=object.__class__.get_model_content_type(),
+                            model=get_content_type_model(model=self.__class__),
                             channel=object.content_object.channel,
                             delete_object_comment=True):
                         
