@@ -3,10 +3,10 @@ Your subscription expired.
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Dear {{ kwargs.first_name }},</h1>
+<h1>Dear {{ first_name }},</h1>
 <p>Your subscription has expired.</p>
 
-<a href="{{kwargs.domain}}{% url 'memberships:membership' %}">Explore new plans</a>
+<a href="{{domain}}{% url 'memberships:membership' %}">Explore new plans</a>
 
 
 {% endblock html_body %}    

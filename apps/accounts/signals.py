@@ -22,10 +22,11 @@ def send_token_via_email(sender, **kwargs):
         user = token.user
 
         send_email.delay(
-            template_name="emails/token.html", 
-            email=user.email, 
-            first_name=user.first_name, 
-            user_token=user.token, 
-            token=token.token
+            template_name="emails/token.html",
+            to_email=user.email,
+            body={
+                "first_name": user.first_name,
+                "user_token": user.token,
+                "token": token.token
+            }
         )
-

@@ -1,7 +1,7 @@
 from django.dispatch import receiver
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import post_save, post_delete
 
-from channel_admins.models import ChannelAdmin , ChannelAdminPermission
+from channel_admins.models import ChannelAdmin
 from channel_subscribers.models import ChannelSubscriber
 from apps.core.tasks import send_email
 from channel_admins.tasks import create_permission_for_admin
@@ -12,19 +12,21 @@ def send_admin_promotion_email(sender, **kwargs):
     '''Notify a user when has been promoted'''
 
     instance = kwargs["instance"]
-    
+
     if kwargs['created']:
         user = instance.user
         channel = instance.channel
 
         send_email(
-            "emails/promotion_notification.html", 
-            email=user.email,
-            channel_title=channel.title, 
-            first_name=user.first_name, 
-            channel_token=channel.token
+            "emails/promotion_notification.html",
+            to_email=user.email,
+            body={
+                "channel_title": channel.title,
+                "first_name": user.first_name,
+                "channel_token": channel.token
+            }
         )
-        
+
 
 def create_admin_after_creating_channel(sender, **kwargs):
     '''Auto admin created channel by owner'''

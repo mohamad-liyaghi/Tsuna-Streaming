@@ -19,17 +19,37 @@ def notify_music_creation(sender, instance, created, **kwargs):
         print(instance.token)
             
         if instance.user == instance.channel.owner:
-            send_email(template_name="emails/notify_music_creation.html", first_name=instance.user.first_name,
-                        email=instance.user.email, channel_title=instance.title, channel_token=instance.channel.token,
-                          music_token=instance.token)
+            send_email(
+                template_name="emails/notify_music_creation.html",
+                to_email=instance.user.email,
+                body={
+                    "first_name": instance.user.first_name,
+                    "channel_title": instance.title,
+                    "channel_token": instance.channel.token,
+                    "music_token": instance.token
+                }
+              )
 
         else:
             # send email to both admin and owner
-            send_email(template_name="emails/notify_music_creation.html", first_name=instance.user.first_name,
-                        email=instance.user.email, channel_title=instance.title, channel_token=instance.channel.token,
-                        music_token=instance.token)
+            send_email(
+                template_name="emails/notify_music_creation.html",
+                email=instance.user.email,
+                body={
+                    "first_name": instance.user.first_name,
+                    "channel_title": instance.title,
+                    "channel_token": instance.channel.token,
+                    "music_token": instance.token
+                }
+              )
 
-            send_email(template_name="emails/notify_music_creation.html", first_name=instance.user.first_name,
-                        email=instance.channel.owner.email, channel_title=instance.title, channel_token=instance.channel.token,
-                          music_token=instance.token)
-
+            send_email(
+                template_name="emails/notify_music_creation.html",
+                to_email=instance.channel.owner.email,
+                body={
+                  "first_name": instance.user.first_name,
+                  "channel_title": instance.title,
+                  "channel_token": instance.channel.token,
+                  "music_token": instance.token
+                }
+              )

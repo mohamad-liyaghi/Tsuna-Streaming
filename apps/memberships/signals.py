@@ -15,10 +15,13 @@ def notify_user_subscription(sender, created, instance, **kwargs):
 
         send_email.delay(
             template_name="emails/notify_premium.html", 
-            email=user.email, 
-            first_name=user.first_name, 
-            membership_title=subscription.membership.title, 
-            finish_date=subscription.finish_date
+            to_email=user.email,
+            body={
+                "first_name": user.first_name,
+                "membership_title": subscription.membership.title,
+                "finish_date": subscription.finish_date
+
+            }
         )
 
 
@@ -30,7 +33,8 @@ def notify_user_plan_expiration(sender, instance, **kwargs):
 
     send_email.delay(
         template_name="emails/notify_plan_expiration.html", 
-        first_name=subscription.user.first_name,
-        email=subscription.user.email, 
+        to_email=subscription.user.email,
+        body={
+            "first_name": subscription.user.first_name,
+        }
     )
-

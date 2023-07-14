@@ -3,10 +3,10 @@ Your subscription has started!
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Dear {{ kwargs.first_name }},</h1>
+<h1>Dear {{ first_name }},</h1>
 <p>
-    Thank you for subscribing to {{ kwargs.membership_title }}! We're pleased to inform you that your subscription has now started.
-    From now on, you are a premium user until {{ kwargs.finish_date }}.
+    Thank you for subscribing to {{ membership_title }}! We're pleased to inform you that your subscription has now started.
+    From now on, you are a premium user until {{ finish_date }}.
 </p>
 
 

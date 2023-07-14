@@ -3,9 +3,9 @@ Verify Your Account on Tsuna Streaming
 {% endblock subject %}
 
 {% block html_body %}
-<h1>Hello {{ kwargs.first_name }},</h1>
+<h1>Hello {{ first_name }},</h1>
 <p>Please click on the link below to verify your account.</p>
 
-<a href="{{ kwargs.domain }}{% url 'accounts:verify' kwargs.token kwargs.user_token %}">Verification Link</a>
+<a href="{{ domain }}{% url 'accounts:verify' token user_token %}">Verification Link</a>
 
 {% endblock html_body %}

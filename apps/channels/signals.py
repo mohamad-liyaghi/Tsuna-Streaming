@@ -18,8 +18,11 @@ def notify_channel_creation(sender, instance, created, **kwargs):
     if created:
         send_email(
             template_name="emails/notify_channel_creation.html", 
-            first_name=user.first_name, 
-            email=user.email,
-            channel_title=instance.title, 
-            channel_token=instance.token
+            to_email=user.email,
+            body={
+                "first_name": user.first_name,
+                "channel_title": instance.title,
+                "channel_token": instance.token
+
+            }
         )

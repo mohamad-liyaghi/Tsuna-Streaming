@@ -11,7 +11,7 @@ class ContentObjectMixin:
     def dispatch(self, request, *args, **kwargs):
 
         # Get the object token from the URL.
-        object_token = self.kwargs.get('object_token')
+        object_token = self.get('object_token')
 
         # Split the token into "model" and "token" parts.
         model_name, token = object_token.split('-')

@@ -3,11 +3,11 @@ New music added to your channel.
 {% endblock subject %} 
 
 {% block html_body %}
-<h1>Hello dear {{ kwargs.first_name }},</h1>
-<p>A new music added to {{ kwargs.channel_title }}!</p>
+<h1>Hello dear {{ first_name }},</h1>
+<p>A new music added to {{ channel_title }}!</p>
 
 
-<a href="{{ kwargs.domain }}{% url 'musics:music_detail' kwargs.channel_token kwargs.music_token  %}">
+<a href="{{ domain }}{% url 'musics:music_detail' channel_token music_token  %}">
     Music Link
 </a> 
 

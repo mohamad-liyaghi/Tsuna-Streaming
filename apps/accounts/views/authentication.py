@@ -71,8 +71,8 @@ class VerifyUserView(APIView):
     throttle_classes = [AuthenticationThrottle,]
 
     def get(self, request, *args, **kwargs):
-        user_id = self.kwargs.get("user_token")
-        token = self.kwargs.get("token")
+        user_id = self.get("user_token")
+        token = self.get("token")
 
         if all([user_id, token]):
             user = get_object_or_404(USER, token=user_id)
