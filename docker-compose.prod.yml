@@ -46,6 +46,15 @@ services:
     env_file:
       - .env.prod
 
+  test_postgres:
+    image: postgres:11
+
+    container_name: tsuna-streaming-test-database
+    restart: on-failure
+
+    ports:
+          - "5433:5432"
+
   pgadmin:
       image: dpage/pgadmin4
       container_name: tsuna-streaming-pgadmin
