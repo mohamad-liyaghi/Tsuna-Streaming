@@ -4,10 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
 from comments.exceptions import CommentNotAllowed
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class Comment(BaseTokenModel):
+class Comment(AbstractToken):
     '''Generic comment model'''
 
     parent = models.ForeignKey("self", on_delete=models.CASCADE, blank=True, null=True,

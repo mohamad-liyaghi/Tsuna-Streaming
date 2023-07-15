@@ -2,7 +2,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from rest_framework import status
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 from core.utils import get_content_type_by_id
 
 
@@ -29,8 +29,8 @@ class ContentObjectMixin:
 
         # Look up the content model by name if not exist in cache.
         if not content_model:
-            # check if given content model is subclass of BaseContentModel
-            content_model = BaseContentModel.get_content_model_by_name(
+            # check if given content model is subclass of AbstractContent
+            content_model = AbstractContent.get_content_model_by_name(
                 model_name.capitalize()
             )
 

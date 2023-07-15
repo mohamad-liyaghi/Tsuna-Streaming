@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from channel_admins.models import ChannelAdmin
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class ChannelAdminPermission(BaseTokenModel):
+class ChannelAdminPermission(AbstractToken):
     '''
         Admin permission model.
         After creating admin object, an instance of this model will be created for content models via signals.

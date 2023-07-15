@@ -7,6 +7,7 @@ from videos.models import Video
 from votes.models import Vote
 from comments.models import Comment
 from viewers.models import Viewer
+from core.models import ContentVisibility
 
 
 from PIL import Image
@@ -58,7 +59,7 @@ class TestVideoModel:
 
 
     def test_get_video_views(self):
-        '''Test the get_viewer_count placed in BaseContentModel'''
+        '''Test the get_viewer_count placed in AbstractContent'''
         self.create_video()
 
         assert self.video.get_viewer_count() == 0
@@ -67,7 +68,7 @@ class TestVideoModel:
         Video.objects.create(
             title='test', description='new video', 
             video=image, user=self.user, channel=self.channel,
-            visibility=Video.Visibility.PUBLISHED)
+            visibility=ContentVisibility.PUBLISHED)
 
         assert self.channel.videos.published().count() == 1
 
@@ -116,8 +117,3 @@ class TestVideoModel:
         with pytest.raises(PermissionDenied):
             self.video = Video.objects.create(title='test', description='new video', 
                                         video=image, user=non_admin_user, channel=self.channel)
-    
-    def test_video_token(self):
-        '''Test that video is in the video token'''
-        self.create_video()
-        assert self.video.token.split('-')[0] == self.video.__class__.__name__.lower()

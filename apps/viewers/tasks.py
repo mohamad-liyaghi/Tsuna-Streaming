@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from celery import shared_task
 from viewers.models import Viewer
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 from accounts.models import Account
 
 
@@ -20,7 +20,7 @@ def insert_viewer_into_db():
             _, object_token, user_token = key.split(':') # viewer:model-obj:user_token
             
             if (viewer and viewer.get('source', '') == 'cache'):
-                object_model = BaseContentModel.get_content_model_by_name(((object_token.split('-')[0]).capitalize()))
+                object_model = AbstractContent.get_content_model_by_name(((object_token.split('-')[0]).capitalize()))
 
                 if object_model:
                     try:

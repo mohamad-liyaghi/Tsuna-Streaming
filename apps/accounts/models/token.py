@@ -2,10 +2,10 @@ from django.db import models
 from django.conf import settings
 import datetime
 from django.utils import timezone
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class Token(BaseTokenModel):
+class Token(AbstractToken):
     '''
         A 32 char token for email verification stuff.
         Token is valid for 10 mins and only can be tried for 5 times.

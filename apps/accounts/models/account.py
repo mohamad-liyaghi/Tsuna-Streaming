@@ -2,9 +2,9 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from accounts.managers import AccountManager
 from accounts.validators import validate_profile_size
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
-class Account(AbstractUser, BaseTokenModel):
+class Account(AbstractUser, AbstractToken):
 
     class Role(models.TextChoices):
         '''User Role'''

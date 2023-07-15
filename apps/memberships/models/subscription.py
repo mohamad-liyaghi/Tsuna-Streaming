@@ -3,10 +3,10 @@ from django.conf import settings
 from django.utils import timezone
 from memberships.models import Membership
 import datetime
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class Subscription(BaseTokenModel):
+class Subscription(AbstractToken):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
                                  related_name="subscription")

@@ -1,50 +1,34 @@
 from django.db import models
 from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.fields import GenericRelation
+
 from django.core.cache import cache
-
-from core.utils import unique_token_generator, get_content_type_model
-
-
-
-class BaseTokenModel(models.Model):
-    '''
-        Most of the models has a token field.
-        They can simply inherit from this model and use the unique token creation privileges
-    '''
-    token = models.CharField(max_length=32, blank=True, null=True, editable=False)
-
-    class Meta:
-        abstract = True
-    
-    def save(self, *args, **kwargs):
-
-        # If object is not saved yet
-        if not self.pk:
-            # Create a unique token for object
-            self.token = unique_token_generator(self, BaseContentModel)
-            return super(BaseTokenModel, self).save(*args, **kwargs)
-        
-        return super(BaseTokenModel, self).save(*args, **kwargs)
-        
+from .token import AbstractToken
+from core.utils import get_content_type_model
 
 
-class BaseContentModel(BaseTokenModel):
-    '''
-        The base content model of content models (video, broadcast etc...).
-        This model contains some common fields.
-        The only diffrence between this model and BaseTokenModel is the methods.
-    '''
+class ContentVisibility(models.TextChoices):
+    """
+    Content visibility choices
+    """
+    PRIVATE = ("pr", "Private")
+    PUBLISHED = ("pu", "Public")
 
+
+class AbstractContent(AbstractToken):
+    """
+    Abstract model for content models
+    Provide the common fields for content models
+    """
+    # TODO: update fields
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=300)
 
-
-    class Visibility(models.TextChoices):
-        PRIVATE = ("pr", "Private")
-        PUBLISHED = ("pu", "Public")
-
-    visibility = models.CharField(max_length=2, choices=Visibility.choices, default=Visibility.PRIVATE)
+    visibility = models.CharField(
+        max_length=2,
+        choices=ContentVisibility.choices,
+        default=ContentVisibility.PRIVATE
+    )
     is_updated = models.BooleanField(default=False)
 
     # whether or not user can add comment
@@ -61,34 +45,36 @@ class BaseContentModel(BaseTokenModel):
 
     @property
     def is_published(self):
-        return self.visibility == "pu"
+        """Return True if object is status is PUBLISHED"""
+        return self.visibility == ContentVisibility.PUBLISHED
 
     @classmethod
     def get_content_model_by_name(cls, name):
+        # TODO: remove this
         '''Return the subclass content model'''
 
         for subclass in cls.__subclasses__():
             if subclass.__name__ == name:
                 return subclass
-            
+
         return None
 
-
-    def get_viewer_count(self):    
+    def get_viewer_count(self):
+        # TODO: Move this
         '''Return objects viewers count'''
         # get object viewer count from cache
-        db_viewers_count = cache.get(f'db_viewer_count:{self.token}')   
+        db_viewers_count = cache.get(f'db_viewer_count:{self.token}')
 
         # if cache not exist, calculate from db
-        if not db_viewers_count :   
+        if not db_viewers_count:
             db_viewers_count = self.viewers.count()
             # set viewers count in cache
             cache.set(f'db_viewer_count:{self.token}', db_viewers_count, timeout=10 * 60)
-        
+
         viewers_in_cache = [
             cache.get(viewer) for viewer in cache.keys("viewer:*:*")
         ]
-        
+
         # total of those caches with source == cache
         cache_viewers_count = sum(
             1
@@ -98,8 +84,8 @@ class BaseContentModel(BaseTokenModel):
 
         return db_viewers_count + cache_viewers_count
 
-
     def get_votes_count(self):
+        # TODO: Move this
         '''Get count of up/down votes of an object'''
 
         key = f"vote_count:{self.token}"
@@ -142,30 +128,29 @@ class BaseContentModel(BaseTokenModel):
 
         return cache.get(key)
 
-
     def save(self, *args, **kwargs):
-
+        # TODO: update this
         if self.pk:
             # update is_updated field if an object is updated
             self.is_updated = True
-            return super(BaseContentModel, self).save(*args, **kwargs)
-        
-        if not self.pk: 
+            return super(AbstractContent, self).save(*args, **kwargs)
+
+        if not self.pk:
             # get the object channels admin
             admin = self.user.channel_admins.filter(channel=self.channel).first()
 
             if admin:
                 # check if user has permission
                 if admin.permissions.filter(
-                    model=get_content_type_model(model=self.__class__),
-                    add_object=True
+                        model=get_content_type_model(model=self.__class__),
+                        add_object=True
                 ).exists():
-                    return super(BaseContentModel, self).save(*args, **kwargs)        
-                
+                    return super(AbstractContent, self).save(*args, **kwargs)
+
                 raise PermissionDenied("Admin dont have permission to add object.")
 
             raise PermissionDenied("Admin didnt found.")
 
-        return super(BaseContentModel, self).save(*args, **kwargs)
+        return super(AbstractContent, self).save(*args, **kwargs)
 
 

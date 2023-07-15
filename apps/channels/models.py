@@ -3,10 +3,10 @@ from django.conf import settings
 from django.core.cache import cache
 from accounts.validators import validate_profile_size
 from channels.exceptions import ChannelLimitExceededException
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class Channel(BaseTokenModel):
+class Channel(AbstractToken):
     
     title = models.CharField(max_length=240)
     description = models.TextField(max_length=500, default="A new channel on Tsuna Streaming.")

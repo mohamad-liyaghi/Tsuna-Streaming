@@ -3,7 +3,7 @@ from django.core.cache import cache
 from celery import shared_task
 from votes.models import Vote
 from accounts.models import Account
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 
 
 @shared_task
@@ -30,7 +30,7 @@ def insert_vote_into_db():
             if (vote and vote.get('source', '') == 'cache' or \
                 vote and vote.get('source', '') == 'database' and vote.get('deleted', '') == True):
 
-                object_model = BaseContentModel.get_content_model_by_name((object_token.split('-')[0]).capitalize())
+                object_model = AbstractContent.get_content_model_by_name((object_token.split('-')[0]).capitalize())
 
                 if object_model:
 

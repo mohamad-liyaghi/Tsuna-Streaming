@@ -1,13 +1,13 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 from channels.models import Channel
 
 
-class Music(BaseContentModel):
+class Music(AbstractContent):
     '''
-        The main Music model that uses common fields of BaseContentModel
+        The main Music model that uses common fields of AbstractContent
     '''
 
     music = models.FileField(upload_to="musics/user_music/")

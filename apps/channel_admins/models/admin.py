@@ -4,10 +4,10 @@ from channel_subscribers.models import ChannelSubscriber
 from accounts.models import Account
 from django.core.exceptions import PermissionDenied
 from channel_admins.exceptions import (DuplicatePromotionException, SubscriptionRequiredException)
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class ChannelAdmin(BaseTokenModel):
+class ChannelAdmin(AbstractToken):
     '''Base Channel Admin model'''
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='channel_admins')

@@ -1,12 +1,12 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError  
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 from channels.models import Channel
 from videos.managers import VideoManager
 
 
-class Video(BaseContentModel):
+class Video(AbstractContent):
 
     video = models.FileField(upload_to="videos/user_video/")
     thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="assets/images/default-video-thumbnail.jpg")

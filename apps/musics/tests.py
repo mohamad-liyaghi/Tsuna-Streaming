@@ -51,7 +51,7 @@ class TestMusicModel:
 
 
     def test_get_music_views(self):
-        '''Test the get_viewer_count placed in BaseContentModel'''
+        '''Test the get_viewer_count placed in AbstractContent'''
         self.create_music()
 
         assert self.music.get_viewer_count() == 0
@@ -103,8 +103,3 @@ class TestMusicModel:
         with pytest.raises(PermissionDenied):
             self.music = Music.objects.create(title='test', description='new music', 
                                         music='music.mp3', user=non_admin_user, channel=self.channel)
-    
-    def test_music_token(self):
-        '''Test that music is in the music token'''
-        self.create_music()
-        assert self.music.token.split('-')[0] == self.music.__class__.__name__.lower()

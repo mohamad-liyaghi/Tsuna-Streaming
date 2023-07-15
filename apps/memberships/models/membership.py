@@ -1,10 +1,10 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from memberships.exceptions import MembershipInUserError
-from core.models import BaseTokenModel
+from core.models import AbstractToken
 
 
-class Membership(BaseTokenModel):
+class Membership(AbstractToken):
     '''Membership plans for users to buy'''
 
     title = models.CharField(max_length=210)

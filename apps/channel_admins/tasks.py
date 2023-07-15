@@ -2,7 +2,7 @@ from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import BooleanField
 from celery import shared_task
-from apps.core.models import BaseContentModel
+from apps.core.models import AbstractContent
 from channel_admins.models import ChannelAdmin , ChannelAdminPermission
 
 
@@ -20,7 +20,7 @@ def create_permission_for_admin(admin_token, *args, **kwargs):
                                 )
 
     # all content models (e.g: Video, etc.)
-    content_models = BaseContentModel.__subclasses__()
+    content_models = AbstractContent.__subclasses__()
 
     # get the admin that got created.
     if (admin:= ChannelAdmin .objects.filter(token=admin_token).first()):
