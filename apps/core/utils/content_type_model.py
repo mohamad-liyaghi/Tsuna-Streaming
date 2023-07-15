@@ -44,3 +44,31 @@ def get_content_type_model(
 
     # Otherwise return model
     return cached['model']
+
+
+def get_content_type_by_id(_id: int) -> Union[models.Model, None]:
+    """
+    Return the content type model for the given id
+    :param _id: The id of the content type
+    """
+    # Get from cache
+    cache_key = f'content_type_id:{_id}'
+    cached = cache.get(cache_key)
+
+    if not cached:
+        try:
+            # Get content type
+            content_type = ContentType.objects.get(id=_id)
+            # Set in cache
+            cache.set(
+                key=cache_key,
+                value={'id': content_type.id, 'model': content_type}
+            )
+            cached = cache.get(cache_key)
+            return cached['model']
+
+        # Return None if not found
+        except ContentType.DoesNotExist:
+            return
+
+    return cached['model']
