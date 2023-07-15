@@ -10,7 +10,7 @@ import pytest
 class TestViewerModel:
     def create_video(self):
         self.video = Video.objects.create(title='test', description='new video', 
-                                        video='fake_video.mp4', user=self.user, channel=self.channel)
+                                        file='fake_video.mp4', user=self.user, channel=self.channel)
 
     def setup(self):
         self.user = Account.objects.create_user(email="simple@simple.com", password="1234USERnormal")

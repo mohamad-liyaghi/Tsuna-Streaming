@@ -35,7 +35,7 @@ class MusicCreateSeriaizer(serializers.ModelSerializer):
         fields = [
             "title",
             "description",
-            "music",
+            "file",
             "thumbnail",
             "allow_comment",
             "visibility",
@@ -74,7 +74,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
         fields = [
             "title", 
             "description", 
-            "music", 
+            "file", 
             "thumbnail", 
             "token", 
             "user", 
@@ -85,11 +85,11 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            "get_viewer_count"
+            # "get_viewer_count" #TODO make this work
             ]
 
         extra_kwargs = {
-            "music" : {'read_only' : True},
+            "file" : {'read_only' : True},
             "token" : {'read_only' : True},
             "user" : {'read_only' : True},
             "channel" : {'read_only' : True},

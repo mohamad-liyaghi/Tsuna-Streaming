@@ -1,13 +1,25 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 
 
 def error_handler_404(request, *args, **kwargs):
-    '''Return a message when a page cannot be founded. [404]'''
+    """
+    Return a message with status of 404 when page not found.
+    """
 
-    return HttpResponse("404 Error. Couldnt find the page with given url.", status=404)
+    return JsonResponse(
+        {
+            'message': 'Page not found.'
+        }, status=404
+    )
 
 
 def error_handler_500(request, *args, **kwargs):
-    '''Return a message when sth goes wrong with server. [500]'''
+    """
+    Return a message with status of 500 when an internal server error occurred.
+    """
 
-    return HttpResponse("500 Server error. Please contact our administration.", status=500)
+    return JsonResponse(
+        {
+            'message': 'An internal server error occurred.'
+        }, status=500
+    )

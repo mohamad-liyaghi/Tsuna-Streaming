@@ -19,7 +19,7 @@ class VideoCreateSeriaizer(serializers.ModelSerializer):
 
     class Meta:
         model = Video
-        fields = ["title", "description", "video", "thumbnail", "allow_comment", "visibility", "date", "token"]
+        fields = ["title", "description", "file", "thumbnail", "allow_comment", "visibility", "date", "token"]
 
         extra_kwargs = {
             "date" : {'read_only' : True},
@@ -49,7 +49,7 @@ class VideoDetailSerializer(serializers.ModelSerializer):
         fields = [
             "title", 
             "description", 
-            "video", 
+            "file", 
             "thumbnail", 
             "token", 
             "user", 
@@ -60,11 +60,11 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            "get_viewer_count"
+            # "get_viewer_count" #TOOD: make this work
             ]
 
         extra_kwargs = {
-            "video" : {'read_only' : True},
+            "file" : {'read_only' : True},
             "token" : {'read_only' : True},
             "user" : {'read_only' : True},
             "channel" : {'read_only' : True},

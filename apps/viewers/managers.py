@@ -59,3 +59,6 @@ class ViewerManager(models.Manager):
 
         # Return False if cache already exists
         return False
+
+
+# TODO: add get_viewer_count

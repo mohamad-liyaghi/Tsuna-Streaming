@@ -8,12 +8,16 @@ from videos.managers import VideoManager
 
 class Video(AbstractContent):
 
-    video = models.FileField(upload_to="videos/user_video/")
-    thumbnail = models.ImageField(upload_to="videos/thumbnail/", default="assets/images/default-video-thumbnail.jpg")
-
-
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="videos")
-    channel = models.ForeignKey(Channel, on_delete=models.CASCADE, related_name="videos")   
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="videos"
+    )
+    channel = models.ForeignKey(
+        Channel,
+        on_delete=models.CASCADE,
+        related_name="videos"
+    )
 
     objects = VideoManager()
 
@@ -25,10 +29,8 @@ class Video(AbstractContent):
 
         if self.user.role in ['a', 'p'] and file_size > 50:
             raise ValidationError('Video file size should not exceed 15MB.')
-        
+
         if self.user.role == 'n' and file_size > 10:
             raise ValidationError('Normal users can upload videos up to 10MB.')
 
         super().clean()
-    
-    

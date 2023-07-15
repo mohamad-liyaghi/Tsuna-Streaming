@@ -92,3 +92,5 @@ class VoteManager(models.Manager):
                 timeout= 60 * 60 * 60 * 24 
             ) 
             return cache.get(key)
+
+# TODO: add get_vote_count
