@@ -1,0 +1,1 @@
+from apps.core.tests.fixtures import *  # noqa
