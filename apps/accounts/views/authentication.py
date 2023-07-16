@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -19,46 +20,28 @@ from accounts.models import VerificationToken
 
 USER = get_user_model()
 
+
 @extend_schema_view(
-    get=extend_schema(
-        description='''Simply ask for credentials.'''
-    ),
     post=extend_schema(
-        description='''Check and verify users credentials.'''
+        description='''Register an account to the system.''',
+        responses={
+            201: 'Created',
+            400: 'Bad Request',
+            403: 'Forbidden',
+        }
     ),
 )
-class RegisterUserView(APIView):
-    '''Register new accounts'''
+class RegisterUserView(CreateAPIView):
+    """
+        Users can register to the system.
+    """
 
-    permission_classes = [AllowUnAuthenticatedPermission,]
+    permission_classes = [AllowUnAuthenticatedPermission]
     serializer_class = RegisterUserSerializer
-    throttle_classes = [AuthenticationThrottle,]
+    throttle_classes = [AuthenticationThrottle]
 
 
-    def get(self, request, *args, **kwargs):
-        '''Simply ask for credentials'''
-        return Response("Enter your credentials.", status=status.HTTP_200_OK)
-    
-
-    def post(self, request, *args, **kwargs):
-        '''
-            Validate email and register a user if data was valid.
-            First it checks if there is any user registered with given email:
-                1- if it was active, user must log in.
-                2- if not active, user should verify
-            Otherwise user can register
-        '''
-        serialized_data = self.serializer_class(data=request.data)
-
-        if serialized_data.is_valid():
-            serialized_data.save()
-            return Response("We have send you an email, please check your inbox and verify your account",
-                             status=status.HTTP_201_CREATED)
-
-        return Response(serialized_data.errors, status=status.HTTP_403_FORBIDDEN)
-
-
-
+# TODO: Update this and add resend
 @extend_schema_view(
     get=extend_schema(
         description='''Get the token from url and check whether  or not the token is active and do the activation process.'''
@@ -108,7 +91,8 @@ class VerifyUserView(APIView):
     ),
 )
 class LoginUserView(TokenObtainPairView):
-    '''Users can request to this endpoint in order to get new access key'''
-    permission_classes = [AllowUnAuthenticatedPermission,]
-    throttle_classes = [AuthenticationThrottle,]
-    pass
+    """
+    Get JWT token for users.
+    """
+    permission_classes = [AllowUnAuthenticatedPermission]
+    throttle_classes = [AuthenticationThrottle]
