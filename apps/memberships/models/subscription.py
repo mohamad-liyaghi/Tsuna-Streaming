@@ -30,12 +30,6 @@ class Subscription(AbstractToken):
         '''Change user status after creating a subscription'''
 
         if not self.pk:
-
-            # If this is a new subscription, change the user's role to 'p' (Premium)
-            if not self.user.role == 'a':
-                self.user.role = 'p'
-                self.user.save()
-
             # Get the Membership's active months
             membership_active_months = self.membership.active_months
 
@@ -46,17 +40,6 @@ class Subscription(AbstractToken):
             self.finish_date = finish_date
 
         return super(Subscription, self).save(*args, **kwargs)
-
-
-    def delete(self, *args, **kwargs):
-        '''Change user status after deleting a subscription'''
-        
-        # When a subscription is deleted, change the user's role back to 'n' (normal)
-        if not self.user.role == 'a':
-            self.user.role = 'n'
-            self.user.save()
-
-        return super(Subscription, self).delete(*args, **kwargs)
 
 
     @property

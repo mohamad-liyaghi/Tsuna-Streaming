@@ -18,7 +18,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = USER
         fields = ["email", "first_name", "last_name", 
                 "picture", "bio", "get_role_display", "token", 
-                "active_subscription"]
+                #"active_subscription" #TODO: update this
+                ]
                 
         extra_kwargs = {
             'email': {'read_only': True},

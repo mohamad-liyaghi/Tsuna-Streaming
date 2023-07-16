@@ -30,7 +30,7 @@ class Video(AbstractContent):
         if self.user.role in ['a', 'p'] and file_size > 50:
             raise ValidationError('Video file size should not exceed 15MB.')
 
-        if self.user.role == 'n' and file_size > 10:
+        if self.user.is_normal() and file_size > 10:
             raise ValidationError('Normal users can upload videos up to 10MB.')
 
         super().clean()

@@ -66,11 +66,11 @@ class Channel(AbstractToken):
             user_channels = self.owner.channels.count()
 
             # admin users can create unlimited amount of channel
-            if self.owner.role == 'a':
+            if self.owner.is_admin():
                 return super(Channel, self).save(*args, **kwargs)
             
             #  premium users can create less than 10 channels.
-            elif self.owner.role ==  'p':
+            elif self.owner.is_premium():
                 # Premium user can only create 10 channels.
                 if user_channels < 10:
                     return super(Channel, self).save(*args, **kwargs)
@@ -79,7 +79,7 @@ class Channel(AbstractToken):
 
             # normal users can create less than 5 channels
             # normal users that had premium sub and created more that 5 channels, now can create less that 10 channels.
-            elif self.owner.role == 'n':
+            elif self.owner.is_normal():
 
                 # normal users that hadnt premiums account yet.
                 if user_channels < 5:

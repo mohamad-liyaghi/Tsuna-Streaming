@@ -6,7 +6,7 @@ class IsAdminUser(BasePermission):
     message = 'Only admins can perform this action'
 
     def has_permission(self, request, view):
-        return (request.user.role == "a")
+        return (request.user.is_admi())
     
 
 class IsNormalUser(BasePermission):
@@ -15,4 +15,4 @@ class IsNormalUser(BasePermission):
     message = 'You are already a premium user'
 
     def has_permission(self, request, view):
-        return (request.user.role == 'n')
+        return (request.user.is_normal())

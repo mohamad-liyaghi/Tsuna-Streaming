@@ -2,29 +2,40 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class AccountManager(BaseUserManager):
-    
-    def create_user(self, email, password, **kwargs):
+    """
+    Custom user model manager where email is the unique identifiers
+    """
 
+    def create_user(
+            self, email: str, password: str, is_active=False, **kwargs
+    ):
+        """
+        Override the create_user method to create a user with a given email and password
+        """
         email = self.normalize_email(email)
 
-        is_active = False
-        user = self.model(email=email, is_active=is_active,
-                        role="n", **kwargs)
+        user = self.model(
+            email=email,
+            is_active=is_active,
+            **kwargs
+        )
 
         user.set_password(password)
-
         user.save()
         return user
 
-    def create_superuser(self, email, password, **kwargs):
+    def create_superuser(self, email: str, password: str, **kwargs):
+        """Create a superuser"""
         email = self.normalize_email(email)
 
-        is_active = True
-        user = self.model(email=email, is_active=is_active, is_superuser=True, is_staff=True,
-                        role="a", **kwargs)
+        user = self.model(
+            email=email,
+            is_active=True,
+            is_superuser=True,
+            is_staff=True,
+            **kwargs
+        )
 
         user.set_password(password)
-
         user.save()
-
         return user
