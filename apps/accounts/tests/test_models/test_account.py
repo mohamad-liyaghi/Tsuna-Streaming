@@ -1,5 +1,5 @@
 import pytest
-from accounts.models import Account, Token
+from accounts.models import Account, VerificationToken
 
 
 @pytest.mark.django_db
@@ -21,7 +21,7 @@ class TestAccountModel:
 
         assert not self.simple_user.is_active
         # token gets created after a users add to db
-        assert Token.objects.filter(user=self.simple_user).exists()
+        assert VerificationToken.objects.filter(user=self.simple_user).exists()
     
     def test_superuser_is_active(self):
         """Super users are active by default."""

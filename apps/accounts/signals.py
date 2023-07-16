@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.conf import settings
 
-from accounts.models import Token
+from accounts.models import VerificationToken
 from apps.core.tasks import send_email
 
 
@@ -11,10 +11,10 @@ def create_verification_token(sender, created, instance, **kwargs):
     """Create token for user when user created."""
     # Check user is not active
     if created and not instance.is_active:
-        Token.objects.create(user=instance)
+        VerificationToken.objects.create(user=instance)
 
 
-@receiver(post_save, sender=Token)
+@receiver(post_save, sender=VerificationToken)
 def send_token_via_email(sender, created, **kwargs):
     """
     Send token via email when token created.

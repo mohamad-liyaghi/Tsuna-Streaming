@@ -2,38 +2,50 @@ from django.db import models
 from django.conf import settings
 import datetime
 from django.utils import timezone
+from datetime import timedelta
 from core.models import AbstractToken
 
 
-class Token(AbstractToken):
-    '''
-        A 32 char token for email verification stuff.
-        Token is valid for 10 mins and only can be tried for 5 times.
-    '''
+class VerificationToken(AbstractToken):
+    """
+    This model is used to store the verification token for users
+    """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
-                                 related_name="tokens")
-    
-    date_created = models.DateTimeField(auto_now_add=True)
-    retry = models.PositiveIntegerField(default=0)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="verification_tokens",
+    )
 
+    expire_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
-        return str(self.user)
-    
-    @property
-    def is_valid(self):
-        # check if tries are not more than 5 times.
-        if self.retry == 5 or self.retry > 5:
-            return False
-    
-        # check if code was created within 10 mins
-        now = timezone.now()
-        ten_mins_before_now = now - datetime.timedelta(minutes=10)
+        return f"{self.user} - {self.token}"
 
-        return not (self.date_created <=  ten_mins_before_now)
+    @property
+    def is_valid(self) -> bool:
+        """
+        Each token is valid for 10 minutes
+        Return True if the token is valid
+        """
+        now = timezone.now()
+        ten_minutes_ago = now - timedelta(minutes=10)
+        return self.expire_at > ten_minutes_ago
+
+    def save(self, *args, **kwargs):
+        """
+        Ovrride the save method for:
+        - set the expiration date
+        """
+        if not self.expire_at:
+            self.__set_expiration_date()
+        return super().save(*args, **kwargs)
+
+    def __set_expiration_date(self) -> None:
+        self.expire_at = timezone.now() + datetime.timedelta(minutes=10)
 
     class Meta:
-        ordering = ["-date_created"]
-
-    
+        """
+        Override the default ordering
+        """
+        ordering = ["expire_at"]

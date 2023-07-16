@@ -1,7 +1,7 @@
 from accounts.models.account import Account
-from accounts.models.token import Token
+from accounts.models.token import VerificationToken
 
 __all__ = [ 
     'Account',
-    'Token',
+    'VerificationToken',
 ]

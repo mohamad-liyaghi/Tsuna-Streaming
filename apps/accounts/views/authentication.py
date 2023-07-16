@@ -14,7 +14,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import RegisterUserSerializer
 from accounts.throttling import AuthenticationThrottle
-from accounts.models import Token
+from accounts.models import VerificationToken
 
 
 USER = get_user_model()
@@ -78,7 +78,7 @@ class VerifyUserView(APIView):
             user = get_object_or_404(USER, token=user_id)
 
             if not user.is_active:
-                user_token = Token.objects.filter(user=user).first()
+                user_token = VerificationToken.objects.filter(user=user).first()
 
                 if user_token:
 

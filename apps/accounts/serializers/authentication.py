@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from accounts.models import Token
+from accounts.models import VerificationToken
 
 
 USER = get_user_model()
@@ -33,13 +33,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("An active account with email {} founded".format(email))
 
             elif not user.is_active:
-                token = Token.objects.filter(user=user).first()
+                token = VerificationToken.objects.filter(user=user).first()
 
                 if token and token.is_valid:
                     raise serializers.ValidationError("We have already sent you a token to {}, please verify your account".format(email))
 
                 else:
-                    Token.objects.create(user=user)
+                    VerificationToken.objects.create(user=user)
                     raise serializers.ValidationError("We have sent you a token to {}, please verify your account.".format(email))
 
         return value
