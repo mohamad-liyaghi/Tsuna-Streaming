@@ -31,7 +31,8 @@ USER = get_user_model()
             201: 'Created',
             400: 'Bad Request',
             403: 'Forbidden',
-        }
+        },
+        tags=['Authentication'],
     ),
 )
 class RegisterUserView(CreateAPIView):
@@ -52,7 +53,8 @@ class RegisterUserView(CreateAPIView):
             400: 'Bad Request',
             403: 'Forbidden',
             404: 'Token or user not found',
-        }
+        },
+        tags=['Authentication'],
     ),
 )
 class VerifyUserView(APIView):
@@ -94,7 +96,8 @@ class VerifyUserView(APIView):
             201: 'OK',
             400: 'Bad Request',
             403: 'Forbidden',
-        }
+        },
+        tags=['Authentication'],
     ),
 )
 class ResendTokenView(CreateAPIView):
@@ -110,7 +113,8 @@ class ResendTokenView(CreateAPIView):
 
 @extend_schema_view(
     post=extend_schema(
-        description='''Return JWT token to users for loging in.'''
+        description='''Return JWT token to users for loging in.''',
+        tags=['Authentication'],
     ),
 )
 class LoginUserView(TokenObtainPairView):
