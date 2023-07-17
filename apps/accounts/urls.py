@@ -11,6 +11,10 @@ app_name = "accounts"
 urlpatterns = [
     path("register/", RegisterUserView.as_view(), name='register'),
     path("login/", LoginUserView.as_view(), name="login"),
-    path("verify/<str:token>/<str:user_token>/", VerifyUserView.as_view(), name="verify"),
+    path(
+        "verify/<str:verification_token>/<str:user_token>/",
+        VerifyUserView.as_view(),
+        name="verify"
+    ),
     path("profile/<str:token>/", ProfileView.as_view(), name='profile')
 ] 

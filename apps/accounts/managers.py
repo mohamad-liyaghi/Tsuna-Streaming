@@ -1,4 +1,6 @@
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import BaseUserManager
+from django.db import models
 
 
 class AccountManager(BaseUserManager):
@@ -39,3 +41,23 @@ class AccountManager(BaseUserManager):
         user.set_password(password)
         user.save()
         return user
+
+
+class VerificationTokenManager(models.Manager):
+    """Custom manager for verification tokens"""
+
+    def verify(self, user: "Account", token: 'VerificationToken'):
+        """
+        Check user is not active and the code is valid
+        """
+
+        if user.is_active:
+            return False, "User is already active."
+
+        if token.user != user:
+            return False, "Token and user mismath."
+
+        if not token.is_valid:
+            return False, "Token is expired."
+
+        return True, 'ok'

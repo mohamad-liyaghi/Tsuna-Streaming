@@ -25,6 +25,15 @@ class TestRegisterUserView:
         assert response.status_code == status.HTTP_201_CREATED
         assert Account.objects.count() == 1
 
+    def test_register_authenticated(
+            self, api_client, create_superuser
+    ):
+        api_client.force_authenticate(user=create_superuser)
+        response = api_client.post(
+            self.url_path, self.data, format='json'
+        )
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
     def test_register_duplicate_user(
             self, api_client, create_active_user
     ):
@@ -50,12 +59,3 @@ class TestRegisterUserView:
             self.url_path, self.data, format='json'
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
-
-    def test_register_authenticated(
-            self, api_client, create_superuser
-    ):
-        api_client.force_authenticate(user=create_superuser)
-        response = api_client.post(
-            self.url_path, self.data, format='json'
-        )
-        assert response.status_code == status.HTTP_403_FORBIDDEN

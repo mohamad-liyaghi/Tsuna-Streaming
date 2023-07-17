@@ -1,5 +1,7 @@
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from accounts.models import VerificationToken
 
 USER = get_user_model()
 
@@ -43,3 +45,28 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         return USER.objects.create_user(**validated_data)
+
+
+class VerifyUserSerializer(serializers.Serializer):
+    def verify_code(self, user_token: str, token: VerificationToken):
+        """
+        Check the code is active
+        """
+        user = get_object_or_404(USER, token=user_token)
+
+        verified, message = VerificationToken.objects.verify(
+            user=user,
+            token=token
+        )
+
+        if verified:
+            self._activate_user(user)
+            return
+
+        # If token is not valid for any reason, raise an error
+        raise serializers.ValidationError(message)
+
+    def _activate_user(self, user) -> None:
+        """Activate a user"""
+        user.is_active = True
+        user.save()

@@ -4,6 +4,7 @@ import datetime
 from django.utils import timezone
 from datetime import timedelta
 from core.models import AbstractToken
+from accounts.managers import VerificationTokenManager
 
 
 class VerificationToken(AbstractToken):
@@ -18,6 +19,8 @@ class VerificationToken(AbstractToken):
     )
 
     expire_at = models.DateTimeField(null=True, blank=True)
+
+    objects = VerificationTokenManager()
 
     def __str__(self) -> str:
         return f"{self.user} - {self.token}"

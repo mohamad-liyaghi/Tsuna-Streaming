@@ -1,7 +1,9 @@
-from accounts.serializers.authentication import (
-    RegisterUserSerializer
+from .authentication import (
+    RegisterUserSerializer,
+    VerifyUserSerializer,
 )
 
 __all__ = [
-    "RegisterUserSerializer", 
+    "RegisterUserSerializer",
+    "VerifyUserSerializer",
 ]
