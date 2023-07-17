@@ -14,7 +14,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import (
     RegisterUserSerializer,
-    VerifyUserSerializer
+    VerifyUserSerializer,
+    ResendTokenSerializer
 )
 from accounts.throttling import AuthenticationThrottle
 from accounts.models import VerificationToken
@@ -82,6 +83,30 @@ class VerifyUserView(APIView):
             return Response("Account verified", status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema_view(
+    post=extend_schema(
+        description='''
+        Resend verification token to user if the other one is expired.
+        ''',
+        responses={
+            201: 'OK',
+            400: 'Bad Request',
+            403: 'Forbidden',
+        }
+    ),
+)
+class ResendTokenView(CreateAPIView):
+    """
+    Resend verification token to user if the other one is expired.
+    """
+
+    permission_classes = [AllowUnAuthenticatedPermission]
+    throttle_classes = [AuthenticationThrottle]
+
+    serializer_class = ResendTokenSerializer
+
 
 @extend_schema_view(
     post=extend_schema(

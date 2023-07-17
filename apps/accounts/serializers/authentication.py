@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError, PermissionDenied
 from rest_framework import serializers
 from accounts.models import VerificationToken
 
@@ -70,3 +71,29 @@ class VerifyUserSerializer(serializers.Serializer):
         """Activate a user"""
         user.is_active = True
         user.save()
+
+
+class ResendTokenSerializer(serializers.ModelSerializer):
+    """
+    Serializer for resending verification token.
+    """
+    user = serializers.SlugRelatedField(
+        slug_field="token",
+        queryset=USER.objects.filter(is_active=False)
+    )
+
+    class Meta:
+        model = VerificationToken
+        fields = ("user",)
+
+    def create(self, validated_data):
+        user = validated_data.get("user")
+        try:
+            return VerificationToken.objects.create(user=user)
+
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+
+        except PermissionDenied as e:
+            raise serializers.ValidationError(e)
+

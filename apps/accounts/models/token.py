@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
-import datetime
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.utils import timezone
+import datetime
 from datetime import timedelta
 from core.models import AbstractToken
 from accounts.managers import VerificationTokenManager
@@ -41,11 +42,30 @@ class VerificationToken(AbstractToken):
         - set the expiration date
         """
         if not self.expire_at:
+            self.__check_user_active()
+            self.__check_token_existance()
             self.__set_expiration_date()
         return super().save(*args, **kwargs)
 
     def __set_expiration_date(self) -> None:
         self.expire_at = timezone.now() + datetime.timedelta(minutes=10)
+
+    def __check_token_existance(self) -> None:
+        """
+        Check if an active token already exists
+        """
+
+        verification_token = self.user.verification_tokens.first()
+
+        if verification_token and verification_token.is_valid:
+            raise PermissionDenied("An active token already exists.")
+
+    def __check_user_active(self) -> None:
+        """
+        Check if the user is active
+        """
+        if self.user.is_active:
+            raise ValidationError("User is already active.")
 
     class Meta:
         """

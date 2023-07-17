@@ -1,6 +1,7 @@
 import pytest
 from datetime import timedelta
 from django.utils import timezone
+from django.core.exceptions import ValidationError, PermissionDenied
 from accounts.models import VerificationToken
 
 
@@ -28,3 +29,12 @@ class TestTokenModel:
         """When a user is deleted, the token is deleted too"""
         self.user.delete()
         assert VerificationToken.objects.count() == 0
+
+    def test_create_duplicate(self):
+        assert self.user.verification_tokens.count() == 1
+        with pytest.raises(PermissionDenied):
+            VerificationToken.objects.create(user=self.user)
+
+    def test_create_for_active_account(self, create_active_user):
+        with pytest.raises(ValidationError):
+            VerificationToken.objects.create(user=create_active_user)
