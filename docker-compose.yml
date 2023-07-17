@@ -26,9 +26,6 @@ services:
       - postgres
       - redis
       - smtp4dev
-      - celery
-      - celery-beat
-      - flower
 
   postgres:
     image: postgres:11
@@ -97,6 +94,7 @@ services:
     command: sh docker/local/commands/celery.sh
     depends_on:
       - redis
+      - backend
     volumes:
       - .:/backend
     env_file:
@@ -112,6 +110,7 @@ services:
     command: sh docker/local/commands/celery-beat.sh
     depends_on:
       - redis
+      - backend
     volumes:
       - .:/backend
     env_file:
@@ -129,6 +128,7 @@ services:
     depends_on:
       - redis
       - celery
+      - backend
     ports:
       - "5555:5555"
     volumes:

@@ -29,3 +29,7 @@ CACHES = {
 
 # TODO: Add the fixture for not sending email and remove this
 DOMAIN = 'test-domain.com'
+
+# Disable Throttling
+for throttle in REST_FRAMEWORK['DEFAULT_THROTTLE_RATES']:
+    REST_FRAMEWORK['DEFAULT_THROTTLE_RATES'][throttle] = '1000/second'

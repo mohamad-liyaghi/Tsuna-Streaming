@@ -12,6 +12,4 @@ RUN pip install -r requirement.txt
 
 COPY . /backend
 
-RUN mv .env.prod.sample .env.prod
-
 EXPOSE 8000

@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -10,96 +11,101 @@ from rest_framework_simplejwt.views import (
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-
 from accounts.permissions import AllowUnAuthenticatedPermission
-from accounts.serializers import RegisterUserSerializer
+from accounts.serializers import (
+    RegisterUserSerializer,
+    VerifyUserSerializer,
+    ResendTokenSerializer
+)
 from accounts.throttling import AuthenticationThrottle
-from accounts.models import Token
+from accounts.models import VerificationToken
 
 
 USER = get_user_model()
 
+
 @extend_schema_view(
-    get=extend_schema(
-        description='''Simply ask for credentials.'''
-    ),
     post=extend_schema(
-        description='''Check and verify users credentials.'''
+        description='''Register an account to the system.''',
+        responses={
+            201: 'Created',
+            400: 'Bad Request',
+            403: 'Forbidden',
+        }
     ),
 )
-class RegisterUserView(APIView):
-    '''Register new accounts'''
+class RegisterUserView(CreateAPIView):
+    """
+        Users can register to the system.
+    """
 
-    permission_classes = [AllowUnAuthenticatedPermission,]
+    permission_classes = [AllowUnAuthenticatedPermission]
     serializer_class = RegisterUserSerializer
-    throttle_classes = [AuthenticationThrottle,]
-
-
-    def get(self, request, *args, **kwargs):
-        '''Simply ask for credentials'''
-        return Response("Enter your credentials.", status=status.HTTP_200_OK)
-    
-
-    def post(self, request, *args, **kwargs):
-        '''
-            Validate email and register a user if data was valid.
-            First it checks if there is any user registered with given email:
-                1- if it was active, user must log in.
-                2- if not active, user should verify
-            Otherwise user can register
-        '''
-        serialized_data = self.serializer_class(data=request.data)
-
-        if serialized_data.is_valid():
-            serialized_data.save()
-            return Response("We have send you an email, please check your inbox and verify your account",
-                             status=status.HTTP_201_CREATED)
-
-        return Response(serialized_data.errors, status=status.HTTP_403_FORBIDDEN)
-
+    throttle_classes = [AuthenticationThrottle]
 
 
 @extend_schema_view(
     get=extend_schema(
-        description='''Get the token from url and check whether  or not the token is active and do the activation process.'''
+        description="""Verify an account""",
+        responses={
+            200: 'OK',
+            400: 'Bad Request',
+            403: 'Forbidden',
+            404: 'Token or user not found',
+        }
     ),
 )
 class VerifyUserView(APIView):
-    '''Verify accounts.'''
+    """Verify an account"""
 
-    permission_classes = [AllowUnAuthenticatedPermission,]
-    throttle_classes = [AuthenticationThrottle,]
+    permission_classes = [AllowUnAuthenticatedPermission]
+    throttle_classes = [AuthenticationThrottle]
+
+    serializer_class = VerifyUserSerializer
+
+    def get_object(self):
+        """Get the token object"""
+        return get_object_or_404(
+            VerificationToken,
+            token=self.kwargs['verification_token']
+        )
 
     def get(self, request, *args, **kwargs):
-        user_id = self.get("user_token")
-        token = self.get("token")
+        """Get the url"""
+        verification_token = self.get_object()
+        serializer = self.serializer_class(data=request.data)
 
-        if all([user_id, token]):
-            user = get_object_or_404(USER, token=user_id)
+        if serializer.is_valid():
+            serializer.verify_code(
+                user_token=kwargs['user_token'],
+                token=verification_token,
+            )
+            return Response("Account verified", status=status.HTTP_200_OK)
 
-            if not user.is_active:
-                user_token = Token.objects.filter(user=user).first()
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-                if user_token:
 
-                    if user_token.is_valid:
+@extend_schema_view(
+    post=extend_schema(
+        description='''
+        Resend verification token to user if the other one is expired.
+        ''',
+        responses={
+            201: 'OK',
+            400: 'Bad Request',
+            403: 'Forbidden',
+        }
+    ),
+)
+class ResendTokenView(CreateAPIView):
+    """
+    Resend verification token to user if the other one is expired.
+    """
 
-                        if user_token.token == token:
-                            user.is_active = True
-                            user.save()
-                            return Response("Account verified successfully.", status=status.HTTP_200_OK)
+    permission_classes = [AllowUnAuthenticatedPermission]
+    throttle_classes = [AuthenticationThrottle]
 
-                        user_token.retry += 1
-                        user_token.save()
-                        return Response("Invalid token were given.", status=status.HTTP_403_FORBIDDEN)  
-
-                    return Response("Token was expired.", status=status.HTTP_403_FORBIDDEN)
-                                  
-                return Response("We couldnt find a valid token for given user.", status=status.HTTP_403_FORBIDDEN)
-                
-            return Response("Invalid user was given.", status=status.HTTP_403_FORBIDDEN)
-
-        return Response("Invalid Information", status=status.HTTP_403_FORBIDDEN)
+    serializer_class = ResendTokenSerializer
 
 
 @extend_schema_view(
@@ -108,7 +114,8 @@ class VerifyUserView(APIView):
     ),
 )
 class LoginUserView(TokenObtainPairView):
-    '''Users can request to this endpoint in order to get new access key'''
-    permission_classes = [AllowUnAuthenticatedPermission,]
-    throttle_classes = [AuthenticationThrottle,]
-    pass
+    """
+    Get JWT token for users.
+    """
+    permission_classes = [AllowUnAuthenticatedPermission]
+    throttle_classes = [AuthenticationThrottle]

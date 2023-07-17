@@ -33,7 +33,7 @@ class Music(AbstractContent):
         if self.user.role in ['a', 'p'] and file_size > 15:
             raise ValidationError('Music file size should not exceed 15MB.')
 
-        if self.user.role == 'n' and file_size > 10:
+        if self.user.is_normal() and file_size > 10:
             raise ValidationError(
                 'Normal users can upload music files up to 10MB.'
             )

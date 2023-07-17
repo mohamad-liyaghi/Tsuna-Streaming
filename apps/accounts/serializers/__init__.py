@@ -1,7 +1,15 @@
-from accounts.serializers.authentication import (
-    RegisterUserSerializer
+from .authentication import (
+    RegisterUserSerializer,
+    VerifyUserSerializer,
+    ResendTokenSerializer,
+)
+from .profile import (
+    ProfileSerializer,
 )
 
 __all__ = [
-    "RegisterUserSerializer", 
+    "RegisterUserSerializer",
+    "VerifyUserSerializer",
+    "ResendTokenSerializer",
+    "ProfileSerializer",
 ]

@@ -1,15 +1,22 @@
 from django.urls import path
 from accounts.views.authentication import (
-    RegisterUserView, VerifyUserView, LoginUserView
+    RegisterUserView,
+    VerifyUserView,
+    LoginUserView,
+    ResendTokenView
 )
 from accounts.views.profile import ProfileView
 
 app_name = "accounts"
 
-
 urlpatterns = [
     path("register/", RegisterUserView.as_view(), name='register'),
     path("login/", LoginUserView.as_view(), name="login"),
-    path("verify/<str:token>/<str:user_token>/", VerifyUserView.as_view(), name="verify"),
-    path("profile/<str:token>/", ProfileView.as_view(), name='profile')
+    path(
+        "verify/<str:verification_token>/<str:user_token>/",
+        VerifyUserView.as_view(),
+        name="verify"
+    ),
+    path("resend/", ResendTokenView.as_view(), name='resend_verification'),
+    path("profile/<str:user_token>/", ProfileView.as_view(), name='profile')
 ] 

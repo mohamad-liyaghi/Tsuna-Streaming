@@ -1,51 +1,99 @@
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError, PermissionDenied
 from rest_framework import serializers
-from accounts.models import Token
-
+from accounts.models import VerificationToken
 
 USER = get_user_model()
 
 
 class RegisterUserSerializer(serializers.ModelSerializer):
-    '''User registration serializer'''
+    """Serializer for registering users."""
     
     email = serializers.EmailField()
     password = serializers.CharField(style={'input_type': 'password'})
 
     class Meta:
         model = USER
-        fields = ["email", "first_name", "last_name", "picture", "bio", "password"]
-
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "picture",
+            "bio",
+            "password"
+        )
 
     def validate_email(self, value):
-        '''
-            Check if user with the same email exists or not.
-            If exists, is it active or not.
-            Active users must Login
-            Deactive users must verify themselves
-        '''
+        """
+        Make sure that email is unique and not used before.
+        """
 
         email = value
         user = USER.objects.filter(email=email).first()
 
         if user:
             if user.is_active:
-                raise serializers.ValidationError("An active account with email {} founded".format(email))
+                raise serializers.ValidationError(
+                    f"An active account with email `{email}` already exists."
+                )
 
-            elif not user.is_active:
-                token = Token.objects.filter(user=user).first()
-
-                if token and token.is_valid:
-                    raise serializers.ValidationError("We have already sent you a token to {}, please verify your account".format(email))
-
-                else:
-                    Token.objects.create(user=user)
-                    raise serializers.ValidationError("We have sent you a token to {}, please verify your account.".format(email))
+            raise serializers.ValidationError(
+                f"A deactive account with email `{email}` already exists."
+            )
 
         return value
 
     def create(self, validated_data):
-        user = super(RegisterUserSerializer, self).create(validated_data)
-        user.set_password(validated_data['password'])
+        return USER.objects.create_user(**validated_data)
+
+
+class VerifyUserSerializer(serializers.Serializer):
+    def verify_code(self, user_token: str, token: VerificationToken):
+        """
+        Check the code is active
+        """
+        user = get_object_or_404(USER, token=user_token)
+
+        verified, message = VerificationToken.objects.verify(
+            user=user,
+            token=token
+        )
+
+        if verified:
+            self._activate_user(user)
+            return
+
+        # If token is not valid for any reason, raise an error
+        raise serializers.ValidationError(message)
+
+    def _activate_user(self, user) -> None:
+        """Activate a user"""
+        user.is_active = True
         user.save()
-        return user
+
+
+class ResendTokenSerializer(serializers.ModelSerializer):
+    """
+    Serializer for resending verification token.
+    """
+    user = serializers.SlugRelatedField(
+        slug_field="token",
+        queryset=USER.objects.filter(is_active=False)
+    )
+
+    class Meta:
+        model = VerificationToken
+        fields = ("user",)
+
+    def create(self, validated_data):
+        user = validated_data.get("user")
+        try:
+            return VerificationToken.objects.create(user=user)
+
+        except ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+
+        except PermissionDenied as e:
+            raise serializers.ValidationError(e)
+
