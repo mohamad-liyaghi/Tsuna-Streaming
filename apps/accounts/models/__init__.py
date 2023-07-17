@@ -1,5 +1,5 @@
-from accounts.models.account import Account
-from accounts.models.token import VerificationToken
+from .account import Account
+from .verification_token import VerificationToken
 
 __all__ = [ 
     'Account',

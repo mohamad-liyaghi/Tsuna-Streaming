@@ -18,5 +18,5 @@ urlpatterns = [
         name="verify"
     ),
     path("resend/", ResendTokenView.as_view(), name='resend_verification'),
-    path("profile/<str:token>/", ProfileView.as_view(), name='profile')
+    path("profile/<str:user_token>/", ProfileView.as_view(), name='profile')
 ] 
