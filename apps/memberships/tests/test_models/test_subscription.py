@@ -66,4 +66,11 @@ class TestSubscriptionModel:
                 membership=create_membership
             )
 
-# TODO: get active subs
+    def test_get_active_subscriptions(self, create_subscription):
+        user = create_subscription.user
+        assert Subscription.objects.get_active_subscription(user=user) == create_subscription
+
+    def test_get_active_sub_not_exist(self, create_active_user):
+        assert not Subscription.objects.get_active_subscription(
+            user=create_active_user
+        )

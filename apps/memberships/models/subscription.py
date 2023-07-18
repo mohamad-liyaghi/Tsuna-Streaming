@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 import datetime
 from memberships.models import Membership
+from memberships.managers import SubscriptionManager
 from core.models import AbstractToken
 
 
@@ -26,6 +27,8 @@ class Subscription(AbstractToken):
 
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(blank=True, null=True)
+
+    objects = SubscriptionManager()
 
     @property
     def is_active(self):
