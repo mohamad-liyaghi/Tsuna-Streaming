@@ -19,7 +19,7 @@ class AbstractAccountRole(models.Model):
     def is_premium(self) -> bool:
         # TODO: get_premium_plan
         """Check if user has an active subscription"""
-        subscription = self.subscription.first()
+        subscription = self.subscriptions.first()
         return (subscription and subscription.is_active)
 
     def is_normal(self) -> bool:

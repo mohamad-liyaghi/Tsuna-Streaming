@@ -19,7 +19,7 @@ def notify_user_subscription(sender, created, instance, **kwargs):
             body={
                 "first_name": user.first_name,
                 "membership_title": subscription.membership.title,
-                "finish_date": subscription.finish_date
+                "end_date": subscription.end_date
 
             }
         )

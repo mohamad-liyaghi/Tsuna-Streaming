@@ -31,12 +31,12 @@ class MembershipSubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ["membership", "start_date", "finish_date", "token"]
+        fields = ["membership", "start_date", "end_date", "token"]
 
         extra_kwargs = {
                 'membership': {"read_only" : True}, 
                 'start_date': {"read_only" : True}, 
-                'finish_date': {"read_only" : True}, 
+                'end_date': {"read_only" : True}, 
                 'token': {"read_only" : True}, 
             }
         
