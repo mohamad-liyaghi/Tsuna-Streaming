@@ -8,57 +8,62 @@ import pytest
 @pytest.mark.django_db
 class TestSubscriptionModel:
 
-    @pytest.fixture(autouse=True)
-    def setup(self, create_active_user):
-        # TODO: make a fixture for this
-        self.user = create_active_user
-        self.membership = Membership.objects.create(title="membership", active_months=1)
-
-    def test_create_subscription(self):
+    def test_create_subscription(self, create_active_user, create_membership):
         Subscription.objects.create(
-            user=self.user,
-            membership=self.membership
+            user=create_active_user,
+            membership=create_membership,
         )
-        self.user.refresh_from_db()
-        assert self.user.is_premium()
+        create_active_user.refresh_from_db()
+        assert create_active_user.is_premium()
 
-    def test_create_subscription_for_deactive_user(self, create_deactive_user):
+    def test_create_subscription_for_deactive_user(
+            self, create_deactive_user, create_membership
+    ):
+        assert not create_deactive_user.is_active
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
                 user=create_deactive_user,
-                membership=self.membership
+                membership=create_membership
             )
 
-    def test_create_subscription_for_superuser(self, create_superuser):
+    def test_create_subscription_for_superuser(
+            self, create_superuser, create_membership
+    ):
+        assert create_superuser.is_superuser
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
                 user=create_superuser,
-                membership=self.membership
+                membership=create_membership
             )
 
-    def test_delete_subscription(self):
-        subscription = Subscription.objects.create(
-            user=self.user,
-            membership=self.membership
-        )
-        subscription.delete()
-        self.user.refresh_from_db()
-        assert self.user.is_normal()
+    def test_delete_subscription(self, create_subscription):
+        user = create_subscription.user
+        create_subscription.delete()
+        user.refresh_from_db()
+        assert user.is_normal()
 
-    def test_subscription_is_active(self):
-        subscription = Subscription.objects.create(
-            user=self.user,
-            membership=self.membership
-        )
-        assert subscription.is_active
+    def test_subscription_is_active(self, create_subscription):
+        assert create_subscription.is_active
 
-    def test_subscription_is_not_active(self):
-        subscription = Subscription.objects.create(
-            user=self.user,
-            membership=self.membership
-        )
-        subscription.end_date = timezone.now() - datetime.timedelta(days=1)
-        subscription.save()
-        assert not subscription.is_active
+    def test_subscription_is_not_active(self, create_subscription):
+        create_subscription.end_date = timezone.now() - datetime.timedelta(days=1)
+        create_subscription.save()
+        assert not create_subscription.is_active
+
+    def test_subscrive_unavailable_plan(self, create_membership, create_active_user):
+        create_membership.is_available = False
+        create_membership.save()
+        with pytest.raises(PermissionDenied):
+            Subscription.objects.create(
+                user=create_active_user,
+                membership=create_membership
+            )
+
+    def test_subscribe_twice(self, create_subscription, create_membership):
+        with pytest.raises(PermissionDenied):
+            Subscription.objects.create(
+                user=create_subscription.user,
+                membership=create_membership
+            )
 
 # TODO: get active subs

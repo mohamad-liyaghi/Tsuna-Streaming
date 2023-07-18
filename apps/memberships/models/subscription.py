@@ -2,8 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from memberships.models import Membership
 import datetime
+from memberships.models import Membership
 from core.models import AbstractToken
 
 
@@ -53,6 +53,7 @@ class Subscription(AbstractToken):
 
         if not self.pk:
             self.__check_user_role()
+            self.__check_membership_is_available()
             self.__set_end_date()
 
         return super(Subscription, self).save(*args, **kwargs)
@@ -69,6 +70,13 @@ class Subscription(AbstractToken):
 
         if not self.user.is_normal():
             raise PermissionDenied("Only normal users can have a subscription")
+
+    def __check_membership_is_available(self):
+        """
+        Check if the membership is available
+        """
+        if not self.membership.is_available:
+            raise PermissionDenied("Membership is not available to subscribe")
 
     def __str__(self) -> str:
         return f"{self.user} - {self.membership}"
