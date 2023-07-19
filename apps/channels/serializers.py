@@ -56,7 +56,7 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
             "date_joined", 
             "is_verified", 
             "role", 
-            "subscribers_count", 
+            # "subscribers_count",  # TODO : add subscribers count
             ]
 
         extra_kwargs = {

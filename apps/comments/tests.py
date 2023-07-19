@@ -14,6 +14,8 @@ class TestCommentModel:
 
     def setup(self):
         self.user = Account.objects.create_user(email="simple@simple.com", password="1234USERnormal")
+        self.user.is_active = True
+        self.user.save()
         self.channel = Channel.objects.create(owner=self.user, title="test")    
 
 
