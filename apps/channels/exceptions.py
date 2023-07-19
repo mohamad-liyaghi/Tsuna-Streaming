@@ -1,5 +1,6 @@
 class ChannelLimitExceededException(Exception):
-    '''
-        Raised when the maximum number of channels that can be created has been reached. 
-    '''
+    """
+    Exception raised when a user tries
+    to create a channel but has reached the limit
+    """
     pass
