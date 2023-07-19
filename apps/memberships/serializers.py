@@ -26,11 +26,16 @@ class MembershipDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membership
-        fields = ["title", "description", "price", "active_months", "is_available", "token",]
+        fields = [
+            "title",
+            "description",
+            "price",
+            "active_months",
+            "is_available",
+            "token",
+        ]
 
-        extra_kwargs = {
-            'token': {"read_only" : True}
-        }
+        read_only_fields = ["token"]
 
 
 class MembershipSubscribeSerializer(serializers.ModelSerializer):

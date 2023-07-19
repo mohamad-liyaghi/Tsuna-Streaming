@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 @pytest.mark.django_db
-class TestMembershipList:
+class TestMembershipCreate:
     def setup(self):
         self.url = reverse("memberships:membership")
         self.data = {

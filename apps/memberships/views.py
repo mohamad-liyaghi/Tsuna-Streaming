@@ -21,11 +21,22 @@ from memberships.serializers import (
 
 
 @extend_schema_view(
-    list=extend_schema(
-        description="List of all Membership Plans."
+    get=extend_schema(
+        description="List of all Membership Plans.",
+        responses={
+            200: 'Ok',
+            401: 'Unauthorized',
+        },
+        tags=['Memberships']
     ),
-    create=extend_schema(
-        description="Create a new Membership Plan [Admin only]."
+    post=extend_schema(
+        description="Create a new Membership Plan [Admin only].",
+        responses={
+            201: 'Created',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+        },
+        tags=['Memberships']
     ),
 )
 class MembershipListCreateView(ListCreateAPIView):
@@ -45,18 +56,52 @@ class MembershipListCreateView(ListCreateAPIView):
     
 
 @extend_schema_view(
-    retrieve=extend_schema(
-        description="Detail page of a Membership."
+    get=extend_schema(
+        description="Detail page of a Membership plan.",
+        responses={
+            200: 'Ok',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found',
+        },
+        tags=['Memberships']
     ),
-    update=extend_schema(
-        description="Update a Membership Plan [Admin only]."
+    put=extend_schema(
+        description="Update a Membership Plan [Admin only].",
+        responses={
+            200: 'Ok',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found',
+        },
+        tags=['Memberships']
     ),
-    destroy=extend_schema(
-        description="Delete a new Membership Plan [Admin only]."
+    patch=extend_schema(
+        description="Update a Membership Plan [Admin only].",
+        responses={
+            200: 'Ok',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found',
+        },
+        tags=['Memberships']
+    ),
+    delete=extend_schema(
+        description="Delete a new Membership Plan [Admin only].",
+        responses={
+            204: 'No Content',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found',
+        },
+        tags=['Memberships']
     ),
 )
 class MembershipDetailView(RetrieveUpdateDestroyAPIView):
-
+    """
+    Retrieve, Update or Delete a Membership Plan.
+    Methods: GET, PUT, PATCH, DELETE
+    """
     serializer_class = MembershipDetailSerializer
 
     def get_permissions(self):
@@ -65,20 +110,27 @@ class MembershipDetailView(RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated(), IsAdmin()]
         
         else:
-            return [IsAuthenticated(),]
+            return [IsAuthenticated()]
 
     def get_object(self):
-        return get_object_or_404(Membership, token=self.kwargs['membership_token'])
-    
+        return get_object_or_404(
+            Membership,
+            token=self.kwargs['membership_token']
+        )
 
     def destroy(self, request, *args, **kwargs):
-        
+        """
+        Delete a Membership Plan.
+        If raised MembershipInUserError, return error message.
+        """
         try:
             return super().destroy(request, *args, **kwargs)
-        
-        # return error message if sth goes wrong
+
         except MembershipInUserError as error:
-            return Response(str(error), status=status.HTTP_403_FORBIDDEN)
+            # Return error message if raised MembershipInUserError
+            return Response(
+                str(error), status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 @extend_schema_view(
