@@ -6,10 +6,11 @@ from apps.core.tasks import send_email
 
 @receiver(post_save, sender=Subscription)
 def notify_user_subscription(sender, created, instance, **kwargs):
-    '''Notify a user by email that the subscription has just started'''
+    """
+    Norify a user when a new subscription is created for him
+    """
 
     if created:
-
         subscription = instance
         user = subscription.user
 
@@ -19,15 +20,16 @@ def notify_user_subscription(sender, created, instance, **kwargs):
             body={
                 "first_name": user.first_name,
                 "membership_title": subscription.membership.title,
-                "finish_date": subscription.finish_date
-
+                "end_date": subscription.end_date
             }
         )
 
 
 @receiver(pre_delete, sender=Subscription)
 def notify_user_plan_expiration(sender, instance, **kwargs):
-    '''Notify after deleting subscription'''
+    """
+    Notify a user when his subscription is expired
+    """
 
     subscription = instance
 

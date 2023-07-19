@@ -14,7 +14,9 @@ class TestChannelModel:
 
     def create_premium_user(self):    
         self.premium_user = Account.objects.create_user(email="user1@simple.com", password="1234USERnormal")
-        membership = Membership.objects.create(title="plan", active_months=1)
+        self.premium_user.is_active = True
+        self.premium_user.save()
+        membership = Membership.objects.create(title="plan", active_months=1, is_available=True)
         Subscription.objects.create(user=self.premium_user, membership=membership)
 
 

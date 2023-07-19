@@ -3,14 +3,22 @@ from memberships.models import Membership, Subscription
 
 
 class MembershipSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Creating and Listing Memberships.
+    """
     class Meta:
         model = Membership
-        fields = ["title", "description", "price", "active_months", "is_available", "token",]
+        fields = [
+            "title",
+            "description",
+            "price",
+            "active_months",
+            "is_available",
+            "token",
+        ]
 
-        extra_kwargs = {
-            'description': {'write_only': True},       
-            'token': {"read_only" : True}
-        }
+        read_only_fields = ["token", "is_available"]
+        write_only_fields = ["description"]
 
 
 class MembershipDetailSerializer(serializers.ModelSerializer):
@@ -18,11 +26,16 @@ class MembershipDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Membership
-        fields = ["title", "description", "price", "active_months", "is_available", "token",]
+        fields = [
+            "title",
+            "description",
+            "price",
+            "active_months",
+            "is_available",
+            "token",
+        ]
 
-        extra_kwargs = {
-            'token': {"read_only" : True}
-        }
+        read_only_fields = ["token"]
 
 
 class MembershipSubscribeSerializer(serializers.ModelSerializer):
@@ -31,18 +44,20 @@ class MembershipSubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ["membership", "start_date", "finish_date", "token"]
+        fields = [
+            "membership",
+            "start_date",
+            "end_date",
+            "token"
+        ]
 
-        extra_kwargs = {
-                'membership': {"read_only" : True}, 
-                'start_date': {"read_only" : True}, 
-                'finish_date': {"read_only" : True}, 
-                'token': {"read_only" : True}, 
-            }
-        
+        read_only_fields = fields
 
     def save(self, **kwargs):
-        # set user and membership plan and then save the Subscription
-        kwargs['user'] = self.context['user']
-        kwargs['membership'] = self.context['membership']
-        return super().save(**kwargs)
+        """
+        Override save and add user and membership to the context.
+        """
+        return Subscription.objects.create(
+            user=self.context['user'],
+            membership=self.context['membership']
+        )

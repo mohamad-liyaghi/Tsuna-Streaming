@@ -1,4 +1,5 @@
 from django.db import models
+from memberships.models import Subscription
 
 
 class AbstractAccountRole(models.Model):
@@ -17,10 +18,8 @@ class AbstractAccountRole(models.Model):
         return self.is_superuser
 
     def is_premium(self) -> bool:
-        # TODO: get_premium_plan
         """Check if user has an active subscription"""
-        subscription = self.subscription.first()
-        return (subscription and subscription.is_active)
+        return bool(Subscription.objects.get_active_subscription(user=self))
 
     def is_normal(self) -> bool:
         """Check to see user is not admin and not premium"""
