@@ -5,39 +5,61 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
-from channels.serializers import (ChannelListCreateSerializer, ChannelDetailSerializer)
-from channels.permissions import  ChannelPermission, ChannelLimitPermission    
+from channels.serializers import (
+    ChannelListCreateSerializer,
+    ChannelDetailSerializer
+)
+from channels.permissions import ChannelPermission
 
 
 @extend_schema_view(
-    list=extend_schema(description="List of channels that user is owner or admin of them."),
-    create=extend_schema(description="Create a new channel [Premiums can create 10 and Normal users can create 5]."),
+    get=extend_schema(
+        description="List of channels that user is owner or admin of them.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+        },
+        tags=["Channels"]
+    ),
+    post=extend_schema(
+        description="Create a new channel.",
+        responses={
+            201: 'Created',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+        },
+        tags=["Channels"]
+    ),
 )
 class ChannelListCreateView(ListCreateAPIView):
-    '''List of users channels and Create channel page'''
+    """
+    List of channels that user is owner or admin of them.
+    Create a new channel [Premiums can create 10 and Normal users can create 5].
+    Method: GET, POST
+    """
     
-    def get_permissions(self):
-        permission_classes = [IsAuthenticated, ChannelLimitPermission] if self.request.method == "POST" else [IsAuthenticated]
-        return [permission() for permission in permission_classes]
-    
+    permission_classes = [IsAuthenticated]
     serializer_class = ChannelListCreateSerializer
     filterset_fields = ['title']
     
     def get_queryset(self):
-        # channels that user is owner of them
+        # User channels
         owned_channel = Channel.objects.filter(owner=self.request.user)
 
-        # channels that user is admin of them
+        # Get id of channels that user is admin of them
         user_admin = self.request.user.channel_admins.all().values("channel__id")
+        # Get channels that user is admin of them
         channel_admin = Channel.objects.filter(id__in=user_admin)
 
-        # return chained queryset
+        # return chained queryset of owned_channel and channel_admin
         return owned_channel | channel_admin
     
     def get_serializer_context(self):
-        return {"request" : self.request}
+        # send request to serializer
+        return {"request": self.request}
     
-
 
 @extend_schema_view(
     update=extend_schema(description="Update channels information [Channel staff only]."),

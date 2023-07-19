@@ -4,39 +4,43 @@ from channels.exceptions import ChannelLimitExceededException
 
 
 class ChannelListCreateSerializer(serializers.ModelSerializer):
-    '''A serializer for listing and creating a Channel'''
+    """
+    Serializer for listing and creating channels.
+    """
 
     class Meta:
         model = Channel
         fields = [
             "title",
             "description",
-            "profile",
+            "avatar",
             "thumbnail", 
-            "token", 
-            "date_joined", 
+            "token",
+            "date_created",
             "is_verified"
             ]
 
-        extra_kwargs = {
-            'token': {"read_only" : True},
-            'date_joined': {"read_only" : True},
-            'is_verified': {"read_only" : True},
-            'date_joined': {"read_only" : True},
-            'description': {"write_only" : True},
-            'thumbnail': {"write_only" : True},
-        }
-    
+        read_only_fields = [
+            "token",
+            "date_created",
+            "is_verified"
+            ]
+        write_only_fields = [
+            "description",
+            "avatar",
+        ]
+
     def create(self, validated_data):
-        '''Set request.user as owner of a channel'''
-
-        validated_data["owner"] = self.context["request"].user
+        """
+        Create a new channel.
+        """
         try:
-            return super().create(validated_data)
-
+            return Channel.objects.create(
+                owner=self.context["request"].user,
+                **validated_data
+            )
         except ChannelLimitExceededException as error:
             raise serializers.ValidationError(str(error))
-        
 
 
 class ChannelDetailSerializer(serializers.ModelSerializer):
@@ -49,11 +53,11 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
         fields = [
             "title",
             "description", 
-            "profile", 
+            "profile",
             "thumbnail", 
             "owner", 
             "token", 
-            "date_joined", 
+            "date_joined",
             "is_verified", 
             "role", 
             # "subscribers_count",  # TODO : add subscribers count
