@@ -16,8 +16,8 @@ urlpatterns = [
         name='membership_detail'
     ),
     path(
-            "<str:membership_token>/subscribe/",
-            MembershipSubscribeView.as_view(),
-            name='membership_subscribe'
-        ),
+        "<str:membership_token>/subscribe/",
+        MembershipSubscribeView.as_view(),
+        name='membership_subscribe'
+    ),
 ]

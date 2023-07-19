@@ -44,18 +44,20 @@ class MembershipSubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subscription
-        fields = ["membership", "start_date", "end_date", "token"]
+        fields = [
+            "membership",
+            "start_date",
+            "end_date",
+            "token"
+        ]
 
-        extra_kwargs = {
-                'membership': {"read_only" : True}, 
-                'start_date': {"read_only" : True}, 
-                'end_date': {"read_only" : True}, 
-                'token': {"read_only" : True}, 
-            }
+        read_only_fields = fields
         
 
     def save(self, **kwargs):
-        # set user and membership plan and then save the Subscription
+        """
+        Override save and add user and membership to the context.
+        """
         kwargs['user'] = self.context['user']
         kwargs['membership'] = self.context['membership']
         return super().save(**kwargs)

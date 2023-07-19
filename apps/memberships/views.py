@@ -134,19 +134,34 @@ class MembershipDetailView(RetrieveUpdateDestroyAPIView):
 
 
 @extend_schema_view(
-    create=extend_schema(
-        description="Subscribe to a membership plan [Normal users only]."
+    post=extend_schema(
+        description="Subscribe to a membership plan [Normal users only].",
+        responses={
+            201: 'Created',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found',
+        },
+        tags=['Memberships'],
     ),
 )
 class MembershipSubscribeView(CreateAPIView):
-    '''Create Subscription for user (Subscribe to a membership plan)'''
+    """
+    Subscribe to a membership plan.
+    Methods: POST
+    """
 
     permission_classes = [IsAuthenticated, CanSubscribeMembership]
-    serializer_class  = MembershipSubscribeSerializer
+    serializer_class = MembershipSubscribeSerializer
     
     def get_object(self):
-        return get_object_or_404(Membership, token=self.kwargs['membership_token'])
+        return get_object_or_404(
+            Membership,
+            token=self.kwargs['membership_token']
+        )
     
     def get_serializer_context(self):
-        return {"membership" : self.get_object(), 'user' : self.request.user}
-    
+        return {
+            "membership": self.get_object(),
+            "user": self.request.user
+        }
