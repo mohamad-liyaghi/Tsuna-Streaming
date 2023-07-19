@@ -12,7 +12,7 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from memberships.models import Membership
-from memberships.permissions import IsAdminUser, IsNormalUser
+from memberships.permissions import IsAdmin, CanSubscribeMembership
 from memberships.serializers import (
     MembershipSerializer,
     MembershipDetailSerializer, 
@@ -22,22 +22,26 @@ from memberships.serializers import (
 
 @extend_schema_view(
     list=extend_schema(
-        description="List of all Memberships."
+        description="List of all Membership Plans."
     ),
     create=extend_schema(
         description="Create a new Membership Plan [Admin only]."
     ),
 )
 class MembershipListCreateView(ListCreateAPIView):
+    """
+    List all Membership Plans or Create a new Membership Plan.
+    Methods: GET, POST
+    """
     serializer_class = MembershipSerializer
     queryset = Membership.objects.all()
     
     def get_permissions(self):
         if self.request.method == "POST":
-            return [IsAuthenticated(), IsAdminUser()]
-        
+            # Only admins can create a plan
+            return [IsAuthenticated(), IsAdmin()]
         else:
-            return [IsAuthenticated(),]
+            return [IsAuthenticated()]
     
 
 @extend_schema_view(
@@ -58,7 +62,7 @@ class MembershipDetailView(RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         # Only admins can update/Delete a plan
         if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [IsAuthenticated(), IsAdminUser()]
+            return [IsAuthenticated(), IsAdmin()]
         
         else:
             return [IsAuthenticated(),]
@@ -85,7 +89,7 @@ class MembershipDetailView(RetrieveUpdateDestroyAPIView):
 class MembershipSubscribeView(CreateAPIView):
     '''Create Subscription for user (Subscribe to a membership plan)'''
 
-    permission_classes = [IsAuthenticated, IsNormalUser]
+    permission_classes = [IsAuthenticated, CanSubscribeMembership]
     serializer_class  = MembershipSubscribeSerializer
     
     def get_object(self):

@@ -3,14 +3,22 @@ from memberships.models import Membership, Subscription
 
 
 class MembershipSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Creating and Listing Memberships.
+    """
     class Meta:
         model = Membership
-        fields = ["title", "description", "price", "active_months", "is_available", "token",]
+        fields = [
+            "title",
+            "description",
+            "price",
+            "active_months",
+            "is_available",
+            "token",
+        ]
 
-        extra_kwargs = {
-            'description': {'write_only': True},       
-            'token': {"read_only" : True}
-        }
+        read_only_fields = ["token", "is_available"]
+        write_only_fields = ["description"]
 
 
 class MembershipDetailSerializer(serializers.ModelSerializer):

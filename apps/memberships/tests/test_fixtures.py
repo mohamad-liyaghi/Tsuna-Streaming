@@ -15,3 +15,8 @@ def test_create_subscription(create_subscription):
 @pytest.mark.django_db
 def test_subscriptions_plan(create_membership, create_subscription):
     assert create_subscription.membership == create_membership
+
+
+@pytest.mark.django_db
+def test_create_premium_user(create_premium_user):
+    assert create_premium_user.is_premium()

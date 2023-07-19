@@ -23,3 +23,8 @@ def create_subscription(create_membership, create_active_user):
         user=create_active_user,
         membership=create_membership,
     )
+
+
+@pytest.fixture
+def create_premium_user(create_subscription):
+    return create_subscription.user
