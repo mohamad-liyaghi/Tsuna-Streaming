@@ -52,12 +52,12 @@ class MembershipSubscribeSerializer(serializers.ModelSerializer):
         ]
 
         read_only_fields = fields
-        
 
     def save(self, **kwargs):
         """
         Override save and add user and membership to the context.
         """
-        kwargs['user'] = self.context['user']
-        kwargs['membership'] = self.context['membership']
-        return super().save(**kwargs)
+        return Subscription.objects.create(
+            user=self.context['user'],
+            membership=self.context['membership']
+        )
