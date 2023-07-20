@@ -10,6 +10,10 @@ urlpatterns = [
         ChannelListCreateView.as_view(),
         name='list-create'
     ),
-    path('<str:channel_token>/', ChannelDetailView.as_view(), name='channel_detail'),
+    path(
+        '<str:channel_token>/',
+        ChannelDetailView.as_view(),
+        name='channel_detail'
+    ),
 ]
 

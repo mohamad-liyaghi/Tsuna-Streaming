@@ -44,34 +44,41 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
 
 
 class ChannelDetailSerializer(serializers.ModelSerializer):
-
     owner = serializers.StringRelatedField()
-    role = serializers.SerializerMethodField(method_name="role_in_channel")
+    role = serializers.SerializerMethodField(
+        method_name="role_in_channel"
+    )
 
     class Meta:
         model = Channel
         fields = [
             "title",
             "description", 
-            "profile",
-            "thumbnail", 
+            "avatar",
+            "thumbnail",
             "owner", 
             "token", 
-            "date_joined",
+            "date_created",
             "is_verified", 
             "role", 
             # "subscribers_count",  # TODO : add subscribers count
             ]
 
-        extra_kwargs = {
-            "token" : {"read_only" : True},
-            "owner" : {"read_only" : True},
-            "is_verified" : {"read_only" : True},
-            "role" : {"read_only" : True}
-        }
+        read_only_fields = [
+            'token',
+            'owner',
+            'date_created',
+            'is_verified',
+            'role',
+        ]
 
     def role_in_channel(self, channel):
-        '''Return the user role in channel'''
+        """
+        Return user role in channel.
+        We have 2 roles in channel:
+            1. Owner
+            2. Admin
+        """
         user = self.context['request'].user
 
         if channel.owner == user:
@@ -80,4 +87,4 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
         if user.channel_admins.filter(channel=channel).exists():
             return "Admin"
             
-        return None
+        return

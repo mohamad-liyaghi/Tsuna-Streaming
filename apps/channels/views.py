@@ -9,7 +9,7 @@ from channels.serializers import (
     ChannelListCreateSerializer,
     ChannelDetailSerializer
 )
-from channels.permissions import ChannelPermission
+from channels.permissions import IsChannelStaff
 
 
 @extend_schema_view(
@@ -62,30 +62,67 @@ class ChannelListCreateView(ListCreateAPIView):
     
 
 @extend_schema_view(
-    update=extend_schema(description="Update channels information [Channel staff only]."),
-    prtial_update=extend_schema(description="Update channels information [Channel staff only]."),
-    destroy=extend_schema(description="Delete a channel [Channel staff only]."),
+    get=extend_schema(
+        description="Retrieve a channel.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            404: 'Not found',
+        },
+        tags=["Channels"]
+    ),
+    put=extend_schema(
+        description="Update channels information [Channel staff only].",
+        responses={
+            200: 'ok',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found',
+        },
+        tags=["Channels"]
+    ),
+    patch=extend_schema(
+        description="Update channels information [Channel staff only].",
+        responses={
+            200: 'ok',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found',
+        },
+        tags=["Channels"]
+    ),
+    delete=extend_schema(
+        description="Delete a channel [Channel staff only].",
+        responses={
+            204: 'No content',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found',
+        },
+        tags=["Channels"]
+    ),
 )
 class ChannelDetailView(RetrieveUpdateDestroyAPIView):
-    '''Detail page of a channel [Retrieve, update, delete]'''
+    """
+    Retrieve a channel.
+    Update channels information [Channel staff only].
+    Delete a channel [Channel staff only].
+    Method: PUT, PATCH, DELETE
+    """
     serializer_class = ChannelDetailSerializer
+    permission_classes = [IsAuthenticated, IsChannelStaff]
     lookup_field = "token"
 
-    def get_permissions(self):
-        
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            permission_classes = [IsAuthenticated, ChannelPermission]
-        
-        else:
-            permission_classes = [IsAuthenticated]
-
-        return [permission() for permission in permission_classes]
-    
     def get_serializer_context(self):
-        return {"request" : self.request}
+        # send request to serializer
+        return {"request": self.request}
     
     def get_object(self):
-        return get_object_or_404(
-            Channel.objects.select_related('owner'), 
+        channel = get_object_or_404(
+            Channel.objects.select_related('owner'),
             token=self.kwargs["channel_token"]
         )
+        self.check_object_permissions(self.request, channel)
+        return channel
