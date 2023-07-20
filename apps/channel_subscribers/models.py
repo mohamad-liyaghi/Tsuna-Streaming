@@ -7,7 +7,7 @@ from channel_subscribers.managers import ChannelSubscriberManager
 
 class ChannelSubscriber(models.Model):
     """Model to represent a user's subscription to a channel."""
-    
+
     channel = models.ForeignKey(
         Channel,
         on_delete=models.CASCADE,
