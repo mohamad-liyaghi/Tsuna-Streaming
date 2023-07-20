@@ -4,6 +4,7 @@ import time
 from apps.core.tests.fixtures import *  # noqa
 from apps.accounts.tests.fixtures import *  # noqa
 from apps.memberships.tests.fixtures import *  # noqa
+from apps.channels.tests.fixtures import *  # noqa
 
 
 @pytest.fixture
