@@ -7,6 +7,9 @@ from channels.models import Channel
 
 class ChannelSubscriberManager(models.Manager):
 
+    def get_count(self, channel: Channel) -> int:
+        return self.model.get_subscribers_count(channel=channel)
+
     def get_from_cache(self,channel_token, user_token):
         '''Get subscriber from cache and return it. if not exist in cache, get from database.'''
 

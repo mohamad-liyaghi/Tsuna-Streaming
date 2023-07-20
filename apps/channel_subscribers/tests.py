@@ -1,5 +1,5 @@
 from django.db.utils import IntegrityError
-from django.core.cache import cache
+from django.core.cache import cache, caches
 
 import pytest
 
@@ -49,11 +49,10 @@ class TestChannelSubscriber:
         ChannelSubscriber.objects.unsubscribe_in_cache(self.channel.token, self.subscriber_user.token)
         assert cache.get(f'subscriber:{self.channel.token}:{self.subscriber_user.token}')['subscription_status'] == 'unsubscribed'
 
-    # TODO: make this work
-    # def test_get_channel_subscriber_count(self):
-    #     """Ensure that the number of subscribers for a channel can be retrieved from the cache and DB."""
-    #     assert self.channel.subscribers_count == 1
-    #     # Delete the old subscriber count in cache
-    #     cache.delete(f'subscriber_count:{self.channel.token}')
-    #     self.create_subscriber()
-    #     assert self.channel.subscribers_count == 2
+    def test_get_channel_subscriber_count(self):
+        assert ChannelSubscriber.objects.get_count(self.channel) == 1
+        # Delete the old subscriber count in cache
+        for cache_backend in caches.all():
+            cache_backend.clear()
+        self.create_subscriber()
+        assert ChannelSubscriber.objects.get_count(self.channel) == 2
