@@ -8,3 +8,11 @@ def create_subscriber(create_channel, create_superuser):
         user=create_superuser,
         channel=create_channel
     )
+
+
+@pytest.fixture
+def create_cached_subscriber(create_channel, create_superuser):
+    return ChannelSubscriber.objects.create_in_cache(
+        channel=create_channel,
+        user=create_superuser
+    )

@@ -44,7 +44,7 @@ class ChannelAdmin(AbstractToken):
     def save(self, *args, **kwargs):
         if not self.pk:
             subscriber = ChannelSubscriber.objects.get_from_cache(
-                    channel_token=self.channel.token, user_token=self.user.token
+                    channel=self.channel, user=self.user
                 )
 
             # Raise error if use hasnt subscribed to channel
