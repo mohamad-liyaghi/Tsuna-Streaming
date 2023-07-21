@@ -16,6 +16,44 @@ from channel_subscribers.serializers import SubscriberListSerializer
 
 @extend_schema_view(
     get=extend_schema(
+        description="Check wether user subscribed to a channel or not.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
+    ),
+)
+class SubscriberStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        return get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
+
+    def get(self, request, *args, **kwargs):
+        """
+        Returns whether or not a user is subscribed to a channel.
+        """
+        return Response(
+            bool(
+                ChannelSubscriber.objects.get_from_cache(
+                    channel=self.get_object(),
+                    user=request.user
+                )
+            ),
+            status=status.HTTP_200_OK
+        )
+
+
+@extend_schema_view(
+    get=extend_schema(
         description="Check wether user subscribed to a channel or not."
     ),
     post=extend_schema(
