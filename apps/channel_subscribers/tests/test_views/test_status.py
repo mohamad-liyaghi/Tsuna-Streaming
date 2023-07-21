@@ -76,5 +76,20 @@ class TestSubscriberView:
         assert response.status_code == status.HTTP_200_OK
         assert response.data is False
 
-
-# TODO: Unsubscribe in cache
+    def test_subscriber_removed_from_cache(
+            self,
+            create_cached_subscriber,
+            api_client
+    ):
+        api_client.force_authenticate(create_cached_subscriber['user'])
+        ChannelSubscriber.objects.delete_in_cache(
+            user=create_cached_subscriber['user'],
+            channel=create_cached_subscriber['channel']
+        )
+        response = api_client.get(
+            reverse(
+                self.url_name, kwargs={'channel_token': create_cached_subscriber['channel'].token}
+            )
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data is False

@@ -14,3 +14,17 @@ class CanSubscribePermission(BasePermission):
             channel=obj
         )
         return not bool(subscribed)
+
+
+class CanUnSubscribePermission(BasePermission):
+    """
+    Permission to see if user subscribed a channel of not
+    """
+    message = "You havnt subscribed yet."
+
+    def has_object_permission(self, request, view, obj):
+        subscribed = ChannelSubscriber.objects.get_from_cache(
+            user=request.user,
+            channel=obj
+        )
+        return bool(subscribed)

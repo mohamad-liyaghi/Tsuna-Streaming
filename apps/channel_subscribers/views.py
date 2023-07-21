@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +11,10 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
-from channel_subscribers.permissions import CanSubscribePermission
+from channel_subscribers.permissions import (
+    CanSubscribePermission,
+    CanUnSubscribePermission
+)
 from channel_subscribers.serializers import SubscriberListSerializer
 
 
@@ -83,12 +86,51 @@ class SubscriberCreateView(CreateAPIView):
         """
         Create a new subscriber if does not exist
         """
-        self.get_object()
         ChannelSubscriber.objects.create_in_cache(
             channel=self.get_object(),
             user=request.user
         )
         return Response('OK', status=status.HTTP_201_CREATED)
+
+
+@extend_schema_view(
+    delete=extend_schema(
+        description="Delete a subscriber from channel.",
+        responses={
+            204: 'Deleted',
+            401: 'Unauthorized',
+            403: 'User hasnt subscribed yet.',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
+    ),
+)
+class SubscriberDeleteView(DestroyAPIView):
+    """
+    Delete a Channel Subscriber for a channel
+    """
+    permission_classes = [IsAuthenticated, CanUnSubscribePermission]
+
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        channel = get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
+        self.check_object_permissions(self.request, channel)
+        return channel
+
+    def destroy(self, request, *args, **kwargs):
+        ChannelSubscriber.objects.delete_in_cache(
+            channel=self.get_object(),
+            user=request.user
+        )
+        return Response(
+            'ok',
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 @extend_schema_view(

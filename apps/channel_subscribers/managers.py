@@ -111,6 +111,7 @@ class ChannelSubscriberManager(models.Manager):
 
         # Check if subscriber already exists in cache or db
         cached_subscriber = self.get_from_cache(channel, user)
+        print(cached_subscriber)
 
         # If not exist, raise error
         if not cached_subscriber:
@@ -255,22 +256,29 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        # Check if subscriber exists in db
-        subscriber = self.model.objects.filter(
-            user=user,
-            channel=channel
-        )
-        # Set subscriber in cache and return it
-        if subscriber.exists():
-            return self.__set_cache(
-                channel=channel,
-                user=user,
-                subscription_status='subscribed',
-                source='database'
-            )
+        # Get from cache first
+        key = CACHE_SUBSCRIBER_KEY.format(channel.token, user.token)
+        db_subscriber = cache.get(key)
 
-        # Return none if subscriber does not exist in db
-        return
+        if not db_subscriber:
+            # Check if subscriber exists in db
+            subscriber = self.model.objects.filter(
+                user=user,
+                channel=channel
+            )
+            # Set subscriber in cache and return it
+            if subscriber.exists():
+                return self.__set_cache(
+                    channel=channel,
+                    user=user,
+                    subscription_status='subscribed',
+                    source='database'
+                )
+
+            # Return none if subscriber does not exist in db
+            return
+
+        return db_subscriber
 
     def __set_cache(
             self,

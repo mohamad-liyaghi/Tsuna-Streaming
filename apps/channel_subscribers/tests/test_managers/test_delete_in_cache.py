@@ -13,11 +13,11 @@ class TestDeleteInCache:
             create_cached_subscriber['channel']
         ) == 1
 
-    def test_delete_invalid_subscriber_in_cache(self):
+    def test_delete_invalid_subscriber_in_cache(self, create_superuser, create_channel):
         with pytest.raises(ValueError):
             ChannelSubscriber.objects.delete_in_cache(
-                user='fake_user',
-                channel='fake_channel'
+                user=create_superuser,
+                channel=create_channel
             )
 
     def test_delete_subscriber_in_db(self, create_subscriber):
