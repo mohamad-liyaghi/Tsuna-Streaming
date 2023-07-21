@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 
+from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -10,7 +11,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
-from channel_subscribers.permissions import SubscriberPermission
+from channel_subscribers.permissions import CanSubscribePermission
 from channel_subscribers.serializers import SubscriberListSerializer
 
 
@@ -53,6 +54,44 @@ class SubscriberStatusView(APIView):
 
 
 @extend_schema_view(
+    post=extend_schema(
+        description="Create a new subscriber for a channel.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'You are already subscribed to this channel.',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
+    ),
+)
+class SubscriberCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, CanSubscribePermission]
+
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        channel = get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
+        self.check_object_permissions(self.request, channel)
+        return channel
+
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new subscriber if does not exist
+        """
+        self.get_object()
+        ChannelSubscriber.objects.create_in_cache(
+            channel=self.get_object(),
+            user=request.user
+        )
+        return Response('OK', status=status.HTTP_201_CREATED)
+
+
+@extend_schema_view(
     get=extend_schema(
         description="Check wether user subscribed to a channel or not."
     ),
@@ -65,7 +104,7 @@ class SubscriberStatusView(APIView):
 )
 class SubscriberView(APIView):
     # Only authenticated users can access this view
-    permission_classes = [IsAuthenticated, SubscriberPermission]
+    permission_classes = [IsAuthenticated]
 
     def dispatch(self, request, *args, **kwargs):
         # Check if the given channel exists
