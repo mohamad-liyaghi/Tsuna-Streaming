@@ -4,7 +4,6 @@ from .views import (
     SubscriberCreateView,
     SubscriberDeleteView,
     SubscriberListView,
-    SubscriberView
 )
 
 app_name = 'channel_subscribers'
@@ -25,6 +24,9 @@ urlpatterns = [
         SubscriberDeleteView.as_view(),
         name='delete_subscriber'
     ),
-    path('<str:channel_token>/', SubscriberView.as_view(), name='subscriber'),
-    path('<str:channel_token>/list', SubscriberListView.as_view(), name='subscriber_list')
+    path(
+        '<str:channel_token>/list/',
+        SubscriberListView.as_view(),
+        name='subscriber_list'
+    ),
 ]

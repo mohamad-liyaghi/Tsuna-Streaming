@@ -2,6 +2,7 @@ from django.db import models
 from django.core.cache import cache
 from django.conf import settings
 from typing import Union
+from datetime import datetime
 from channels.models import Channel
 
 CACHE_SUBSCRIBER_KEY = 'subscriber:{}:{}'
@@ -40,6 +41,30 @@ class ChannelSubscriberManager(models.Manager):
             return total_subscriber_count
 
         return cached_subscribers_count.get('count')
+
+    def get_list(self, channel: Channel) -> dict:
+        subscriber_key = CACHE_SUBSCRIBER_KEY.format(channel.token, '*')
+
+        cache_subscribers = [
+            cache.get(key) for key in cache.keys(subscriber_key)
+        ]
+
+        db_subscribers = list(
+            self.model.objects.filter(channel=channel)
+        )
+        # Filter out only subscribed which are in cache and not db
+        cache_subscribers = list(
+            filter(
+                lambda subscriber: (
+                        subscriber.get('subscription_status') == 'subscribed'
+                        and
+                        subscriber.get('source') == 'cache'
+                ),
+                cache_subscribers
+            )
+        )
+        print(cache_subscribers)
+        return cache_subscribers + db_subscribers
 
     def get_from_cache(
             self,
@@ -285,7 +310,8 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
             subscription_status: str = 'subscribed',
-            source: str = 'cache'
+            source: str = 'cache',
+            date: datetime =datetime.now()
     ) -> dict:
         """
         Set subscriber in cache
@@ -303,7 +329,8 @@ class ChannelSubscriberManager(models.Manager):
                 'user': user,
                 'channel': channel,
                 'subscription_status': subscription_status,
-                'source': source
+                'source': source,
+                'date': date
             },
             timeout=60
         )

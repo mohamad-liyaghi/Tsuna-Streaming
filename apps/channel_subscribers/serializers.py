@@ -1,6 +1,9 @@
 from rest_framework import serializers
-from channel_subscribers.models import ChannelSubscriber
+
 
 class SubscriberListSerializer(serializers.Serializer):
+    """
+    Represent a list of subscribers
+    """
     user = serializers.CharField()
     date = serializers.DateTimeField()
