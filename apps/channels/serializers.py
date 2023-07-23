@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from channels.models import Channel
+from channel_subscribers.models import ChannelSubscriber
 from channels.exceptions import ChannelLimitExceededException
 
 
@@ -48,6 +49,9 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
     role = serializers.SerializerMethodField(
         method_name="role_in_channel"
     )
+    subscribers_count = serializers.SerializerMethodField(
+        method_name='get_subscriber_count'
+    )
 
     class Meta:
         model = Channel
@@ -61,7 +65,7 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
             "date_created",
             "is_verified", 
             "role", 
-            # "subscribers_count",  # TODO : add subscribers count
+            "subscribers_count",
             ]
 
         read_only_fields = [
@@ -86,5 +90,11 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
 
         if user.channel_admins.filter(channel=channel).exists():
             return "Admin"
-            
+
         return
+
+    def get_subscriber_count(self, channel) -> int:
+        """
+        Return number of a channel subscribers
+        """
+        return ChannelSubscriber.objects.get_count(channel=channel)

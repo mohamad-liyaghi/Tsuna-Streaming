@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 
+from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -10,97 +11,146 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
-from channel_subscribers.permissions import SubscriberPermission
+from channel_subscribers.permissions import (
+    CanSubscribePermission,
+    CanUnSubscribePermission
+)
 from channel_subscribers.serializers import SubscriberListSerializer
 
 
 @extend_schema_view(
     get=extend_schema(
-        description="Check wether user subscribed to a channel or not."
-    ),
-    post=extend_schema(
-        description="Subscribe to a channel."
-    ),
-    delete=extend_schema(
-        description="Unsubscribe from a channel."
+        description="Check wether user subscribed to a channel or not.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
     ),
 )
-class SubscriberView(APIView):
-    # Only authenticated users can access this view
-    permission_classes = [IsAuthenticated, SubscriberPermission]
+class SubscriberStatusView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def dispatch(self, request, *args, **kwargs):
-        # Check if the given channel exists
-        self.channel = get_object_or_404(Channel, token=self.kwargs['channel_token'])
-        return super().dispatch(request, *args, **kwargs)
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        return get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
 
-    def get(self, request, channel_token, *args, **kwargs):
-        '''
+    def get(self, request, *args, **kwargs):
+        """
         Returns whether or not a user is subscribed to a channel.
-        '''
+        """
+        return Response(
+            bool(
+                ChannelSubscriber.objects.get_from_cache(
+                    channel=self.get_object(),
+                    user=request.user
+                )
+            ),
+            status=status.HTTP_200_OK
+        )
 
-        # Get the subscription status from the database and cache
-        subscriber = ChannelSubscriber.objects.get_from_cache(channel_token, request.user.token)
 
-        # Return True if subscribed, else return False
-        return Response(True if subscriber else False, status=status.HTTP_200_OK)
-    
+@extend_schema_view(
+    post=extend_schema(
+        description="Create a new subscriber for a channel.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'You are already subscribed to this channel.',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
+    ),
+)
+class SubscriberCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated, CanSubscribePermission]
 
-    def post(self, request, channel_token, *args, **kwargs):
-        '''
-        Creates a new subscriber and saves it into the cache. Then, Celery inserts it into the database.
-        If the user has already subscribed to the channel, the permission class prevents them from performing this action. 
-        '''
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        channel = get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
+        self.check_object_permissions(self.request, channel)
+        return channel
 
-        ChannelSubscriber.objects.subscribe_in_cache(
-            channel_token=channel_token, user_token=request.user.token
+    def create(self, request, *args, **kwargs):
+        """
+        Create a new subscriber if does not exist
+        """
+        ChannelSubscriber.objects.create_in_cache(
+            channel=self.get_object(),
+            user=request.user
         )
         return Response('OK', status=status.HTTP_201_CREATED)
 
 
-    def delete(self, request, channel_token, *args, **kwargs):
-        '''
-        Removes the subscriber record from the cache and marks the user as unsubscribed from the channel.
-        Then, Celery deletes the subscriber from the database.
-        If the user hasn't subscribed to the channel yet, the permission class prevents them from performing this action.
-        '''
+@extend_schema_view(
+    delete=extend_schema(
+        description="Delete a subscriber from channel.",
+        responses={
+            204: 'Deleted',
+            401: 'Unauthorized',
+            403: 'User hasnt subscribed yet.',
+            404: 'Channel not found'
+        },
+        tags=['Subscribers']
+    ),
+)
+class SubscriberDeleteView(DestroyAPIView):
+    """
+    Delete a Channel Subscriber for a channel
+    """
+    permission_classes = [IsAuthenticated, CanUnSubscribePermission]
 
-        # Delete the subscriber
-        ChannelSubscriber.objects.unsubscribe_in_cache(
-            channel_token=channel_token, user_token=request.user.token
-        )  
-        
-        return Response('OK', status=status.HTTP_204_NO_CONTENT)
+    def get_object(self):
+        """
+        Returns the channel object from the given channel token.
+        """
+        channel = get_object_or_404(
+            Channel,
+            token=self.kwargs['channel_token']
+        )
+        self.check_object_permissions(self.request, channel)
+        return channel
+
+    def destroy(self, request, *args, **kwargs):
+        ChannelSubscriber.objects.delete_in_cache(
+            channel=self.get_object(),
+            user=request.user
+        )
+        return Response(
+            'ok',
+            status=status.HTTP_204_NO_CONTENT
+        )
 
 
 @extend_schema_view(
     get=extend_schema(
-        description="List of subscribers of a channel."
+        description="List of a channels subscribers.",
+        responses={
+            200: 'ok',
+            401: 'unauthorized'
+        }
     ),
 )
 class SubscriberListView(ListAPIView):
 
     serializer_class = SubscriberListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return get_object_or_404(Channel, token=self.kwargs['channel_token'])
 
     def get_queryset(self):
-
-        subscriber_keys = cache.keys(f'subscriber:{self.kwargs["channel_token"]}:*')
-
-        subscribers_in_database = list(ChannelSubscriber.objects.filter(channel__token=self.kwargs['channel_token']))
-
-        subscribers_in_cache = [
-            {
-                "user": key.split(":")[2],
-                "date": cache_value.get('date', None),
-                "source": cache_value['source']
-            }
-
-            for key in subscriber_keys
-            if (cache_value := cache.get(key)) and
-            # get those subscribers that are only in cache and they are marked as subscribed
-            cache_value['source'] == 'cache' and
-            cache_value.get('subscription_status') == 'subscribed'
-        ]
-
-        return subscribers_in_cache + subscribers_in_database
-    
+        return ChannelSubscriber.objects.get_list(
+            channel=self.get_object()
+    )

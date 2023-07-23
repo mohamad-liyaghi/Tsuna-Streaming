@@ -87,7 +87,7 @@ class TestAdminModel:
         '''Users must be at least 24 hours subscribed to channel in order to get promoted'''
 
         assert self.simple_user.channel_admins.count() == 0
-        ChannelSubscriber.objects.subscribe_in_cache(self.channel.token, self.simple_user.token)
+        ChannelSubscriber.objects.create_in_cache(channel=self.channel, user=self.simple_user)
 
         with pytest.raises(SubscriptionRequiredException):
             self.admin = ChannelAdmin.objects.create(user=self.simple_user, channel=self.channel, promoted_by=self.super_user)
