@@ -3,10 +3,15 @@ from django.core.cache import cache
 from django.conf import settings
 from typing import Union
 from datetime import datetime
+from decouple import config
 from channels.models import Channel
+from channel_subscribers.utils import SubscriberStatus, SubscriberSource
 
-CACHE_SUBSCRIBER_KEY = 'subscriber:{}:{}'
-CACHE_CHANNEL_SUBSCRIBERS_COUNT = 'channel_subscribers_count:{}'
+# COMMON CACHE KEYS
+CACHE_SUBSCRIBER_KEY = config('CACHE_CHANNEL_SUBSCRIBER')
+CACHE_SUBSCRIBERS_COUNT_KEY = config('CACHE_CHANNEL_SUBSCRIBERS_COUNT')
+CACHE_UNSUBSCRIBER_COUNT_KEY = config('CACHE_CHANNEL_UNSUBSCRIBER_COUNT')
+CACHE_DB_SUBSCRIBERS_COUNT_KEY = config('CACHE_CHANNEL_DB_SUBSCRIBERS_COUNT')
 
 
 class ChannelSubscriberManager(models.Manager):
@@ -18,7 +23,7 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
         """
 
-        key = CACHE_CHANNEL_SUBSCRIBERS_COUNT.format(channel.token)
+        key = CACHE_SUBSCRIBERS_COUNT_KEY.format(channel.token)
         # Get Check the cache to see if subscriber count is already cached
         cached_subscribers_count = cache.get(key)
 
@@ -56,14 +61,13 @@ class ChannelSubscriberManager(models.Manager):
         cache_subscribers = list(
             filter(
                 lambda subscriber: (
-                        subscriber.get('subscription_status') == 'subscribed'
+                        subscriber.get('subscription_status') == SubscriberStatus.SUBSCRIBED.value
                         and
-                        subscriber.get('source') == 'cache'
+                        subscriber.get('source') == SubscriberSource.CACHE.value
                 ),
                 cache_subscribers
             )
         )
-        print(cache_subscribers)
         return cache_subscribers + db_subscribers
 
     def get_from_cache(
@@ -89,7 +93,7 @@ class ChannelSubscriberManager(models.Manager):
         # If there is a subscriber in cache
         if subscriber_in_cache:
             # If the subscriber is subscribed, return True
-            if subscriber_in_cache.get('subscription_status') == 'subscribed':
+            if subscriber_in_cache.get('subscription_status') == SubscriberStatus.SUBSCRIBED.value:
                 return subscriber_in_cache
             # If the subscriber is unsubscribed, return None
             return
@@ -117,7 +121,7 @@ class ChannelSubscriberManager(models.Manager):
         return self.__set_cache(
             channel=channel,
             user=user,
-            subscription_status='subscribed',
+            subscription_status=SubscriberStatus.SUBSCRIBED.value,
         )
 
     def delete_in_cache(
@@ -136,7 +140,6 @@ class ChannelSubscriberManager(models.Manager):
 
         # Check if subscriber already exists in cache or db
         cached_subscriber = self.get_from_cache(channel, user)
-        print(cached_subscriber)
 
         # If not exist, raise error
         if not cached_subscriber:
@@ -144,12 +147,12 @@ class ChannelSubscriberManager(models.Manager):
 
         # If source is database, update its status to unsubscribed
         # So then celery task can delete it from db
-        if cached_subscriber.get('source') == 'database':
+        if cached_subscriber.get('source') == SubscriberSource.DATABASE.value:
             self.__set_cache(
                 channel=channel,
                 user=user,
-                subscription_status='unsubscribed',
-                source='database'
+                subscription_status=SubscriberStatus.UNSUBSCRIBED.value,
+                source=SubscriberSource.DATABASE.value
             )
             return
 
@@ -165,7 +168,7 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
         """
         # Check the cache if subscriber count is already cached
-        key = f"cache_subscriber_count_{channel.token}"
+        key =  CACHE_SUBSCRIBERS_COUNT_KEY.format(channel.token)
         cached_subscribers_count = cache.get(key)
 
         if cached_subscribers_count is None:
@@ -177,9 +180,9 @@ class ChannelSubscriberManager(models.Manager):
             # Filter out only subscribed which are in cache and not db
             subscriber_source_cache = filter(
                 lambda subscriber: (
-                        subscriber.get('subscription_status') == 'subscribed'
+                        subscriber.get('subscription_status') == SubscriberStatus.SUBSCRIBED.value
                         and
-                        subscriber.get('source') == 'cache'
+                        subscriber.get('source') == SubscriberSource.CACHE.value
                 ),
                 cached_subscribers
             )
@@ -199,7 +202,7 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
         """
         # Check the cache if subscriber count is already cached
-        key = f"db_subscriber_count_{channel.token}"
+        key = CACHE_DB_SUBSCRIBERS_COUNT_KEY.format(channel.token)
         cached_db_subscribers_count = cache.get(key)
 
         if not cached_db_subscribers_count:
@@ -221,7 +224,7 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
         """
         # Check the cache if subscriber count is already cached
-        key = f"cache_ubsubscribed_count_{channel.token}"
+        key = CACHE_UNSUBSCRIBER_COUNT_KEY.format(channel.token)
         cached_count = cache.get(key)
 
         if cached_count is None:
@@ -234,8 +237,8 @@ class ChannelSubscriberManager(models.Manager):
             # Filter only subscribers with subscription_status = unsubscribed
             filter_unsubscribed = filter(
                 lambda subscriber: (
-                        subscriber.get('source') == 'database' and
-                        subscriber.get('subscription_status') == 'unsubscribed'
+                        subscriber.get('source') == SubscriberSource.DATABASE.value and
+                        subscriber.get('subscription_status') == SubscriberStatus.UNSUBSCRIBED.value
                 ),
                 cached_subscribers
             )
@@ -296,8 +299,8 @@ class ChannelSubscriberManager(models.Manager):
                 return self.__set_cache(
                     channel=channel,
                     user=user,
-                    subscription_status='subscribed',
-                    source='database'
+                    subscription_status=SubscriberStatus.SUBSCRIBED.value,
+                    source=SubscriberSource.DATABASE.value
                 )
 
             # Return none if subscriber does not exist in db
@@ -309,8 +312,8 @@ class ChannelSubscriberManager(models.Manager):
             self,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
-            subscription_status: str = 'subscribed',
-            source: str = 'cache',
+            subscription_status: str = SubscriberStatus.SUBSCRIBED.value,
+            source: str = SubscriberSource.CACHE.value,
             date: datetime =datetime.now()
     ) -> dict:
         """
