@@ -151,5 +151,6 @@ class SubscriberListView(ListAPIView):
         return get_object_or_404(Channel, token=self.kwargs['channel_token'])
 
     def get_queryset(self):
-        return ChannelSubscriber.objects.get_list(channel=self.get_object())
-    
+        return ChannelSubscriber.objects.get_list(
+            channel=self.get_object()
+    )
