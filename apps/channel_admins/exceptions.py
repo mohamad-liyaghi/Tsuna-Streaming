@@ -1,9 +1,7 @@
-class DuplicatePromotionException(Exception):
-    '''Raise this exception when an admin is getting promoted twice.'''
-    pass
-
-
 class SubscriptionRequiredException(Exception):
-    '''Raise this exception when promoting a user that hasnt subscribed the channel.'''
+    """
+    Exception raised when user has not subscribed to the channel.
+    Or user has not subscribed to the channel for a at least a day.
+    """
     pass
 

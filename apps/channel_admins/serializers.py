@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from channel_admins.models import ChannelAdmin , ChannelAdminPermission
 from django.core.exceptions import PermissionDenied
-from channel_admins.exceptions import DuplicatePromotionException, SubscriptionRequiredException
+from channel_admins.exceptions import SubscriptionRequiredException
 
 
 class AdminListSerializer(serializers.ModelSerializer):
@@ -33,8 +33,6 @@ class AdminCreateSerializer(serializers.ModelSerializer):
         try:
             return super().save(**kwargs)
 
-        except DuplicatePromotionException:
-            raise serializers.ValidationError("Admin already exists.")
 
         except SubscriptionRequiredException as e:
             raise serializers.ValidationError(str(e))
