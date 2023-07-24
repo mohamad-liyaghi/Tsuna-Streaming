@@ -8,42 +8,35 @@ class ChannelAdminPermission(AbstractToken):
     Represents Permissions of a channel admin.
     """
 
-    admin = models.ForeignKey(
+    admin = models.OneToOneField(
         ChannelAdmin,
         on_delete=models.CASCADE,
         related_name='permissions'
     )
 
     # Permissions
-    add_object = models.BooleanField(default=False)
-    edit_object = models.BooleanField(default=False)
-    delete_object = models.BooleanField(default=False)
-    publish_object = models.BooleanField(default=False)
-
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["admin", "model"],
-                name="unique_admin_permission"
-            )
-        ]
+    can_add_object = models.BooleanField(default=False)
+    can_edit_object = models.BooleanField(default=False)
+    can_delete_object = models.BooleanField(default=False)
+    can_publish_object = models.BooleanField(default=False)
+    can_change_channel_info = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return str(self.admin.user)
 
     PERMISSION_FIELDS = [
-        'add_object',
-        'edit_object',
-        'delete_object',
-        'publish_object'
+        'can_add_object',
+        'can_edit_object',
+        'can_delete_object',
+        'can_publish_object',
+        'can_change_channel_info',
     ]
 
     def save(self, *args, **kwargs):
         if not self.pk:
             # Set owner permission to True
             ChannelAdminPermission.set_owner_permission(
-                admin=self.admin
+                admin=self
             )
         return super().save(*args, **kwargs)
 
@@ -52,6 +45,6 @@ class ChannelAdminPermission(AbstractToken):
         """
         If user is channel owner, set all permissions to True
         """
-        if admin.channel.owner == admin.user:
+        if admin.admin.channel.owner == admin.admin.user:
             for field in cls.PERMISSION_FIELDS:
                 setattr(admin, field, True)

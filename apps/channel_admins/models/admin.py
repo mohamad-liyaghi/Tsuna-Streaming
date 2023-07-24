@@ -50,10 +50,10 @@ class ChannelAdmin(AbstractToken):
         if not self.pk:
 
             # Check user subscription status
-            ChannelAdmin.check_promoter_status(channel=self.channel, user=self.user)
+            ChannelAdmin.check_subscription(channel=self.channel, user=self.user)
 
             # Check if user can be promoted
-            ChannelAdmin.check_promotion_permission(
+            ChannelAdmin.check_promoter_status(
                 channel=self.channel, user=self.user, promoter=self.promoted_by
             )
 
@@ -81,11 +81,11 @@ class ChannelAdmin(AbstractToken):
             )
 
     @classmethod
-    def check_promoter_status(cls, channel, user, promoter=None) -> None:
+    def check_promoter_status(cls, channel, user, promoter) -> None:
         """
         Check if promoter is the channel owner
         """
-        if user == promoter:
+        if user == channel.owner:
             return
 
         if not promoter == channel.owner:

@@ -59,10 +59,6 @@ class Migration(migrations.Migration):
             name='Permission',
         ),
         migrations.AddConstraint(
-            model_name='channeladminpermission',
-            constraint=models.UniqueConstraint(fields=('admin', 'model'), name='unique_admin_permission'),
-        ),
-        migrations.AddConstraint(
             model_name='channeladmin',
             constraint=models.UniqueConstraint(fields=('channel', 'user'), name='unique_channel_admin'),
         ),

@@ -1,7 +1,6 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 
-from channels.models import Channel
 from channel_admins.models import ChannelAdmin, ChannelAdminPermission
 from channel_subscribers.models import ChannelSubscriber
 from apps.core.tasks import send_email
@@ -26,7 +25,6 @@ def send_admin_promotion_email(sender, created, instance, **kwargs):
             }
         )
 
-@receiver(post_save, sender=Channel)
 def create_admin_after_creating_channel(sender, created, instance, **kwargs):
     """
     Create admin after creating channel.
