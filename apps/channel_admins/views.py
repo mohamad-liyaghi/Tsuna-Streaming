@@ -4,7 +4,6 @@ from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     RetrieveUpdateAPIView
 )
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
@@ -16,14 +15,9 @@ from channel_admins.serializers import (
     AdminListSerializer,
     AdminCreateSerializer,
     AdminDetailSerializer,
-    AdminPermissionDetailSerializer
 )
 from channel_admins.mixins import ChannelMixin
-from channel_admins.permissions import (
-    IsChannelOwner,
-    AdminDetailPermission,
-    AdminPermissionUpdate,
-)
+from channel_admins.permissions import IsChannelOwner
 from core.permissions import IsChannelAdmin
 
 
@@ -123,27 +117,3 @@ class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
             )
         admin.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@extend_schema_view(
-    get=extend_schema(
-        description="Admin permission detail page."
-    ),
-    put=extend_schema(
-        description="Update an admins permissions."
-    ),
-    patch=extend_schema(
-        description="Update an admins permissions."
-    ),
-)
-class AdminPermissionDetail(ChannelMixin, RetrieveUpdateAPIView):
-    '''A page for controling admins permissions.'''
-
-    serializer_class = AdminPermissionDetailSerializer
-    permission_classes = [IsAuthenticated, AdminPermissionUpdate]
-
-    def get_object(self):
-        admin = get_object_or_404(ChannelAdmin, token=self.kwargs['admin_token'], channel=self.channel)
-        return get_object_or_404(ChannelAdminPermission.objects.select_related('admin'), admin=admin,
-                                 token=self.kwargs['permission_token'])
-

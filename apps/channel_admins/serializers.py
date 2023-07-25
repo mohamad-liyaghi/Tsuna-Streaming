@@ -91,13 +91,3 @@ class AdminDetailSerializer(serializers.ModelSerializer):
             )
         permissions.save()
         return instance
-
-
-class AdminPermissionDetailSerializer(serializers.ModelSerializer):
-    '''Detail/Update page of an admins permissions.'''
-
-    admin = serializers.StringRelatedField()
-
-    class Meta:
-        model = ChannelAdminPermission
-        fields = ['admin', 'add_object', 'edit_object', 'delete_object', 'publish_object']
