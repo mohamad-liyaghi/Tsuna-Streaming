@@ -1,6 +1,13 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateAPIView
+)
+
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
@@ -65,13 +72,13 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description="Detail page of an admin."
+        description="Retriev an admins permissions."
     ),
     put=extend_schema(
-        description="Update an admins general permissions."
+        description="Update an admins permissions."
     ),
     patch=extend_schema(
-        description="Update an admins general permissions."
+        description="Update an admins permissions."
     ),
     delete=extend_schema(
         description="Delete an admin."
@@ -79,17 +86,43 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
 )
 class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = AdminDetailSerializer
-    permission_classes = [IsAuthenticated, AdminDetailPermission]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            # All admins can retrieve the admin
+            return [IsAuthenticated(), IsChannelAdmin()]
+        # But only owner can update/delete them
+        return [IsAuthenticated(), IsChannelAdmin(), IsChannelOwner()]
 
     def get_object(self):
         return get_object_or_404(
-            self.channel.admins.prefetch_related('permissions').all(),
+            ChannelAdmin.objects.prefetch_related('permissions'),
+            channel__token=self.channel.token,
             token=self.kwargs['admin_token']
         )
 
     def get_serializer_context(self):
-        '''Send context to serializer for creating admin'''
-        return {'request_user': self.request.user, 'channel': self.channel}
+        """
+        Return user and channel to backend
+        """
+        return {
+            'request_user': self.request.user,
+            'channel': self.channel
+        }
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete an admin
+        Also ensure that user is not deleting himself
+        """
+        admin = self.get_object()
+        if request.user == admin.user:
+            return Response(
+                {'detail': 'You cannot delete yourself.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        admin.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_schema_view(

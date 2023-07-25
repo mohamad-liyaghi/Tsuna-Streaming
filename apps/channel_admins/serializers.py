@@ -39,20 +39,26 @@ class AdminCreateSerializer(serializers.ModelSerializer):
 
 
 class PermissionListSerializer(serializers.ModelSerializer):
-    '''Permission list in admin detail page'''
+    """
+    List of all permissions of an admin
+    """
 
     class Meta:
         model = ChannelAdminPermission
         fields = [
-            'get_model_name',
-            'token',
+            'can_add_object',
+            'can_edit_object',
+            'can_delete_object',
+            'can_publish_object',
+            'can_change_channel_info',
         ]
 
 
 class AdminDetailSerializer(serializers.ModelSerializer):
-    '''Admin detail page serializer'''
-    # list of user permission tokens
-    permissions = PermissionListSerializer(many=True, read_only=True)
+    """
+    Retrieve an admin alongside its permissions
+    """
+    permissions = PermissionListSerializer()
 
     user = serializers.StringRelatedField()
     promoted_by = serializers.StringRelatedField()
@@ -63,11 +69,28 @@ class AdminDetailSerializer(serializers.ModelSerializer):
             'user',
             'promoted_by',
             'date',
-            'change_channel_info',
-            'add_new_admin',
-            'block_user',
             'permissions',
         ]
+        read_only_fields = [
+            'user',
+            'promoted_by',
+            'date',
+        ]
+
+    def update(self, instance, validated_data):
+        """
+        Update the permissions of an admin.
+        """
+        permissions_data = validated_data.pop('permissions')
+        permissions = instance.permissions
+
+        # Update permissions
+        for permission in permissions_data:
+            setattr(
+                permissions, permission, permissions_data[permission]
+            )
+        permissions.save()
+        return instance
 
 
 class AdminPermissionDetailSerializer(serializers.ModelSerializer):
