@@ -1,48 +1,46 @@
 from rest_framework import serializers
-from channel_admins.models import ChannelAdmin , ChannelAdminPermission
-from django.core.exceptions import PermissionDenied
-from channel_admins.exceptions import SubscriptionRequiredException
+from channel_admins.models import ChannelAdmin, ChannelAdminPermission
+from accounts.models import Account
 
 
 class AdminListSerializer(serializers.ModelSerializer):
-    '''List of a channels admins'''
+    """
+    List of admins in a channel.
+    """
     user = serializers.StringRelatedField()
     promoted_by = serializers.StringRelatedField()
-    
+
     class Meta:
-        model = ChannelAdmin 
+        model = ChannelAdmin
         fields = ['user', 'promoted_by', 'channel', 'token']
 
 
 class AdminCreateSerializer(serializers.ModelSerializer):
-    '''Create an admin serializer'''
+    """
+    Create a new admin.
+    """
+    user = serializers.SlugRelatedField(
+        slug_field='token',
+        queryset=Account.objects.all()
+    )
 
     class Meta:
-        model = ChannelAdmin 
-        fields = ['user', 'change_channel_info', 'add_new_admin', 'block_user']
-
+        model = ChannelAdmin
+        fields = ['user']
 
     def save(self, **kwargs):
-        kwargs['promoted_by'] = self.context['request_user']
-        kwargs['channel'] = self.context['channel']
-
-        # only admins with add_new_admin permission can add admins.
-        if not kwargs['promoted_by'].channel_admins.filter(channel=kwargs['channel'], add_new_admin=True).exists():
-            raise serializers.ValidationError("You dont have permission to promote admin.")
+        kwargs.setdefault('promoted_by', self.context['request_user'])
+        kwargs.setdefault('channel', self.context['channel'])
 
         try:
             return super().save(**kwargs)
-
-
-        except SubscriptionRequiredException as e:
+        except Exception as e:
             raise serializers.ValidationError(str(e))
-        
-        except PermissionDenied as error:
-            raise serializers.ValidationError(str(error))
 
 
 class PermissionListSerializer(serializers.ModelSerializer):
     '''Permission list in admin detail page'''
+
     class Meta:
         model = ChannelAdminPermission
         fields = [
@@ -60,7 +58,7 @@ class AdminDetailSerializer(serializers.ModelSerializer):
     promoted_by = serializers.StringRelatedField()
 
     class Meta:
-        model = ChannelAdmin  
+        model = ChannelAdmin
         fields = [
             'user',
             'promoted_by',
@@ -74,7 +72,7 @@ class AdminDetailSerializer(serializers.ModelSerializer):
 
 class AdminPermissionDetailSerializer(serializers.ModelSerializer):
     '''Detail/Update page of an admins permissions.'''
-    
+
     admin = serializers.StringRelatedField()
 
     class Meta:

@@ -5,10 +5,14 @@ from .views import (
     AdminPermissionDetail,
 )
 
-app_name = 'admins'
+app_name = 'channel_admins'
 
 urlpatterns = [
-    path('<str:channel_token>/', AdminListCreateView.as_view(), name='admin_list_create'),
+    path(
+        '<str:channel_token>/',
+        AdminListCreateView.as_view(),
+        name='admin_list_create'
+    ),
     path('<str:channel_token>/<str:admin_token>/', AdminDetailView.as_view(), name='admin_detail'),
     path(
             '<str:channel_token>/<str:admin_token>/<str:permission_token>',

@@ -11,38 +11,55 @@ from channel_admins.serializers import (
     AdminDetailSerializer,
     AdminPermissionDetailSerializer
 )
-from channel_admins.mixins import AdminPermissionMixin
-from channel_admins.permissions import AdminDetailPermission, AdminPermissionUpdate
+from channel_admins.mixins import ChannelMixin
+from channel_admins.permissions import (
+    IsChannelOwner,
+    AdminDetailPermission,
+    AdminPermissionUpdate,
+)
+from core.permissions import IsChannelAdmin
 
 
 @extend_schema_view(
     get=extend_schema(
-        description="List of a channels admins."
+        description="List of a channels admins [Available for admins]."
     ),
     post=extend_schema(
-        description="Promote a user to admin."
+        description="Promote a user to admin [Only by owner]."
     ),
 )
-class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
-    '''List and Create an Admin for chanenl'''
+class AdminListCreateView(ChannelMixin, ListCreateAPIView):
+    """
+    List of admins and create a new one.
+    Create a New Admin
+    Methods: POST, GET
+    """
+    lookup_url_kwarg = 'channel_token'
 
-    permission_classes = [IsAuthenticated,]
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated(), IsChannelAdmin()]
+        return [IsAuthenticated(), IsChannelAdmin(), IsChannelOwner()]
 
     def get_serializer_context(self):
-        '''Send context to serializer for creating admin'''
-        return {'request_user' : self.request.user, 'channel' : self.channel}
+        """
+        Pass user/channel to serializer.
+        """
+        return {
+            'request_user': self.request.user,
+            'channel': self.channel
+        }
 
     def get_queryset(self):
-        # return admins of a channel.
-        return ChannelAdmin.objects.filter(channel=self.channel)
-
+        channel = self.channel
+        return channel.admins.all()
 
     def get_serializer_class(self):
-        '''Return appropriate serializer for each view'''
-        
+        """
+        Choose the serializer class based on request method.
+        """
         if self.request.method == "GET":
             return AdminListSerializer
-
         return AdminCreateSerializer
 
 
@@ -60,21 +77,19 @@ class AdminListCreateView(AdminPermissionMixin, ListCreateAPIView):
         description="Delete an admin."
     ),
 )
-class AdminDetailView(AdminPermissionMixin, RetrieveUpdateDestroyAPIView):
-
+class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
     serializer_class = AdminDetailSerializer
     permission_classes = [IsAuthenticated, AdminDetailPermission]
 
     def get_object(self):
         return get_object_or_404(
-                    self.channel.admins.prefetch_related('permissions').all(),
-                    token=self.kwargs['admin_token']
-            )
+            self.channel.admins.prefetch_related('permissions').all(),
+            token=self.kwargs['admin_token']
+        )
 
     def get_serializer_context(self):
         '''Send context to serializer for creating admin'''
-        return {'request_user' : self.request.user, 'channel' : self.channel}
-    
+        return {'request_user': self.request.user, 'channel': self.channel}
 
 
 @extend_schema_view(
@@ -88,7 +103,7 @@ class AdminDetailView(AdminPermissionMixin, RetrieveUpdateDestroyAPIView):
         description="Update an admins permissions."
     ),
 )
-class AdminPermissionDetail(AdminPermissionMixin, RetrieveUpdateAPIView):
+class AdminPermissionDetail(ChannelMixin, RetrieveUpdateAPIView):
     '''A page for controling admins permissions.'''
 
     serializer_class = AdminPermissionDetailSerializer
@@ -96,6 +111,6 @@ class AdminPermissionDetail(AdminPermissionMixin, RetrieveUpdateAPIView):
 
     def get_object(self):
         admin = get_object_or_404(ChannelAdmin, token=self.kwargs['admin_token'], channel=self.channel)
-        return get_object_or_404(ChannelAdminPermission.objects.select_related('admin'), admin=admin, token=self.kwargs['permission_token'])
-    
-    
+        return get_object_or_404(ChannelAdminPermission.objects.select_related('admin'), admin=admin,
+                                 token=self.kwargs['permission_token'])
+
