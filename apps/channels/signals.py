@@ -5,9 +5,9 @@ from channels.models import Channel
 from channel_subscribers.signals import create_subscriber_after_creating_channel
 from channel_admins.signals import create_admin_after_creating_channel
 
-# Create subscribers and admins after creating channel
-post_save.connect(create_admin_after_creating_channel, sender=Channel)
 
+post_save.connect(create_subscriber_after_creating_channel, sender=Channel)
+post_save.connect(create_admin_after_creating_channel, sender=Channel)
 
 @receiver(post_save, sender=Channel)
 def notify_channel_creation(sender, instance, created, **kwargs):

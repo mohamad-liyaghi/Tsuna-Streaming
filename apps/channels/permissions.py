@@ -18,9 +18,11 @@ class IsChannelStaff(BasePermission):
 
         # check permission for updating channel
         elif request.method in ["PUT", "PATCH"]:
-            # TODO: update this with build in permission
-            return (
-                request.user.channel_admins.filter(channel=obj, change_channel_info=True).exists()
-            )
+
+            # Get the admin object
+            channel_admin = request.user.channel_admins.filter(channel=obj).first()
+            # Check if admin has permission to change channel info
+            return channel_admin and channel_admin.permissions.can_change_channel_info
+
         # If request is GET
         return True

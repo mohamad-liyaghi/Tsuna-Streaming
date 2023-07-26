@@ -1,39 +1,50 @@
 from django.db import models
-from django.contrib.contenttypes.models import ContentType
 from channel_admins.models import ChannelAdmin
 from core.models import AbstractToken
 
 
 class ChannelAdminPermission(AbstractToken):
-    '''
-        Admin permission model.
-        After creating admin object, an instance of this model will be created for content models via signals.
-        E.g: Permission set wether or not an object can be deleted.
-    '''
+    """
+    Represents Permissions of a channel admin.
+    """
 
-    admin = models.ForeignKey(ChannelAdmin, on_delete=models.CASCADE, related_name='permissions')
-    model = models.ForeignKey(ContentType, on_delete=models.CASCADE, related_name='permissions')
+    admin = models.OneToOneField(
+        ChannelAdmin,
+        on_delete=models.CASCADE,
+        related_name='permissions'
+    )
 
-
-    add_object = models.BooleanField(default=False)
-    edit_object = models.BooleanField(default=False)
-    delete_object = models.BooleanField(default=False)
-    publish_object = models.BooleanField(default=False)
-
-    delete_object_comment = models.BooleanField(default=False)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["admin", "model"],
-                name="unique_admin_permission"
-            )
-        ]
+    # Permissions
+    can_add_object = models.BooleanField(default=False)
+    can_edit_object = models.BooleanField(default=False)
+    can_delete_object = models.BooleanField(default=False)
+    can_publish_object = models.BooleanField(default=False)
+    can_change_channel_info = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return str(self.admin.user)
 
-    def get_model_name(self):
-        '''A method that returns models name for viewing in serializer'''
-        return self.model.model
-    
+    PERMISSION_FIELDS = [
+        'can_add_object',
+        'can_edit_object',
+        'can_delete_object',
+        'can_publish_object',
+        'can_change_channel_info',
+    ]
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # Set owner permission to True
+            ChannelAdminPermission.set_owner_permission(
+                admin=self
+            )
+        return super().save(*args, **kwargs)
+
+    @classmethod
+    def set_owner_permission(cls, admin) -> None:
+        """
+        If user is channel owner, set all permissions to True
+        """
+        if admin.admin.channel.owner == admin.admin.user:
+            for field in cls.PERMISSION_FIELDS:
+                setattr(admin, field, True)
