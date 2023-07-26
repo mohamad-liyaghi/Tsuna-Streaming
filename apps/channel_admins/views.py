@@ -23,10 +23,23 @@ from core.permissions import IsChannelAdmin
 
 @extend_schema_view(
     get=extend_schema(
-        description="List of a channels admins [Available for admins]."
+        description="List of a channels admins [Available for admins].",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'Forbidden'
+        },
+        tags=['Channel Admins']
     ),
     post=extend_schema(
-        description="Promote a user to admin [Only by owner]."
+        description="Promote a user to admin [Only by owner].",
+        responses={
+            201: 'Created',
+            400: 'Bad Request',
+            401: 'Unauthorized',
+            403: 'Forbidden'
+        },
+        tags=['Channel Admins']
     ),
 )
 class AdminListCreateView(ChannelMixin, ListCreateAPIView):
@@ -66,16 +79,46 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
 
 @extend_schema_view(
     get=extend_schema(
-        description="Retriev an admins permissions."
+        description="Retrieve an admins permissions.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found'
+        },
+        tags=['Channel Admins']
     ),
     put=extend_schema(
-        description="Update an admins permissions."
+        description="Update an admins permissions.",
+        responses={
+            200: 'ok',
+            400: 'Bad Request',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found'
+        },
+        tags=['Channel Admins']
     ),
     patch=extend_schema(
-        description="Update an admins permissions."
+        description="Update an admins permissions.",
+        responses={
+            200: 'ok',
+            400: 'Bad Request',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found'
+        },
+        tags=['Channel Admins']
     ),
     delete=extend_schema(
-        description="Delete an admin."
+        description="Delete an admin.",
+        responses={
+            204: 'No Content',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not Found'
+        },
+        tags=['Channel Admins']
     ),
 )
 class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
