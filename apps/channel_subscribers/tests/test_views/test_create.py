@@ -1,6 +1,8 @@
 from django.urls import reverse
 from rest_framework import status
 import pytest
+from channels.models import Channel
+from accounts.models import Account
 
 
 @pytest.mark.django_db
@@ -39,11 +41,15 @@ class TestSubscriberCrateView:
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_subscribe_twice_first_in_cache(self, create_cached_subscriber, api_client):
-        api_client.force_authenticate(user=create_cached_subscriber['user'])
+        api_client.force_authenticate(user=Account.objects.get(id=create_cached_subscriber['user']))
         response = api_client.post(
             reverse(
                 self.url_name,
-                kwargs={'channel_token': create_cached_subscriber['channel'].token}
+                kwargs={
+                    'channel_token': Channel.objects.get(
+                        id=create_cached_subscriber['channel']
+                    ).token
+                }
             ),
             {}
         )

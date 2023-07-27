@@ -2,6 +2,8 @@ from django.urls import reverse
 from rest_framework import status
 import pytest
 from channel_subscribers.models import ChannelSubscriber
+from channels.models import Channel
+from accounts.models import Account
 
 
 @pytest.mark.django_db
@@ -50,11 +52,14 @@ class TestSubscriberView:
         assert response.data is True
 
     def test_subscriber_in_cache(self, create_cached_subscriber, api_client):
-        api_client.force_authenticate(user=create_cached_subscriber['user'])
+        user = Account.objects.get(id=create_cached_subscriber['user'])
+        channel = Channel.objects.get(id=create_cached_subscriber['channel'])
+
+        api_client.force_authenticate(user=user)
         response = api_client.get(
             reverse(
                 self.url_name, kwargs={
-                    'channel_token': create_cached_subscriber['channel'].token
+                    'channel_token': channel.token
                 }
             )
         )
@@ -81,14 +86,16 @@ class TestSubscriberView:
             create_cached_subscriber,
             api_client
     ):
-        api_client.force_authenticate(create_cached_subscriber['user'])
+        account = Account.objects.get(id=create_cached_subscriber['user'])
+        channel = Channel.objects.get(id=create_cached_subscriber['channel'])
+        api_client.force_authenticate(account)
         ChannelSubscriber.objects.delete_in_cache(
-            user=create_cached_subscriber['user'],
-            channel=create_cached_subscriber['channel']
+            user=account,
+            channel=channel
         )
         response = api_client.get(
             reverse(
-                self.url_name, kwargs={'channel_token': create_cached_subscriber['channel'].token}
+                self.url_name, kwargs={'channel_token': channel.token}
             )
         )
         assert response.status_code == status.HTTP_200_OK

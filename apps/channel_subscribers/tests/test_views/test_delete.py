@@ -2,6 +2,8 @@ from django.urls import reverse
 from rest_framework import status
 import pytest
 from channel_subscribers.models import ChannelSubscriber
+from channels.models import Channel
+from accounts.models import Account
 
 
 @pytest.mark.django_db
@@ -46,20 +48,22 @@ class TestSubscriberDeleteView:
             ),
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert ChannelSubscriber.objects.get_from_cache(
+        assert not ChannelSubscriber.objects.get_from_cache(
             channel=create_subscriber.channel, user=create_subscriber.user
-        )['subscription_status'] == 'unsubscribed'
+        )
 
     def test_delete_from_cache(self, create_cached_subscriber, api_client):
-        api_client.force_authenticate(create_cached_subscriber['user'])
+        user = Account.objects.get(id=create_cached_subscriber['user'])
+        channel = Channel.objects.get(id=create_cached_subscriber['channel'])
+        api_client.force_authenticate(user)
         response = api_client.delete(
             reverse(
                 self.url_name,
-                kwargs={'channel_token': create_cached_subscriber['channel'].token}
+                kwargs={'channel_token': channel.token}
             ),
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ChannelSubscriber.objects.get_from_cache(
-            channel=create_cached_subscriber['channel'],
-            user=create_cached_subscriber['user']
+            channel=channel,
+            user=user
         )
