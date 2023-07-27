@@ -1,19 +1,17 @@
 from django.db import models
 from django.conf import settings
 from typing import Union
-from decouple import config
 from channels.models import Channel
 from core.utils import ObjectSource
 from channel_subscribers.services import ChannelSubscriberService
-from channel_subscribers.utils import SubscriberStatus
-
-# COMMON CACHE KEYS
-CACHE_SUBSCRIBER_KEY = config('CACHE_CHANNEL_SUBSCRIBER')
-CACHE_UNSUBSCRIBER_COUNT_KEY = config('CACHE_CHANNEL_UNSUBSCRIBER_COUNT')
-CACHE_DB_SUBSCRIBERS_COUNT_KEY = config('CACHE_CHANNEL_DB_SUBSCRIBERS_COUNT')
+from channel_subscribers.constants import CACHE_SUBSCRIBER_KEY
 
 
 class ChannelSubscriberManager(models.Manager):
+    """
+    A manager for subscriber model which uses Subscriber Service for
+    CRUD operations in cache
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -29,18 +27,14 @@ class ChannelSubscriberManager(models.Manager):
         args:
             channel: Channel
         """
-
-        key = CACHE_SUBSCRIBER_KEY.format(channel.token, "*")
-        return len(self.service.get_list(key=key, channel=channel))
+        return len(self.service.get_list(key=CACHE_SUBSCRIBER_KEY, channel=channel))
 
     def get_list(self, channel: Channel) -> dict:
         """
         Get list of subscribers from cache and db.
         """
-        subscriber_key = CACHE_SUBSCRIBER_KEY.format(channel.token, '*')
-
         return self.service.get_list(
-            key=subscriber_key,
+            key=CACHE_SUBSCRIBER_KEY,
             channel=channel
         )
 
@@ -55,9 +49,8 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        key = CACHE_SUBSCRIBER_KEY.format(channel.token, user.token)
         return self.service.get_from_cache(
-            key=key,
+            key=CACHE_SUBSCRIBER_KEY,
             channel=channel,
             user=user
         )
@@ -73,13 +66,10 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        key = CACHE_SUBSCRIBER_KEY.format(channel.token, user.token)
-
         return self.service.create_cache(
-            key=key,
+            key=CACHE_SUBSCRIBER_KEY,
             channel=channel,
             user=user,
-            subscription_status=SubscriberStatus.SUBSCRIBED.value,
             source=ObjectSource.CACHE.value
         )
 
@@ -96,9 +86,8 @@ class ChannelSubscriberManager(models.Manager):
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        key = CACHE_SUBSCRIBER_KEY.format(channel.token, user.token)
         return self.service.delete_cache(
-            key=key,
+            key=CACHE_SUBSCRIBER_KEY,
             channel=channel,
             user=user,
         )

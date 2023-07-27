@@ -29,6 +29,7 @@ class CacheService:
             key: str
             channel: Channel
         """
+        key = key.format(channel.token, "*")
         cached_result = cache.get(key)
 
         if cached_result is None:
@@ -63,6 +64,7 @@ class CacheService:
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
+        key = key.format(channel.token, user.token)
         # First search in db for the object
         search_in_db = self.__search_in_db(
             key=f"db_{key}", channel=channel, user=user
@@ -95,6 +97,7 @@ class CacheService:
             user: settings.AUTH_USER_MODEL
             **data: dict - Extra data
         """
+        key = key.format(channel.token, user.token)
 
         # First check if object exists in cache or db
         # If exists, return None
@@ -122,6 +125,7 @@ class CacheService:
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
+        key = key.format(channel.token, user.token)
         # First check if object exists in cache or db
         get_cache = self.get_from_cache(key=key, channel=channel, user=user)
         # If not exists, Raise exception
