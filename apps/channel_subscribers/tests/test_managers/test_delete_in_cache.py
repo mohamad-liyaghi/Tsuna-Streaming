@@ -22,20 +22,19 @@ class TestDeleteInCache:
                 channel=create_channel
             )
 
-    # TODO: Fix this
-    # def test_delete_subscriber_in_db(self, create_subscriber):
-    #     assert ChannelSubscriber.objects.get_from_cache(
-    #         channel=create_subscriber.channel,
-    #         user=create_subscriber.user
-    #     )
-    #     ChannelSubscriber.objects.delete_in_cache(
-    #         channel=create_subscriber.channel,
-    #         user=create_subscriber.user
-    #     )
-    #     assert not ChannelSubscriber.objects.get_from_cache(
-    #         channel=create_subscriber.channel,
-    #         user=create_subscriber.user
-    #     )
-    #     assert ChannelSubscriber.objects.get_count(
-    #         create_subscriber.channel
-    #     ) == 1
+    def test_delete_subscriber_in_db(self, create_subscriber):
+        assert ChannelSubscriber.objects.get_from_cache(
+            channel=create_subscriber.channel,
+            user=create_subscriber.user
+        )
+        ChannelSubscriber.objects.delete_in_cache(
+            channel=create_subscriber.channel,
+            user=create_subscriber.user
+        )
+        assert not ChannelSubscriber.objects.get_from_cache(
+            channel=create_subscriber.channel,
+            user=create_subscriber.user
+        )
+        assert ChannelSubscriber.objects.get_count(
+            create_subscriber.channel
+        ) == 1

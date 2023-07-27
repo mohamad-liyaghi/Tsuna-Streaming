@@ -20,6 +20,7 @@ class CacheService:
             key: str,
             channel: Channel,
     ) -> Union[list, int]:
+        # TODO: Clean code and add cache
         """
         Return List of objects from cache and db
         Args:
@@ -31,10 +32,10 @@ class CacheService:
             cache.get(object_key) for object_key in cache.keys(key)
         ]
 
-        # objects with source of cache
+        # Filter cache objects with source of cache and not pending delete
         cache_objects = list(
             filter(
-                lambda obj: obj.get('source') == ObjectSource.CACHE.value and not obj.get('pending_delete'),
+                lambda obj: obj.get('source') == ObjectSource.CACHE.value,
                 objects_in_cache
             )
         )
@@ -45,8 +46,21 @@ class CacheService:
                 'user', 'channel', 'date'
             )
         )
-        # return cached_objects + db_objects
-        return cache_objects + db_objects
+
+        # Combine cache and db objects
+        combined_objects = cache_objects + db_objects
+
+        # Remove duplicate users and check pending delete
+        unique_objects = []
+        seen_users = set()
+        for obj in combined_objects:
+            user = obj.get('user')
+            if user not in seen_users:
+                if obj.get('pending_delete') is not True:
+                    unique_objects.append(obj)
+                seen_users.add(user)
+        # Return the unique objects
+        return unique_objects
 
     def get_from_cache(
             self, *,
