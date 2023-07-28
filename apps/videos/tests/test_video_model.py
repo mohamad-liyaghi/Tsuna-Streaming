@@ -4,7 +4,7 @@ from core.utils import get_content_type_model
 from accounts.models import Account
 from channels.models import Channel
 from videos.models import Video
-from votes.models import Vote
+from votes.models import Vote, VoteChoice
 from comments.models import Comment
 from viewers.models import Viewer
 from core.models import ContentVisibility
@@ -81,7 +81,7 @@ class TestVideoModel:
         self.create_video()
         assert self.video.votes.count() == 0
 
-        Vote.objects.create(user=self.user, choice=Vote.Choice.UPVOTE, content_object=self.video)
+        Vote.objects.create(user=self.user, choice=VoteChoice.UPVOTE, content_object=self.video)
         assert self.video.votes.count() == 1
 
         self.video.delete()

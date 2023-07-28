@@ -4,7 +4,7 @@ import pytest
 from accounts.models import Account
 from channels.models import Channel
 from musics.models import Music
-from votes.models import Vote
+from votes.models import Vote, VoteChoice
 from comments.models import Comment
 from viewers.models import Viewer
 from core.utils import get_content_type_model
@@ -66,7 +66,7 @@ class TestMusicModel:
         self.create_music()
         assert self.music.votes.count() == 0
 
-        Vote.objects.create(user=self.user, choice=Vote.Choice.UPVOTE, content_object=self.music)
+        Vote.objects.create(user=self.user, choice=VoteChoice.UPVOTE, content_object=self.music)
         assert self.music.votes.count() == 1
 
         self.music.delete()
