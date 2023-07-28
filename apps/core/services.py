@@ -22,6 +22,7 @@ class CacheService:
             self, *,
             key: str,
             channel: Channel,
+            **kwargs
     ) -> Union[list, int]:
         """
         Return List of objects from cache and db
@@ -29,16 +30,12 @@ class CacheService:
             key: str
             channel: Channel
         """
-        key = key.format(channel.token, "*")
+        key = key.format(channel_token=channel.token, **kwargs, user_token="*")
         cached_result = cache.get(key)
 
         if cached_result is None:
-            cache_objects = self.__get_all_from_cache(
-                key=f"cached_{key}",
-                object_key=key,
-                channel=channel
-            )
-            db_objects = self.__get_all_from_db(key=f"db_{key}", channel=channel)
+            cache_objects = self.__get_all_from_cache(key=key)
+            db_objects = self.__get_all_from_db(channel=channel, **kwargs)
 
             # Combine cache and db objects
             combined_objects = cache_objects + db_objects
@@ -56,6 +53,7 @@ class CacheService:
             key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
+            **kwargs
     ) -> Union[dict, None]:
         """
         Return object from cache or db or check if object exists in cache or db
@@ -64,10 +62,10 @@ class CacheService:
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        key = key.format(channel.token, user.token)
+        key = key.format(channel_token=channel.token, **kwargs, user_token=user.token)
         # First search in db for the object
         search_in_db = self.__search_in_db(
-            key=f"db_{key}", channel=channel, user=user
+            key=key, channel=channel, user=user, **kwargs
         )
         # Search in cache for object
         search_in_cache = self.__search_in_cache(key=key)
@@ -97,7 +95,7 @@ class CacheService:
             user: settings.AUTH_USER_MODEL
             **data: dict - Extra data
         """
-        key = key.format(channel.token, user.token)
+        key = key.format(channel_token=channel.token, user_token=user.token)
 
         # First check if object exists in cache or db
         # If exists, return None
@@ -117,6 +115,7 @@ class CacheService:
             key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
+            **kwargs
     ) -> Union[dict, None]:
         """
         Delete object from cache
@@ -125,7 +124,7 @@ class CacheService:
             channel: Channel
             user: settings.AUTH_USER_MODEL
         """
-        key = key.format(channel.token, user.token)
+        key = key.format(channel_token=channel.token, **kwargs, user_token=user.token)
         # First check if object exists in cache or db
         get_cache = self.get_from_cache(key=key, channel=channel, user=user)
         # If not exists, Raise exception
@@ -139,7 +138,8 @@ class CacheService:
                 key=key,
                 channel=channel,
                 user=user,
-                pending_delete=True
+                pending_delete=True,
+                **kwargs
             )
             return
 
@@ -160,20 +160,23 @@ class CacheService:
             self,
             key: str,
             user: settings.AUTH_USER_MODEL,
-            channel: Channel
+            channel: Channel,
+            **kwargs
     ) -> Union[dict, None]:
-        cached_object = cache.get(key)
+        cache_key = f'search_db_{key}'
+        cached_object = cache.get(cache_key)
 
         if not cached_object:
             # Check if object exists in db
             obj = self.model.objects.filter(
                 user=user,
-                channel=channel
+                channel=channel,
+                **kwargs
             )
             # Set object in cache and return it
             if obj.exists():
                 return self.__set_cache(
-                    key=key,
+                    key=cache_key,
                     channel=channel,
                     user=user,
                     source=ObjectSource.DATABASE.value,
@@ -217,20 +220,16 @@ class CacheService:
         )
         return cache.get(key)
 
-    def __get_all_from_cache(
-            self, *,
-            key: str,
-            object_key: str,
-            channel: Channel,
-    ) -> list:
+    def __get_all_from_cache(self, key: str) -> list:
         """
         Return all objects that are only saved in cache
         """
-        cached_result = cache.get(key)
+        cache_key = f"cache_{key}"
+        cached_result = cache.get(cache_key)
         if cached_result is None:
             # Get all objects in cache
             caches = [
-                cache.get(object_key) for object_key in cache.keys(object_key)
+                cache.get(object_key) for object_key in cache.keys(key)
             ]
 
             # Filter objects that are only in cache, not saved in db
@@ -240,41 +239,44 @@ class CacheService:
                     caches
                 )
             )
-            cache.set(key, cached_object, timeout=60)
+            cache.set(cache_key, cached_object, timeout=60)
             return cached_object
 
         return cached_result
 
     def __get_all_from_db(
             self, *,
-            key: str,
             channel: Channel,
+            **kwargs
     ) -> list:
         """
-        Return all objects that are only saved in db
+        Return all objects that are only saved in db (Based on args)
         """
-        cached_result = cache.get(key)
 
-        if cached_result is None:
-            # Objects from db
-            db_objects = list(
-                self.model.objects.filter(channel=channel).values(
-                    'user', 'channel', 'date'
-                )
+        # Objects from db
+        db_objects = list(
+            self.model.objects.filter(channel=channel, **kwargs).values(
+                'user', 'channel', 'date'
             )
-            cache.set(key, db_objects, timeout=60)
-            return db_objects
-
-        return cached_result
+        )
+        return db_objects
 
     def __get_unique_objects(self, objects: list) -> list:
-        # Remove duplicate users and check pending delete
+        """
+        Remove duplicate users and check pending delete
+        Args:
+            objects: List of duplicated objects
+        """
         unique_objects = []
         seen_users = set()
+
         for combined_object in objects:
             user = combined_object.get('user')
+            # Check if user is new to the set
             if user not in seen_users:
+                # Check object is not pending to delete later
                 if combined_object.get('pending_delete') is not True:
                     unique_objects.append(combined_object)
                 seen_users.add(user)
+
         return unique_objects
