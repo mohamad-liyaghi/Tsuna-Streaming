@@ -49,7 +49,7 @@ class VoteView(ContentObjectMixin, APIView):
 
             vote = Vote.objects.create_in_cache(
                 user=request.user,
-                object=self.object,
+                content_object=self.object,
                 choice=serializer.validated_data['choice']
             )
             if vote:
