@@ -6,6 +6,7 @@ from typing import Union
 from datetime import datetime
 from channels.models import Channel
 from core.utils import ObjectSource
+from core.utils import get_content_type_model
 
 
 class CacheService:
@@ -218,7 +219,7 @@ class CacheService:
                 obj = self.model.objects.filter(
                     user=user,
                     channel=channel,
-                    content_type=self.__get_content_model(content_object),
+                    content_type=get_content_type_model(content_object.__class__),
                     object_id=content_object.id
                 )
             else:
@@ -353,9 +354,3 @@ class CacheService:
                 object_token=content_object.token
             )
         return key.format(channel_token=channel.token, user_token=user_token)
-
-    def __get_content_model(self, content_object: models.Model) -> ContentType:
-        """
-        Return content type of the given object
-        """
-        return ContentType.objects.get_for_model(content_object.__class__)
