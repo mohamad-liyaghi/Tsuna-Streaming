@@ -271,7 +271,6 @@ class CacheService:
                 'pending_delete': pending_delete,
                 **extra_data
             },
-            timeout=60
         )
         return cache.get(key)
 

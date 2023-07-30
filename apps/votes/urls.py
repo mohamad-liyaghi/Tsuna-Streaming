@@ -24,5 +24,9 @@ urlpatterns = [
         VoteDeleteView.as_view(),
         name='delete'
     ),
-    path("<str:object_token>/list/", VoteListView.as_view(), name="vote_list"),
+    path(
+        "<str:content_type_id>/<str:object_token>/list/",
+        VoteListView.as_view(),
+        name="list"
+    ),
 ]
