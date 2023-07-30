@@ -25,9 +25,9 @@ class Video(AbstractContent):
         return self.title
 
     def clean(self):
-        file_size = self.video.size / (1024 * 1024)
+        file_size = self.file.size / (1024 * 1024)
 
-        if self.user.role in ['a', 'p'] and file_size > 50:
+        if self.user.is_premium() and file_size > 50:
             raise ValidationError('Video file size should not exceed 15MB.')
 
         if self.user.is_normal() and file_size > 10:

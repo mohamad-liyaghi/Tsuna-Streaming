@@ -1,9 +1,32 @@
 from django.urls import path
-from .views import VoteView, VoteListView
+from .views import (
+    VoteStatusView,
+    VoteCreateView,
+    VoteDeleteView,
+    VoteListView
+)
 
 app_name = "votes"
 
 urlpatterns = [
-    path("<str:object_token>/", VoteView.as_view(), name="vote"),
-    path("<str:object_token>/list/", VoteListView.as_view(), name="vote_list"),
+    path(
+        "<str:content_type_id>/<str:object_token>/",
+        VoteStatusView.as_view(),
+        name='status'
+    ),
+    path(
+        "<str:content_type_id>/<str:object_token>/create/",
+        VoteCreateView.as_view(),
+        name='create'
+    ),
+    path(
+        "<str:content_type_id>/<str:object_token>/delete/",
+        VoteDeleteView.as_view(),
+        name='delete'
+    ),
+    path(
+        "<str:content_type_id>/<str:object_token>/list/",
+        VoteListView.as_view(),
+        name="list"
+    ),
 ]

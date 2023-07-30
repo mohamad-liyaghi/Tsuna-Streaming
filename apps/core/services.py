@@ -1,16 +1,17 @@
 from django.db import models
 from django.core.cache import cache
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from typing import Union
 from datetime import datetime
 from channels.models import Channel
 from core.utils import ObjectSource
+from core.utils import get_content_type_model
 
 
 class CacheService:
     """
-    A service which provides methods for working with cache.
-    List/Get/Set/Delete objects in cache.
+    A service to handle cache operations.
     """
     def __init__(self, model: models.Model):
         """
@@ -22,6 +23,7 @@ class CacheService:
             self, *,
             key: str,
             channel: Channel,
+            content_object: models.Model = None,
             **kwargs
     ) -> Union[list, int]:
         """
@@ -29,8 +31,15 @@ class CacheService:
         Args:
             key: str
             channel: Channel
+            content_object: models.Model
+            **kwargs: dict - Extra data
         """
-        key = key.format(channel_token=channel.token, **kwargs, user_token="*")
+        key = self.__generate_key(
+            key=key,
+            channel=channel,
+            user='*',
+            content_object=content_object
+        )
         cached_result = cache.get(key)
 
         if cached_result is None:
@@ -53,7 +62,7 @@ class CacheService:
             key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
-            **kwargs
+            content_object: models.Model = None,
     ) -> Union[dict, None]:
         """
         Return object from cache or db or check if object exists in cache or db
@@ -61,11 +70,17 @@ class CacheService:
             key: str
             channel: Channel
             user: settings.AUTH_USER_MODEL
+            content_object: models.Model
         """
-        key = key.format(channel_token=channel.token, **kwargs, user_token=user.token)
+        key = self.__generate_key(
+            key=key,
+            channel=channel,
+            user=user,
+            content_object=content_object
+        )
         # First search in db for the object
         search_in_db = self.__search_in_db(
-            key=key, channel=channel, user=user, **kwargs
+            key=key, channel=channel, user=user, content_object=content_object
         )
         # Search in cache for object
         search_in_cache = self.__search_in_cache(key=key)
@@ -85,7 +100,8 @@ class CacheService:
             key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
-            **data
+            content_object: models.Model = None,
+            **kwargs
     ) -> Union[dict, None]:
         """
         Create a new object in cache (if not exist)
@@ -93,13 +109,24 @@ class CacheService:
             key: str
             channel: Channel
             user: settings.AUTH_USER_MODEL
-            **data: dict - Extra data
+            content_object: models.Model
+            **kwargs: dict - Extra data
         """
-        key = key.format(channel_token=channel.token, user_token=user.token)
+        key = self.__generate_key(
+            key=key,
+            channel=channel,
+            user=user,
+            content_object=content_object
+        )
 
         # First check if object exists in cache or db
         # If exists, return None
-        if self.get_from_cache(key=key, channel=channel, user=user):
+        if self.get_from_cache(
+                key=key,
+                channel=channel,
+                user=user,
+                content_object=content_object
+        ):
             return
 
         # If not exist, create a new object in cache
@@ -107,7 +134,8 @@ class CacheService:
             key=key,
             channel=channel,
             user=user,
-            **data
+            content_object=content_object,
+            **kwargs
         )
 
     def delete_cache(
@@ -115,6 +143,7 @@ class CacheService:
             key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
+            content_object: models.Model = None,
             **kwargs
     ) -> Union[dict, None]:
         """
@@ -123,10 +152,19 @@ class CacheService:
             key: str
             channel: Channel
             user: settings.AUTH_USER_MODEL
+            content_object: models.Model
+            **kwargs - Extra data
         """
-        key = key.format(channel_token=channel.token, **kwargs, user_token=user.token)
+        key = self.__generate_key(
+            key=key,
+            channel=channel,
+            user=user,
+            content_object=content_object
+        )
         # First check if object exists in cache or db
-        get_cache = self.get_from_cache(key=key, channel=channel, user=user)
+        get_cache = self.get_from_cache(
+            key=key, channel=channel, user=user, content_object=content_object
+        )
         # If not exists, Raise exception
         if not get_cache:
             raise ValueError("Object does not exist in cache or db.")
@@ -139,6 +177,7 @@ class CacheService:
                 channel=channel,
                 user=user,
                 pending_delete=True,
+                content_object=content_object,
                 **kwargs
             )
             return
@@ -161,18 +200,34 @@ class CacheService:
             key: str,
             user: settings.AUTH_USER_MODEL,
             channel: Channel,
-            **kwargs
+            content_object: models.Model = None,
     ) -> Union[dict, None]:
+        """
+        Search for an object in db
+        Args:
+            key: str
+            user: settings.AUTH_USER_MODEL
+            channel: Channel
+            content_object: models.Model
+        """
         cache_key = f'search_db_{key}'
         cached_object = cache.get(cache_key)
 
         if not cached_object:
-            # Check if object exists in db
-            obj = self.model.objects.filter(
-                user=user,
-                channel=channel,
-                **kwargs
-            )
+            if content_object:
+                # Check if object exists in db
+                obj = self.model.objects.filter(
+                    user=user,
+                    channel=channel,
+                    content_type=get_content_type_model(content_object.__class__),
+                    object_id=content_object.id
+                )
+            else:
+                # Check if object exists in db
+                obj = self.model.objects.filter(
+                    user=user,
+                    channel=channel
+                )
             # Set object in cache and return it
             if obj.exists():
                 return self.__set_cache(
@@ -216,7 +271,6 @@ class CacheService:
                 'pending_delete': pending_delete,
                 **extra_data
             },
-            timeout=60
         )
         return cache.get(key)
 
@@ -280,3 +334,22 @@ class CacheService:
                 seen_users.add(user)
 
         return unique_objects
+
+    def __generate_key(
+            self,
+            key: str,
+            channel: Channel,
+            user: settings.AUTH_USER_MODEL,
+            content_object: models.Model = None
+    ) -> str:
+        """
+        Return a key based on the given key and args
+        """
+        user_token = user if user else '*'
+        if content_object:
+            return key.format(
+                channel_token=channel.token,
+                user_token=user_token,
+                object_token=content_object.token
+            )
+        return key.format(channel_token=channel.token, user_token=user_token)

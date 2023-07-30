@@ -62,7 +62,7 @@ class ContentTypeModelMixin:
 
         # Get the object token from the URL.
         content_type_id = kwargs.get('content_type_id', None)
-        content_type = get_content_type_by_id(id=content_type_id)
+        content_type = get_content_type_by_id(_id=content_type_id)
 
         if not content_type:
             return JsonResponse(
