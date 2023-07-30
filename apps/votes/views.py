@@ -1,4 +1,5 @@
 from django.core.cache import cache
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -7,9 +8,48 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from votes.serializers import VoteSerializer, VoteListSerializer
-from apps.core.mixins import ContentObjectMixin
+from apps.core.mixins import ContentObjectMixin, ContentTypeModelMixin
 from votes.models import Vote
 from core.permissions import IsChannelAdmin
+
+
+@extend_schema_view(
+    get=extend_schema(
+        description="Check if a user has votes to an object or not.",
+        responses={
+            200: 'ok',
+            401: "Unauthorized",
+            404: "Not found",
+        }
+    ),
+)
+class VoteStatusView(ContentTypeModelMixin, APIView):
+    """
+    Check if a user has votes to an object or not.
+    """
+    permission_classes = [IsAuthenticated, ]
+
+    def get_object(self):
+        # Get the object from the URL
+        return get_object_or_404(
+            self.model,
+            token=self.kwargs.get('object_token')
+        )
+
+    def get(self, request, *args, **kwargs):
+        object = self.get_object()
+        # Check if user has voted or not
+        vote_status = bool(
+            Vote.objects.get_from_cache(
+                channel=object.channel,
+                user=request.user,
+                content_object=object
+            )
+        )
+        return Response(
+            vote_status, status=status.HTTP_200_OK
+        )
+
 
 @extend_schema_view(
     get=extend_schema(
