@@ -1,7 +1,7 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -12,8 +12,9 @@ from votes.serializers import VoteSerializer, VoteListSerializer
 from apps.core.mixins import ContentObjectMixin, ContentTypeModelMixin
 from votes.models import Vote
 from core.permissions import IsChannelAdmin
-from votes.permissions import CanVotePermission
+from votes.permissions import CanCreateVotePermission, CanDeleteVotePermission
 
+# TODO: Object mixin
 
 @extend_schema_view(
     get=extend_schema(
@@ -69,7 +70,7 @@ class VoteCreateView(ContentTypeModelMixin, CreateAPIView):
     """
     Create a vote for an object.
     """
-    permission_classes = [IsAuthenticated, CanVotePermission]
+    permission_classes = [IsAuthenticated, CanCreateVotePermission]
 
     def get_object(self):
         # Get the object from the URL
@@ -89,6 +90,30 @@ class VoteCreateView(ContentTypeModelMixin, CreateAPIView):
         )
         return Response(status=status.HTTP_201_CREATED)
 
+
+class VoteDeleteView(ContentTypeModelMixin, DestroyAPIView):
+    """
+    Delete a vote for an object.
+    """
+    permission_classes = [IsAuthenticated, CanDeleteVotePermission]
+
+    def get_object(self):
+        # Get the object from the URL
+        vote = get_object_or_404(
+            self.model,
+            token=self.kwargs.get('object_token')
+        )
+        self.check_object_permissions(self.request, vote)
+        return vote
+
+    def destroy(self, request, *args, **kwargs):
+        content_object = self.get_object()
+        Vote.objects.delete_in_cache(
+            channel=content_object.channel,
+            user=request.user,
+            content_object=content_object,
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @extend_schema_view(

@@ -65,7 +65,7 @@ class TestVoteCreateView:
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_create_uuid_not_found(self, api_client, create_active_user, create_unique_uuid):
+    def test_delete_content_object_not_found(self, api_client, create_active_user, create_unique_uuid):
         user = create_active_user
         api_client.force_authenticate(user=user)
         response = api_client.post(
