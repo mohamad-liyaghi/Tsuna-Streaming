@@ -1,5 +1,4 @@
 from django.core.cache import cache
-from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView, DestroyAPIView
 from rest_framework.response import Response
@@ -8,13 +7,13 @@ from rest_framework.permissions import IsAuthenticated
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
-from votes.serializers import VoteSerializer, VoteListSerializer
-from apps.core.mixins import ContentObjectMixin, ContentTypeModelMixin
-from votes.models import Vote
-from core.permissions import IsChannelAdmin
+from votes.serializers import VoteStatusSerializer, VoteListSerializer, VoteCreateSerializer
+from votes.models import Vote, VoteChoice
 from votes.permissions import CanCreateVotePermission, CanDeleteVotePermission
+from votes.mixins import VoteObjectMixin
+from core.permissions import IsChannelAdmin
+from apps.core.mixins import ContentObjectMixin
 
-# TODO: Object mixin
 
 @extend_schema_view(
     get=extend_schema(
@@ -23,35 +22,36 @@ from votes.permissions import CanCreateVotePermission, CanDeleteVotePermission
             200: 'ok',
             401: "Unauthorized",
             404: "Not found",
-        }
+        },
+        tags=['Votes']
     ),
 )
-class VoteStatusView(ContentTypeModelMixin, APIView):
+class VoteStatusView(VoteObjectMixin, APIView):
     """
-    Check if a user has votes to an object or not.
+    Return Vote status of a user
     """
     permission_classes = [IsAuthenticated, ]
-
-    def get_object(self):
-        # Get the object from the URL
-        return get_object_or_404(
-            self.model,
-            token=self.kwargs.get('object_token')
-        )
+    serializer_class = VoteStatusSerializer
 
     def get(self, request, *args, **kwargs):
+        # Self.object is set in VoteObjectMixin
         content_object = self.get_object()
 
         # Check if user has voted or not
-        vote_status = bool(
-            Vote.objects.get_from_cache(
+        vote_status = Vote.objects.get_from_cache(
                 channel=content_object.channel,
                 user=request.user,
                 content_object=content_object
             )
-        )
+        if vote_status:
+            serialized_data = VoteStatusSerializer(instance=vote_status)
+
+            return Response(
+                serialized_data.data, status=status.HTTP_200_OK
+            )
+
         return Response(
-            vote_status, status=status.HTTP_200_OK
+            status=status.HTTP_200_OK
         )
 
 
@@ -63,111 +63,52 @@ class VoteStatusView(ContentTypeModelMixin, APIView):
             401: "Unauthorized",
             403: "Forbidden",
             404: "Not found",
-        }
+        },
+        tags=['Votes']
     ),
 )
-class VoteCreateView(ContentTypeModelMixin, CreateAPIView):
+class VoteCreateView(VoteObjectMixin, CreateAPIView):
     """
     Create a vote for an object.
     """
     permission_classes = [IsAuthenticated, CanCreateVotePermission]
+    serializer_class = VoteCreateSerializer
 
-    def get_object(self):
-        # Get the object from the URL
-        vote = get_object_or_404(
-            self.model,
-            token=self.kwargs.get('object_token')
-        )
-        self.check_object_permissions(self.request, vote)
-        return vote
-
-    def create(self, request, *args, **kwargs):
-        content_object = self.get_object()
-        Vote.objects.create_in_cache(
-            channel=content_object.channel,
-            user=request.user,
-            content_object=content_object,
-        )
-        return Response(status=status.HTTP_201_CREATED)
+    def get_serializer_context(self):
+        return {
+            'content_object': self.get_object,
+            'user': self.request.user
+        }
 
 
-class VoteDeleteView(ContentTypeModelMixin, DestroyAPIView):
+@extend_schema_view(
+    delete=extend_schema(
+        description="Delete a vote for an object.",
+        responses={
+            204: 'No content',
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not found",
+        },
+        tags=['Votes']
+    ),
+)
+class VoteDeleteView(VoteObjectMixin, DestroyAPIView):
     """
     Delete a vote for an object.
     """
     permission_classes = [IsAuthenticated, CanDeleteVotePermission]
 
-    def get_object(self):
-        # Get the object from the URL
-        vote = get_object_or_404(
-            self.model,
-            token=self.kwargs.get('object_token')
-        )
-        self.check_object_permissions(self.request, vote)
-        return vote
-
     def destroy(self, request, *args, **kwargs):
+        # Self.object is set in ContentObjectMixin
         content_object = self.get_object()
+        # Delete the vote
         Vote.objects.delete_in_cache(
             channel=content_object.channel,
             user=request.user,
             content_object=content_object,
         )
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-@extend_schema_view(
-    get=extend_schema(
-        description="Number of upvotes, downvotes, user voted [Boolean], user choice [if voted]."
-    ),
-    post=extend_schema(
-        description="Vote or delete or update a vote."
-    ),
-)
-class VoteView(ContentObjectMixin, APIView):
-    '''
-        Get: show the upvote and downvotes and also user vote status
-        Post: Vote a model
-    '''
-    permission_classes = [IsAuthenticated, ]
-    serializer_class = VoteSerializer
-
-    def get(self, request, *args, **kwargs):
-
-        # users votes.
-        user_vote = Vote.objects.get_from_cache(self.object, request.user)
-
-        return Response(
-            {
-                "voted": True if user_vote else False,
-                "user_vote": user_vote.get('choice', None) if user_vote else None,
-                # "status": self.object.get_votes_count(), TODO: make this work
-            },
-            status=status.HTTP_200_OK
-        )
-
-    def post(self, request, *args, **kwargs):
-
-        serializer = self.serializer_class(data=request.data)
-
-        if serializer.is_valid():
-
-            vote = Vote.objects.create_in_cache(
-                user=request.user,
-                content_object=self.object,
-                choice=serializer.validated_data['choice']
-            )
-            if vote:
-                return Response(
-                    {
-                        "voted": True if vote else False,
-                        "user_vote": vote.get('choice', None) if vote else None
-                    },
-                    status=status.HTTP_201_CREATED)
-
-            return Response(vote, status=status.HTTP_204_NO_CONTENT)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema_view(

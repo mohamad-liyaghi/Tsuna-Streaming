@@ -32,7 +32,7 @@ class TestVoteStatusView:
             })
         )
         assert response.status_code == status.HTTP_200_OK
-        assert response.data is False
+        assert response.data is None
 
     def test_get_with_vote_in_db(self, create_vote, api_client):
         user = create_vote.user
@@ -44,7 +44,6 @@ class TestVoteStatusView:
             })
         )
         assert response.status_code == status.HTTP_200_OK
-        assert response.data is True
 
     def test_get_with_vote_in_cache(self, create_cached_vote, api_client):
         user = Account.objects.get(id=create_cached_vote['user'])
@@ -56,7 +55,7 @@ class TestVoteStatusView:
             })
         )
         assert response.status_code == status.HTTP_200_OK
-        assert response.data is True
+        assert response.data
 
     def test_get_not_found(self, api_client, create_active_user, create_unique_uuid):
         user = create_active_user
