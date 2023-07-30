@@ -25,7 +25,8 @@ from votes.mixins import VoteObjectMixin
 )
 class VoteStatusView(VoteObjectMixin, APIView):
     """
-    Return Vote status of a user
+    Return users vote if voted;
+    Else return None.
     """
     permission_classes = [IsAuthenticated, ]
     serializer_class = VoteStatusSerializer
@@ -34,19 +35,19 @@ class VoteStatusView(VoteObjectMixin, APIView):
         # Self.object is set in VoteObjectMixin
         content_object = self.get_object()
 
-        # Check if user has voted or not
+        # Get the vote from cache and db
         vote_status = Vote.objects.get_from_cache(
                 channel=content_object.channel,
                 user=request.user,
                 content_object=content_object
             )
         if vote_status:
-            serialized_data = VoteStatusSerializer(instance=vote_status)
-
             return Response(
-                serialized_data.data, status=status.HTTP_200_OK
+                VoteStatusSerializer(instance=vote_status).data,
+                status=status.HTTP_200_OK
             )
 
+        # Return None if user hasnt voted.
         return Response(
             status=status.HTTP_200_OK
         )

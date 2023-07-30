@@ -1,21 +1,23 @@
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from celery import shared_task
 from votes.models import Vote
 from accounts.models import Account
 from apps.core.models import AbstractContent
+from core.utils import get_content_type_model
 
 
 @shared_task
-def remove_object_votes(object_model_content_type_id, object_id):
-    '''Remove all objects votes with celery'''
-
+def remove_object_votes(content_type_id: int, object_id: int):
+    """
+    Remove all objects votes
+    """
     # get the object model content type (eg: Video)
-    model = ContentType.objects.get(id=object_model_content_type_id)
+    model = get_content_type_model(content_type_id)
     # delete all related votes
     Vote.objects.filter(content_type=model, object_id=object_id).delete()
 
 
+# TODO: update this
 @shared_task
 def insert_vote_into_db():
     # get votes from db

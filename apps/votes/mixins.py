@@ -18,5 +18,6 @@ class VoteObjectMixin(ContentTypeModelMixin):
             self.model,
             token=self.kwargs.get('object_token')
         )
+        # Check permissions for the object
         self.check_object_permissions(self.request, content_object)
         return content_object

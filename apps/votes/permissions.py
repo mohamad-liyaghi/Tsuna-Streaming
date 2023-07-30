@@ -13,14 +13,14 @@ class CanCreateVotePermission(BasePermission):
         """
         Check if user has not voted yet
         """
-        vote_status = bool(
+        vote_exists = bool(
             Vote.objects.get_from_cache(
                 channel=obj.channel,
                 user=request.user,
                 content_object=obj
             )
         )
-        return not vote_status
+        return not vote_exists
 
 
 class CanDeleteVotePermission(BasePermission):
@@ -34,11 +34,11 @@ class CanDeleteVotePermission(BasePermission):
         """
         Check if user has voted
         """
-        vote_status = bool(
+        vote_exists = bool(
             Vote.objects.get_from_cache(
                 channel=obj.channel,
                 user=request.user,
                 content_object=obj
             )
         )
-        return vote_status
+        return vote_exists

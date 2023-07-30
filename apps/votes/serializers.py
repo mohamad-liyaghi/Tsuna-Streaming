@@ -12,6 +12,9 @@ class VoteStatusSerializer(serializers.ModelSerializer):
 
 
 class VoteCreateSerializer(serializers.ModelSerializer):
+    """
+    A serializer for creating a vote
+    """
     class Meta:
         model = Vote
         fields = ["choice"]
@@ -20,6 +23,7 @@ class VoteCreateSerializer(serializers.ModelSerializer):
         content_object = self.context['content_object']()
         user = self.context['user']
 
+        # Create a vote in cache
         return Vote.objects.create_in_cache(
             channel=content_object.channel,
             user=user,
@@ -29,8 +33,11 @@ class VoteCreateSerializer(serializers.ModelSerializer):
 
 
 class VoteListSerializer(serializers.ModelSerializer):
+    """
+    List of all votes in cache
+    """
     user = serializers.StringRelatedField()
     
     class Meta:
         model = Vote
-        fields = ["user", "choice"]
+        fields = ["user", "choice", "date"]
