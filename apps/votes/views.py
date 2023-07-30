@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -11,6 +12,7 @@ from votes.serializers import VoteSerializer, VoteListSerializer
 from apps.core.mixins import ContentObjectMixin, ContentTypeModelMixin
 from votes.models import Vote
 from core.permissions import IsChannelAdmin
+from votes.permissions import CanVotePermission
 
 
 @extend_schema_view(
@@ -37,18 +39,56 @@ class VoteStatusView(ContentTypeModelMixin, APIView):
         )
 
     def get(self, request, *args, **kwargs):
-        object = self.get_object()
+        content_object = self.get_object()
+
         # Check if user has voted or not
         vote_status = bool(
             Vote.objects.get_from_cache(
-                channel=object.channel,
+                channel=content_object.channel,
                 user=request.user,
-                content_object=object
+                content_object=content_object
             )
         )
         return Response(
             vote_status, status=status.HTTP_200_OK
         )
+
+
+@extend_schema_view(
+    post=extend_schema(
+        description="Create a vote for an object.",
+        responses={
+            201: 'Created',
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not found",
+        }
+    ),
+)
+class VoteCreateView(ContentTypeModelMixin, CreateAPIView):
+    """
+    Create a vote for an object.
+    """
+    permission_classes = [IsAuthenticated, CanVotePermission]
+
+    def get_object(self):
+        # Get the object from the URL
+        vote = get_object_or_404(
+            self.model,
+            token=self.kwargs.get('object_token')
+        )
+        self.check_object_permissions(self.request, vote)
+        return vote
+
+    def create(self, request, *args, **kwargs):
+        content_object = self.get_object()
+        Vote.objects.create_in_cache(
+            channel=content_object.channel,
+            user=request.user,
+            content_object=content_object,
+        )
+        return Response(status=status.HTTP_201_CREATED)
+
 
 
 @extend_schema_view(
