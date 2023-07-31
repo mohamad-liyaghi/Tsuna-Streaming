@@ -15,7 +15,7 @@ from videos.serializers import (
     VideoCreateSeriaizer, 
     VideoDetailSerializer
 )
-from viewers.decorators import check_viewer_status
+from viewers.decorators import ensure_viewer_exists
     
 
 @extend_schema_view(
@@ -83,7 +83,7 @@ class VideoDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
         self.check_object_permissions(self.request, video)
         return video
 
-    @check_viewer_status
+    @ensure_viewer_exists
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
     

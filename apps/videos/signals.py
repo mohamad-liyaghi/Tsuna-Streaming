@@ -12,7 +12,6 @@ post_delete.connect(delete_object_comments_after_deleting, sender=Video)
 post_delete.connect(delete_object_viewers_after_deleting, sender=Video)
 
 
-
 @receiver(post_save, sender=Video)
 def notify_video_creation(sender, instance, created, **kwargs):
     

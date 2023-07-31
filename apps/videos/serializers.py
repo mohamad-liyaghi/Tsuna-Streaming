@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
 from videos.models import Video
+from viewers.models import Viewer
 
 
 class VideoListSerializer(serializers.ModelSerializer):
@@ -43,6 +44,10 @@ class VideoDetailSerializer(serializers.ModelSerializer):
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
+    get_viewer_count = serializers.SerializerMethodField(
+        method_name="get_viewer_count",
+        read_only=True
+    )
 
     class Meta:
         model = Video
@@ -60,7 +65,7 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            # "get_viewer_count" #TOOD: make this work
+            "get_viewer_count"
             ]
 
         extra_kwargs = {
@@ -71,3 +76,12 @@ class VideoDetailSerializer(serializers.ModelSerializer):
             "date" : {'read_only' : True},
             "is_updated" : {'read_only' : True},
         }
+
+    def get_viewer_count(self, obj):
+        """
+        Get the number of viewers for a video
+        """
+        return Viewer.objects.get_count(
+            content_type=obj.get_content_type,
+            channel=obj.channel,
+        )

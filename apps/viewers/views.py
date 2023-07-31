@@ -1,42 +1,35 @@
-from django.core.cache import cache
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
 
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from viewers.serializers import ViewerListSerializer
+from viewers.models import Viewer
 from core.mixins import ContentObjectMixin
-from core.permissions import IsChannelAdmin
 
 
 @extend_schema_view(
-    get=extend_schema(description="List of an objects viewers."),
+    get=extend_schema(
+        description="List of an objects viewers.",
+        responses={
+            200: 'ok',
+            401: "Unauthorized",
+            404: "Not found",
+        },
+        tags=['Viewers']
+    ),
 )
-class ViewerListView(ContentObjectMixin, APIView):
-    '''List of an objects viewers'''
-    permission_classes = [IsAuthenticated, IsChannelAdmin]
+class ViewerListView(ContentObjectMixin, ListAPIView):
+    """
+    Return a list of viewers for an object.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = ViewerListSerializer
 
-    def get(self, request, *args, **kwargs):
-        viewers = []
-
-        # get all viewers in cache with source == cache
-        cache_viewers = [
-            {
-                "user": key.split(":")[2],
-                "date": cache_value['date'],
-                "source": cache_value['source']
-            }
-            for key in cache.keys("viewer:*:*")
-            if (cache_value := cache.get(key)) and cache_value['source'] == 'cache'
-        ]
-
-        # all viewers in db 
-        db_viewers = self.object.viewers.select_related('user').all().order_by('-date')
-
-        # append both in viewers list
-        viewers += cache_viewers + list(db_viewers)
-    
-        serializer = ViewerListSerializer(viewers, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        content_object = self.get_object()
+        # Get the viewers from cache and db and return
+        return Viewer.objects.get_list(
+            channel=content_object.channel,
+            content_object=content_object
+        )

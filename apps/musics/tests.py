@@ -52,12 +52,16 @@ class TestMusicModel:
         assert get_content_type_model(model=Music) == music_content_type
 
 
-    # TODO: write this tests
-    # def test_get_music_views(self):
-    #     '''Test the get_viewer_count placed in AbstractContent'''
-    #     self.create_music()
+    def test_get_music_views(self):
+        """
+        By default, music has 0 views
+        """
+        self.create_music()
 
-    #     assert self.music.get_viewer_count() == 0
+        assert Viewer.objects.get_count(
+            content_object=self.music,
+            channel=self.music.channel
+        ) == 0
 
 
     def test_delete_vote_after_deleting_music(self):

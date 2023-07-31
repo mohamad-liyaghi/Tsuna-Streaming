@@ -8,6 +8,7 @@ from accounts.models import Account
 def test_create_vote(create_vote):
     assert Vote.objects.count() == 1
 
+
 @pytest.mark.django_db
 def test_create_vote_in_cache(create_cached_vote):
     user = Account.objects.get(id=create_cached_vote['user'])

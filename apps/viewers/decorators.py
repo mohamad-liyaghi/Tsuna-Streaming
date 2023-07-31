@@ -1,20 +1,30 @@
 from viewers.models import Viewer
 
-def check_viewer_status(view):
-    '''This decorator checks if user hasnt viewed an object, a new viewer object will be created'''
-    
-    def check_view_exists_or_not(self, request, *args, **kwargs):        
-        object = self.get_object()
 
-        # check is there a view for the object
-        viewer = Viewer.objects.get_from_cache(obj=object, user=request.user)
+def ensure_viewer_exists(view):
+    """
+    Ensures that a viewer exists for the object, and if not, creates one.
+    """
 
-        if viewer:
-            return view(self, request, *args, **kwargs)
+    def ensure_viewer_and_continue(self, request, *args, **kwargs):
+        # Get the object
+        target_object = self.get_object()
 
-        # create a user view for an object if does not exist            
-        Viewer.objects.create_in_cache(user_token=request.user.token, object_token=object.token)
+        # Attempt to fetch an existing viewer for this object
+        viewer = Viewer.objects.get_from_cache(
+            channel=target_object.channel,
+            object_token=target_object,
+            user_token=request.user,
+        )
+
+        if not viewer:
+            # If no viewer was found, create one
+            Viewer.objects.create_in_cache(
+                channel=target_object.channel,
+                object_token=target_object,
+                user_token=request.user,
+            )
 
         return view(self, request, *args, **kwargs)
 
-    return check_view_exists_or_not
+    return ensure_viewer_and_continue

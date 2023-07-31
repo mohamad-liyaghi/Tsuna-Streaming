@@ -8,7 +8,7 @@ from musics.permissions import CreateMusicPermission, MusicDetailPermission
 from musics.mixins import ChannelObjectMixin
 from musics.serializers import (MusicListSerializer, MusicCreateSeriaizer, 
                                 MusicDetailSerializer)
-from viewers.decorators import check_viewer_status
+from viewers.decorators import ensure_viewer_exists
     
 
 @extend_schema_view(
@@ -66,6 +66,6 @@ class MusicDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
         self.check_object_permissions(self.request, music)
         return music
 
-    @check_viewer_status # This decorator adds viewer for the object if not already exist
+    @ensure_viewer_exists
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
