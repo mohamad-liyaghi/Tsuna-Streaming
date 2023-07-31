@@ -4,5 +4,9 @@ from .views import ViewerListView
 app_name = 'viewers'
 
 urlpatterns = [
-    path("<str:object_token>/", ViewerListView.as_view(), name="viewer_list"),
+    path(
+        "<str:content_type_id>/<str:object_token>/list/",
+        ViewerListView.as_view(),
+        name="list",
+    )
 ]

@@ -9,7 +9,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from votes.serializers import VoteStatusSerializer, VoteListSerializer, VoteCreateSerializer
 from votes.models import Vote, VoteChoice
 from votes.permissions import CanCreateVotePermission, CanDeleteVotePermission
-from votes.mixins import VoteObjectMixin
+from core.mixins import ContentObjectMixin
 
 
 @extend_schema_view(
@@ -23,7 +23,7 @@ from votes.mixins import VoteObjectMixin
         tags=['Votes']
     ),
 )
-class VoteStatusView(VoteObjectMixin, APIView):
+class VoteStatusView(ContentObjectMixin, APIView):
     """
     Return users vote if voted;
     Else return None.
@@ -32,7 +32,7 @@ class VoteStatusView(VoteObjectMixin, APIView):
     serializer_class = VoteStatusSerializer
 
     def get(self, request, *args, **kwargs):
-        # Self.object is set in VoteObjectMixin
+        # Self.object is set in ContentObjectMixin
         content_object = self.get_object()
 
         # Get the vote from cache and db
@@ -65,7 +65,7 @@ class VoteStatusView(VoteObjectMixin, APIView):
         tags=['Votes']
     ),
 )
-class VoteCreateView(VoteObjectMixin, CreateAPIView):
+class VoteCreateView(ContentObjectMixin, CreateAPIView):
     """
     Create a vote for an object.
     """
@@ -91,7 +91,7 @@ class VoteCreateView(VoteObjectMixin, CreateAPIView):
         tags=['Votes']
     ),
 )
-class VoteDeleteView(VoteObjectMixin, DestroyAPIView):
+class VoteDeleteView(ContentObjectMixin, DestroyAPIView):
     """
     Delete a vote for an object.
     """
@@ -120,7 +120,7 @@ class VoteDeleteView(VoteObjectMixin, DestroyAPIView):
         tags=['Votes']
     ),
 )
-class VoteListView(VoteObjectMixin, ListAPIView):
+class VoteListView(ContentObjectMixin, ListAPIView):
     """
     List of users that voted for an object.
     """
