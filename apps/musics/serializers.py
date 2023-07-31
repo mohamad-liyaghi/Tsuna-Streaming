@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
 
 from musics.models import Music
+from viewers.models import Viewer
 
 
 class MusicListSerializer(serializers.ModelSerializer):
@@ -68,6 +69,10 @@ class MusicDetailSerializer(serializers.ModelSerializer):
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
+    get_viewer_count = serializers.SerializerMethodField(
+        method_name="get_viewer_count",
+        read_only=True
+    )
 
     class Meta:
         model = Music
@@ -85,7 +90,7 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            # "get_viewer_count" #TODO make this work
+            "get_viewer_count"
             ]
 
         extra_kwargs = {
@@ -96,3 +101,12 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "date" : {'read_only' : True},
             "is_updated" : {'read_only' : True},
         }
+
+        def get_viewer_count(self, obj):
+            """
+            Return the number of viewers for a music.
+            """
+            return Viewer.objects.get_count(
+                channel=obj.channel,
+                content_object=obj
+            )
