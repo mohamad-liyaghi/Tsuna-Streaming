@@ -3,7 +3,7 @@ from celery import shared_task
 from votes.models import Vote
 from accounts.models import Account
 from apps.core.models import AbstractContent
-from core.utils import get_content_type_model
+from core.utils import get_content_type_by_id
 
 
 @shared_task
@@ -12,7 +12,7 @@ def remove_object_votes(content_type_id: int, object_id: int):
     Remove all objects votes
     """
     # get the object model content type (eg: Video)
-    model = get_content_type_model(content_type_id)
+    model = get_content_type_by_id(content_type_id)
     # delete all related votes
     Vote.objects.filter(content_type=model, object_id=object_id).delete()
 
