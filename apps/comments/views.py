@@ -6,26 +6,60 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
+from comments.models import Comment
 from comments.serializers import CommentSerializer, CommentDetailSerializer
-from comments.permissions import CommentPermission, CommentDetailPermission
+from comments.permissions import CommentCreatePermission, CommentDetailPermission
 from apps.core.mixins import ContentObjectMixin
 
 
 @extend_schema_view(
-    get=extend_schema(description="List an object's comments."),
-    post=extend_schema(description="Add/reply to a comment if comments are allowed for an object.")
+    get=extend_schema(
+        description="List an object's comments.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    ),
+    post=extend_schema(
+        description="Create/Reply a comment.",
+        responses={
+            201: 'Created',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    )
 )
 class CommentListCreateView(ContentObjectMixin, ListCreateAPIView):
-    permission_classes = [IsAuthenticated, CommentPermission]
+    """
+    Create And List Comments.
+    """
+
+    def get_permissions(self):
+        # check if comments are allowed for object if request is POST
+        if self.request.method == "POST":
+            return [IsAuthenticated(), CommentCreatePermission()]
+        return [IsAuthenticated()]
+
     serializer_class = CommentSerializer
 
     def get_serializer_context(self):
-        return {'user' : self.request.user, 'object' : self.object}
+        """
+        send user and object to serializer.
+        """
+        return {'user': self.request.user, 'content_object': self.get_object}
 
     def get_queryset(self):
-        return self.object.comments.select_related('user').filter(parent=None).order_by("-pinned", "-date")
+        content_object = self.get_object()
+        parent_comments = content_object.comments.select_related(
+            'user'
+        ).filter(parent__isnull=True)
+        return parent_comments.order_by("-pinned", "-date")
         
-
 
 @extend_schema_view(
     get=extend_schema(description="Comment detail page [replies]."),

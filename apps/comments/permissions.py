@@ -1,19 +1,16 @@
 from rest_framework.permissions import BasePermission
 from core.utils import get_content_type_model
 
-class CommentPermission(BasePermission):
+
+class CommentCreatePermission(BasePermission):
     
-    message = 'Comments are closed.'
+    message = 'Comments are not allowed for this object.'
 
     def has_permission(self, request, view):
-
-        object = view.object
-
-        # users cannot add comment when allow_comment is False
-        if request.method == "POST":
-            return object.allow_comment
-
-        return True
+        """
+        Check if comments are allowed for an object.
+        """
+        return view.get_object().allow_comment
     
 
 

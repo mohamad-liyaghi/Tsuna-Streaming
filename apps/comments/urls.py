@@ -4,8 +4,11 @@ from .views import CommentListCreateView, CommentDetailView, CommentPinView
 app_name = "comments"
 
 urlpatterns = [
-    path('<str:object_token>/',
-             CommentListCreateView.as_view(), name="comment_list_create"),
+    path(
+        "<str:content_type_id>/<str:object_token>/",
+        CommentListCreateView.as_view(),
+        name="list_create"
+    ),
 
     path('<str:object_token>/<str:comment_token>',
                  CommentDetailView.as_view(), name="comment_detail"),

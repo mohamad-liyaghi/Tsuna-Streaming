@@ -47,7 +47,7 @@ class Comment(AbstractToken):
     def __str__(self) -> str:
         return str(self.user)
 
-    def __check_comment_allowed(self):
+    def __check_comment_allowed(self) -> None:
         """
         Check if comments are allowed for the object.
         """
