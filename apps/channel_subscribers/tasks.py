@@ -2,6 +2,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from celery import shared_task
 from channel_subscribers.models import ChannelSubscriber
+from core.utils import ObjectSource
 
 
 CACHE_SUBSCRIBER_KEY = 'subscribers:*:*'
@@ -10,7 +11,7 @@ CACHE_SUBSCRIBER_KEY = 'subscribers:*:*'
 @shared_task
 def insert_subscriber_from_cache_into_db():
     """
-    Get all subscribers from cache and insert them into db
+    Insert subscribers from cache to db
     """
     subscriber_keys = cache.keys(CACHE_SUBSCRIBER_KEY)
     # Get all subscribers from cache
@@ -21,7 +22,7 @@ def insert_subscriber_from_cache_into_db():
     # Filter records with source of `cache` and status of `subscribed`
     cached_subscriber = filter(
         lambda subscriber: (
-                subscriber.get('source') == 'cache'
+                subscriber.get('source') == ObjectSource.CACHE.value
                 and
                 subscriber.get('subscription_status') == 'subscribed'
         ),
@@ -29,7 +30,7 @@ def insert_subscriber_from_cache_into_db():
     )
 
     if cached_subscriber:
-        # Bulk create subcribers and insert to db
+        # Bulk create subscribers and insert to db
         ChannelSubscriber.objects.bulk_create(
             [
                 ChannelSubscriber(
@@ -79,5 +80,5 @@ def delete_unsubscribed_from_db():
             Q(user__in=users) & Q(channel__in=channels)
         ).delete()
 
-    # Remove unsubscribers from cache
+    # Remove unsubscribed from cache
     cache.delete_many(subscriber_keys)

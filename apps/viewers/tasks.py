@@ -1,4 +1,3 @@
-from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from celery import shared_task
 from viewers.models import Viewer
@@ -20,7 +19,6 @@ def insert_viewer_into_db():
             channel_token='*', object_token='*', user_token='*'
         )
     )
-    print('Keys are: ', viewer_keys)
 
     if viewer_keys:
         # Get all cached viewers

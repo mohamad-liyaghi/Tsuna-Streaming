@@ -10,8 +10,9 @@ def delete_vote_after_deleting_object(sender, instance, *args, **kwargs):
 
     # Call the celery task to delete them
     remove_object_votes.delay(
-        get_content_type_model(
+        content_type_id=get_content_type_model(
             instance.__class__, return_id=True
         ),
-        instance.id
+        object_id=instance.id,
+        object_token=instance.token
     )
