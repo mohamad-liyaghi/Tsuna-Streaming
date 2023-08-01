@@ -10,6 +10,7 @@ from apps.channel_admins.tests.fixtures import *  # noqa
 from apps.votes.tests.fixtures import *  # noqa
 from apps.videos.fixtures import * # noqa
 from apps.viewers.tests.fixtures import *  # noqa
+from apps.comments.tests.fixtures import *  # noqa
 
 @pytest.fixture
 def create_unique_uuid():
