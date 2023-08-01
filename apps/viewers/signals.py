@@ -8,7 +8,9 @@ def delete_object_viewers_after_deleting(sender, instance, *args, **kwargs):
     """
 
     remove_object_viewers.delay(
-        get_content_type_model(
+        content_type_id=get_content_type_model(
             instance.__class__, return_id=True
-        ), instance.id
+        ),
+        object_id=instance.id,
+        object_token=instance.token,
     )

@@ -2,54 +2,76 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from celery import shared_task
 from viewers.models import Viewer
-from apps.core.models import AbstractContent
+from viewers.constants import CACHE_OBJECT_VIEWER
+from core.utils import ObjectSource
+from core.utils import get_content_type_by_id
 from accounts.models import Account
 
 
 @shared_task
 def insert_viewer_into_db():
-    '''Insert viewers from cache into db'''
+    """
+    Insert Cached viewers to database.
+    """
 
-    # get all viewers from db
-    viewer_keys = cache.keys("viewer:*:*")
+    # Get keys of all cached viewers
+    viewer_keys = cache.keys(
+        CACHE_OBJECT_VIEWER.format(
+            channel_token='*', object_token='*', user_token='*'
+        )
+    )
+    print('Keys are: ', viewer_keys)
 
     if viewer_keys:
+        # Get all cached viewers
+        all_viewers = cache.get_many(viewer_keys).values()
 
-        for key in viewer_keys:
-            viewer = cache.get(key)
-            _, object_token, user_token = key.split(':') # viewer:model-obj:user_token
-            
-            if (viewer and viewer.get('source', '') == 'cache'):
-                object_model = AbstractContent.get_content_model_by_name(((object_token.split('-')[0]).capitalize()))
+        # Filter those viewers that are cached
+        cached_viewers = [
+            viewer for viewer in all_viewers
+            if viewer['source'] == ObjectSource.CACHE.value
+        ]
 
-                if object_model:
-                    try:
-                        
-                        Viewer.objects.create(                        
-                            user = Account.objects.get(token=user_token),
-                            content_object = object_model.objects.get(token=object_token),
-                            date = viewer.get('date'),
-                        )
+        # Get all users of cached viewers
+        users = Account.objects.filter(
+            id__in=[viewer['user'] for viewer in cached_viewers]
+        )
 
-                        # change viewer status from cache to database
-                        viewer['source'] = 'database'
-                        cache.set(key, viewer)
-                
-                    except:
-                        # if the object were not found
-                        cache.delete(key)
+        # Create instances of Viewer model
+        new_viewers = [
+            Viewer(
+                user=users.get(id=viewer['user']),
+                content_object=viewer['content_object'],
+                date=viewer['date'],
+            ) for viewer in cached_viewers
+        ]
 
-                else:
-                    # if content model does not exist
-                    cache.delete(key)
+        # Bulk Insert
+        Viewer.objects.bulk_create(new_viewers)
+        # Delete their cache
+        cache.delete_many(viewer_keys)
 
 
 @shared_task
-def remove_object_viewers(object_model_content_type_id, object_id):
-    '''Remove all objects viewers with celery'''
+def remove_object_viewers(content_type_id: int, object_id: int, object_token: str):
+    """
+    Remove viewers of an object after deleting it.
+    """
+    content_model = get_content_type_by_id(
+        _id=content_type_id
+    )
 
-    # get the object model content type (eg: Video)
-    model = ContentType.objects.get(id=object_model_content_type_id)
+    # Delete all object viewers in db.
+    Viewer.objects.filter(
+        content_type=content_model,
+        object_id=object_id
+    ).delete()
 
-    # delete all related viewers
-    Viewer.objects.filter(content_type=model, object_id=object_id).delete()
+    # Delete object viewers from cache
+    cache.delete_pattern(
+        CACHE_OBJECT_VIEWER.format(
+            channel_token="*",
+            object_token=object_token,
+            user_token='*'
+        )
+    )

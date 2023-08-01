@@ -13,16 +13,16 @@ def ensure_viewer_exists(view):
         # Attempt to fetch an existing viewer for this object
         viewer = Viewer.objects.get_from_cache(
             channel=target_object.channel,
-            object_token=target_object,
-            user_token=request.user,
+            content_object=target_object,
+            user=request.user,
         )
 
         if not viewer:
             # If no viewer was found, create one
             Viewer.objects.create_in_cache(
                 channel=target_object.channel,
-                object_token=target_object,
-                user_token=request.user,
+                content_object=target_object,
+                user=request.user,
             )
 
         return view(self, request, *args, **kwargs)
