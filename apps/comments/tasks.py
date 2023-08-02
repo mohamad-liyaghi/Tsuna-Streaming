@@ -1,14 +1,16 @@
-from django.contrib.contenttypes.models import ContentType
 from celery import shared_task
 from comments.models import Comment
+from core.utils import get_content_type_by_id
 
 
 @shared_task
-def remove_object_comments(object_model_content_type_id, object_id):
-    '''Remove all objects comments with celery'''
-    
+def remove_object_comments(content_type_id: int, object_id: int):
+    """
+    Remove all comments related to an object after its deletion.
+    """
     # get the object model content type (eg: Video)
-    model = ContentType.objects.get(id=object_model_content_type_id)
-
-    # delete all related comments
-    Comment.objects.filter(content_type=model, object_id=object_id).delete()
+    content_model = get_content_type_by_id(_id=content_type_id)
+    # Delete Related Comments
+    Comment.objects.filter(
+        content_type=content_model, object_id=object_id
+    ).delete()

@@ -1,53 +1,55 @@
 from rest_framework.permissions import BasePermission
 from core.utils import get_content_type_model
 
-class CommentPermission(BasePermission):
+
+class CommentCreatePermission(BasePermission):
     
-    message = 'Comments are closed.'
+    message = 'Comments are not allowed for this object.'
 
     def has_permission(self, request, view):
-
-        object = view.object
-
-        # users cannot add comment when allow_comment is False
-        if request.method == "POST":
-            return object.allow_comment
-
-        return True
+        """
+        Check if comments are allowed for an object.
+        """
+        return view.get_object().allow_comment
     
 
 
-class CommentDetailPermission(BasePermission):
-    message = 'You are not author of this comment.'
-    
-    def has_permission(self, request, view):
-        object = view.get_object()
+class IsCommentOwner(BasePermission):
+    """
+    Check if user is the comment's owner.
+    """
 
-        if request.method in ["PUT", "PATCH"]:
-            return (request.user == object.user)
-        
-        elif request.method == "DELETE":
-            '''Object owner and channel admins can delete a comment.'''
+    message = 'You are not the owner of this comment.'
 
-            if request.user == object.user:
-                return True
-            
-            else:
-                # check if user is admin
-                admin = request.user.channel_admins.filter(channel=object.content_object.channel).first()
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if user is the comment's owner.
+        For deleting, the content's channel admin can also delete the comment.
+        """
+        user = request.user
+        match request.method:
+            case 'PATCH' | 'PUT':
+                return obj.user == user
 
-                if admin:
-                    # if user is admin, check if user has permission to delete comment.
-                    if admin.permissions.filter(
-                            model=get_content_type_model(model=self.__class__),
-                            channel=object.content_object.channel,
-                            delete_object_comment=True):
-                        
-                        return True
-                    
-                    return False
-                
-                return False
-                
+            case 'DELETE':
+                channel_admin = user.channel_admins.filter(
+                    channel=obj.content_object.channel
+                ).exists()
+                return obj.user == user or channel_admin
 
-        return True
+class CanPinComment(BasePermission):
+    """
+    Check if user is the channel's admin.
+    """
+
+    message = 'You are not the channel admin.'
+
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if user is the channel's admin.
+        """
+        user = request.user
+        # Check if user is the channel's admin.
+        return user.channel_admins.filter(
+            channel=obj.content_object.channel
+        ).exists()
