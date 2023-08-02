@@ -88,3 +88,9 @@ class CommentDetailSerializer(serializers.ModelSerializer):
             instance=comment.replies.select_related('user'),
             many=True
         ).data
+
+
+class CommentPinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["pinned"]

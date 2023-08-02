@@ -1,13 +1,23 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
+from rest_framework.generics import (
+    RetrieveUpdateDestroyAPIView,
+    ListCreateAPIView,
+    UpdateAPIView
+)
 
-from comments.serializers import CommentSerializer, CommentDetailSerializer
-from comments.permissions import CommentCreatePermission, IsCommentOwner
+from comments.serializers import (
+    CommentSerializer,
+    CommentDetailSerializer,
+    CommentPinSerializer
+)
+from comments.permissions import (
+    CommentCreatePermission,
+    IsCommentOwner,
+    CanPinComment
+)
+
 from apps.core.mixins import ContentObjectMixin
 
 
@@ -123,29 +133,40 @@ class CommentDetailView(ContentObjectMixin, RetrieveUpdateDestroyAPIView):
         self.check_object_permissions(self.request, comment)
         return comment
 
+
 @extend_schema_view(
-    get=extend_schema(description="Pin a comment [channel staff only].")
+    put=extend_schema(
+        description="Pin a comment by channel staff.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    ),
+    patch=extend_schema(
+            description="Pin a comment by channel staff.",
+            responses={
+                200: 'ok',
+                401: 'Unauthorized',
+                403: 'Permission denied',
+                404: 'Not found'
+            },
+            tags=['Comments']
+    ),
 )
-class CommentPinView(ContentObjectMixin, APIView):
-    permission_classes = [IsAuthenticated,] 
+class CommentPinView(ContentObjectMixin, UpdateAPIView):
+    permission_classes = [IsAuthenticated, CanPinComment]
+    serializer_class = CommentPinSerializer
 
     def get_object(self):
-        return get_object_or_404(
-                self.object.comments.select_related('user'), 
-                token=self.kwargs.get("comment_token")
-            )
+        content_object = super().get_object(bypass_permission=True)
 
-    def post(self, request, *args, **kwargs):
-        if self.object.allow_comment:
-            # get the parent comment 
-            comment = self.get_object()
-
-            # parent comment channel                      
-            channel = self.object.channel
-
-            if request.user.channel_admins.filter(channel=channel):
-                    comment.pinned = True if not comment.pinned else False
-                    comment.save()
-                    return Response("OK", status=status.HTTP_200_OK)
-                    
-        return Response("Permission denied.", status=status.HTTP_403_FORBIDDEN)
+        comment = get_object_or_404(
+            content_object.comments.select_related('user').prefetch_related(
+            ),
+            token=self.kwargs.get("comment_token")
+        )
+        self.check_object_permissions(self.request, comment)
+        return comment

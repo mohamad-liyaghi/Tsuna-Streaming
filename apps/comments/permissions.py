@@ -36,3 +36,20 @@ class IsCommentOwner(BasePermission):
                     channel=obj.content_object.channel
                 ).exists()
                 return obj.user == user or channel_admin
+
+class CanPinComment(BasePermission):
+    """
+    Check if user is the channel's admin.
+    """
+
+    message = 'You are not the channel admin.'
+
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if user is the channel's admin.
+        """
+        user = request.user
+        # Check if user is the channel's admin.
+        return user.channel_admins.filter(
+            channel=obj.content_object.channel
+        ).exists()

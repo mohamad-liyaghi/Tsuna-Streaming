@@ -16,7 +16,9 @@ urlpatterns = [
          name="comment_detail"
     ),
                  
-    path('<str:object_token>/<str:comment_token>/pin/',
-                 CommentPinView.as_view(), name="comment_pin"),
-    
+    path(
+        "<str:content_type_id>/<str:object_token>/<str:comment_token>/pin/",
+         CommentPinView.as_view(),
+        name="comment_pin"
+    ),
 ]
