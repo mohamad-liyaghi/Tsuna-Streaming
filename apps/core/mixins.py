@@ -35,7 +35,7 @@ class ContentObjectMixin(ContentTypeModelMixin):
     Retrieve the object that user is trying to access.
     """
 
-    def get_object(self):
+    def get_object(self, bypass_permission: bool = False):
         """
         Get the object from the URL
         The self.model is set in the ContentTypeModelMixin
@@ -46,6 +46,10 @@ class ContentObjectMixin(ContentTypeModelMixin):
             self.model,
             token=self.kwargs.get('object_token')
         )
-        # Check permissions for the object
-        self.check_object_permissions(self.request, content_object)
+
+        # Check permissions for the object if bypass_permission is False
+        if not bypass_permission:
+            # Check permissions for the object
+            self.check_object_permissions(self.request, content_object)
+
         return content_object

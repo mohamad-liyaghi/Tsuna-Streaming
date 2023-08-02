@@ -6,9 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
-from comments.models import Comment
 from comments.serializers import CommentSerializer, CommentDetailSerializer
-from comments.permissions import CommentCreatePermission, CommentDetailPermission
+from comments.permissions import CommentCreatePermission, IsCommentOwner
 from apps.core.mixins import ContentObjectMixin
 
 
@@ -62,21 +61,67 @@ class CommentListCreateView(ContentObjectMixin, ListCreateAPIView):
         
 
 @extend_schema_view(
-    get=extend_schema(description="Comment detail page [replies]."),
-    put=extend_schema(description="Update a comment [only by its user]."),
-    patch=extend_schema(description="Update a comment [only by its user]."),
-    delete=extend_schema(description="Delete a comment [by its user or channel's owner].")
+    get=extend_schema(
+        description="Retrieve a comment and its replies.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    ),
+    put=extend_schema(
+        description="Update a comment by its owner.",
+        responses={
+            200: 'ok',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    ),
+    patch=extend_schema(
+        description="Update a comment by its owner.",
+        responses={
+            200: 'ok',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    ),
+    delete=extend_schema(
+        description="Delete a comment by its owner.",
+        responses={
+            204: 'No content',
+            401: 'Unauthorized',
+            403: 'Permission denied',
+            404: 'Not found'
+        },
+        tags=['Comments']
+    )
 )
 class CommentDetailView(ContentObjectMixin, RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsAuthenticated, CommentDetailPermission]
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated()]
+        # For PUT, PATCH and DELETE requests
+        return [IsAuthenticated(), IsCommentOwner()]
+
     serializer_class = CommentDetailSerializer
 
     def get_object(self):
-        return get_object_or_404(
-                self.object.comments.select_related('user'), 
-                token=self.kwargs.get("comment_token")
-            )
+        content_object = super().get_object(bypass_permission=True)
 
+        comment = get_object_or_404(
+            content_object.comments.select_related('user').prefetch_related(
+            ),
+            token=self.kwargs.get("comment_token")
+        )
+        self.check_object_permissions(self.request, comment)
+        return comment
 
 @extend_schema_view(
     get=extend_schema(description="Pin a comment [channel staff only].")

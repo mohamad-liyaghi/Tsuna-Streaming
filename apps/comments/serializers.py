@@ -69,15 +69,22 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ["user", "body", "date", "edited", "pinned", "token", "replies"]
-        extra_kwargs = {
-            "edited" : {"read_only" : True},
-            "pinned" : {"read_only" : True},
-            "token" : {"read_only" : True},
-        }
-
+        fields = [
+            "user",
+            "body",
+            "date",
+            "edited",
+            "pinned",
+            "token",
+            "replies"
+        ]
+        read_only_fields = ["date", "edited", "pinned", "token"]
 
     def reply_list(self, comment):
-        '''return list of comment list'''
-        serializer = CommentRepliesSerializer(instance=comment.replies.select_related('user').all(), many=True)
-        return serializer.data
+        """
+        Return List of replies of a comment.
+        """
+        return CommentRepliesSerializer(
+            instance=comment.replies.select_related('user'),
+            many=True
+        ).data

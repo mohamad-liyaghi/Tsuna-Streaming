@@ -14,37 +14,25 @@ class CommentCreatePermission(BasePermission):
     
 
 
-class CommentDetailPermission(BasePermission):
-    message = 'You are not author of this comment.'
-    
-    def has_permission(self, request, view):
-        object = view.get_object()
+class IsCommentOwner(BasePermission):
+    """
+    Check if user is the comment's owner.
+    """
 
-        if request.method in ["PUT", "PATCH"]:
-            return (request.user == object.user)
-        
-        elif request.method == "DELETE":
-            '''Object owner and channel admins can delete a comment.'''
+    message = 'You are not the owner of this comment.'
 
-            if request.user == object.user:
-                return True
-            
-            else:
-                # check if user is admin
-                admin = request.user.channel_admins.filter(channel=object.content_object.channel).first()
+    def has_object_permission(self, request, view, obj):
+        """
+        Check if user is the comment's owner.
+        For deleting, the content's channel admin can also delete the comment.
+        """
+        user = request.user
+        match request.method:
+            case 'PATCH' | 'PUT':
+                return obj.user == user
 
-                if admin:
-                    # if user is admin, check if user has permission to delete comment.
-                    if admin.permissions.filter(
-                            model=get_content_type_model(model=self.__class__),
-                            channel=object.content_object.channel,
-                            delete_object_comment=True):
-                        
-                        return True
-                    
-                    return False
-                
-                return False
-                
-
-        return True
+            case 'DELETE':
+                channel_admin = user.channel_admins.filter(
+                    channel=obj.content_object.channel
+                ).exists()
+                return obj.user == user or channel_admin
