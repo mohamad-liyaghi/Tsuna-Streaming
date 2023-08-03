@@ -1,10 +1,10 @@
 import pytest
 from videos.models import Video
 
-# TODO: Move this
+
 @pytest.fixture
-def create_video(create_channel):
+def create_video(create_channel, create_file):
     return Video.objects.create(
         title='test', user=create_channel.owner,
-        channel=create_channel, file='fake.mp3'
+        channel=create_channel, file=create_file
     )
