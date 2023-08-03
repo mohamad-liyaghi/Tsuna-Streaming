@@ -5,32 +5,50 @@ from viewers.models import Viewer
 
 
 class VideoListSerializer(serializers.ModelSerializer):
-    '''A serializer for user latest videos list'''
+    """
+    List of a channel's videos.
+    """
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
 
     class Meta:
         model = Video
-        fields = ["title", "thumbnail", "token", "channel", "date", "user", "is_published"]
+        fields = [
+            "title",
+            "thumbnail",
+            "token",
+            "channel",
+            "date",
+            "user",
+            "is_published"
+        ]
 
 
-class VideoCreateSeriaizer(serializers.ModelSerializer):
-    '''Serializer for adding new video'''
-
-
+class VideoCreateSerializer(serializers.ModelSerializer):
+    """
+    Create a new video
+    """
     class Meta:
         model = Video
-        fields = ["title", "description", "file", "thumbnail", "allow_comment", "visibility", "date", "token"]
+        fields = [
+            "title",
+            "description",
+            "file",
+            "thumbnail",
+            "allow_comment",
+            "visibility",
+            "date",
+            "token"
+        ]
 
-        extra_kwargs = {
-            "date" : {'read_only' : True},
-            "token" : {'read_only' : True}
-        }
+        read_only_fields = [
+            'token',
+            'date',
+        ]
     
     def save(self, **kwargs):
-        # set user for video uploader
-        kwargs["user"] = self.context['user']
-        kwargs["channel"] = self.context['channel']
+        kwargs.setdefault('user', self.context['user'])
+        kwargs.setdefault('channel', self.context['channel'])
 
         try:
             return super().save(**kwargs)

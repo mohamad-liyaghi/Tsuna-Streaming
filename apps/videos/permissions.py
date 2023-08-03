@@ -4,20 +4,17 @@ from core.utils import get_content_type_model
 
 
 class CreateVideoPermission(BasePermission):
-    message = 'You are not allowed to add video to this channel'
+    message = 'Only channel admins can add videos.'
 
     def has_permission(self, request, view):
+        """
+        Check if user has permission to add video.
+        """
         channel = view.channel
-        
-        if request.method == "POST":
-            # Check if user is admin
-            if (admin:=channel.admins.filter(user=request.user).first()):
-                # If user is admin, check if user has permission to add video
-                return (admin and admin.permissions.filter(model=get_content_type_model(Video), add_object=True))
-            
-            return False
-        
-        return True
+        user = request.user
+        # Check if user is admin of channel
+        admin = user.channel_admins.filter(channel=channel).first()
+        return admin.permissions.can_add_object
         
 
 class VideoPermission(BasePermission):
