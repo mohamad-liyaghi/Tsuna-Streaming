@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404
-
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
-
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from videos.models import Video
@@ -22,6 +20,7 @@ from viewers.decorators import ensure_viewer_exists
 from core.mixins import ChannelObjectMixin
 from core.permissions import IsChannelAdmin
 from core.models import ContentVisibility
+
 
 @extend_schema_view(
     get=extend_schema(
@@ -139,7 +138,7 @@ class VideoListCreateView(ChannelObjectMixin, ListCreateAPIView):
 )
 class VideoDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
     lookup_field = "token"
-    throttle_classes = [VideoThrottle,]
+    throttle_classes = [VideoThrottle]
     serializer_class = VideoDetailSerializer
 
     def get_permissions(self):
@@ -157,7 +156,7 @@ class VideoDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
     def get_object(self):
         video = get_object_or_404(
             Video.objects.select_related("channel", "user"),
-            token=self.kwargs["video_token"],
+            token=self.kwargs["object_token"],
             channel=self.channel
         )
         self.check_object_permissions(self.request, video)
