@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
-from videos.models import Video
-from core.utils import get_content_type_model
+from core.models import ContentVisibility
 
 
 class CreateVideoPermission(BasePermission):
@@ -17,29 +16,43 @@ class CreateVideoPermission(BasePermission):
         return admin.permissions.can_add_object
         
 
-class VideoPermission(BasePermission):
-    message = 'Permission denied.'
-    
+class UpdateVideoPermission(BasePermission):
+    message = 'Only channel admins can update videos.'
+
     def has_permission(self, request, view):
+        """
+        Check if user has permission to update video.
+        """
+        channel = view.channel
+        user = request.user
+        # Check if user is admin of channel
+        admin = user.channel_admins.filter(channel=channel).first()
+        return admin.permissions.can_edit_object
 
-        if request.method == "GET":
-            return True
-        
-        admin = request.user.channel_admins.filter(channel=view.channel).first()
 
-        # only channel owner and some admins can update a video
-        if request.method in ["PUT", "PATCH"]:
-            return (admin and admin.permissions.filter(model=get_content_type_model(Video), edit_object=True))
+class DeleteVideoPermission(BasePermission):
+    message = 'Only channel admins can delete videos.'
+
+    def has_permission(self, request, view):
+        """
+        Check if user has permission to delete video.
+        """
+        channel = view.channel
+        user = request.user
+        # Check if user is admin of channel
+        admin = user.channel_admins.filter(channel=channel).first()
+        return admin.permissions.can_delete_object
 
 
-        # only channel owner and some admins can delete a video
-        elif request.method == "DELETE":
-            return (admin and admin.permissions.filter(model=get_content_type_model(Video), delete_object=True))
-
+class RetrievePrivateVideoPermission(BasePermission):
+    message = 'Only channel admins can view private videos.'
 
     def has_object_permission(self, request, view, obj):
-        # only admin of channels can view unpublished videos
-        if not obj.is_published:
-            return (request.user.channel_admins.filter(channel=obj.channel).first())
-        
-        return True
+        """
+        Check if user has permission to view private video.
+        """
+        channel = view.channel
+        return (
+                obj.visibility == ContentVisibility.PUBLISHED or
+                request.user.channel_admins.filter(channel=channel).exists()
+        )

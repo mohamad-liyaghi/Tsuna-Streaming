@@ -9,5 +9,9 @@ urlpatterns = [
         VideoListCreateView.as_view(),
         name='list_create'
     ),
-    path('<str:channel_token>/<str:video_token>/', VideoDetailView.as_view(), name='video_detail'),
+    path(
+        '<str:channel_token>/<str:video_token>/',
+        VideoDetailView.as_view(),
+        name='detail'
+    ),
 ]
