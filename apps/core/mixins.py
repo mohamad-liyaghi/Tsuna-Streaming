@@ -2,6 +2,7 @@ from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from core.utils import get_content_type_by_id
+from channels.models import Channel
 
 
 class ContentTypeModelMixin:
@@ -53,3 +54,15 @@ class ContentObjectMixin(ContentTypeModelMixin):
             self.check_object_permissions(self.request, content_object)
 
         return content_object
+
+
+class ChannelObjectMixin:
+    """
+    Get the channel object from the channel token.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        # Set as self.channel
+        self.channel = get_object_or_404(
+            Channel, token=self.kwargs['channel_token']
+        )
+        return super().dispatch(request, *args, **kwargs)

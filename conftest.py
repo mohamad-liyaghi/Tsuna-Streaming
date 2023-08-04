@@ -8,7 +8,7 @@ from apps.channels.tests.fixtures import *  # noqa
 from apps.channel_subscribers.tests.fixtures import *  # noqa
 from apps.channel_admins.tests.fixtures import *  # noqa
 from apps.votes.tests.fixtures import *  # noqa
-from apps.videos.fixtures import * # noqa
+from apps.videos.tests.fixtures import * # noqa
 from apps.viewers.tests.fixtures import *  # noqa
 from apps.comments.tests.fixtures import *  # noqa
 

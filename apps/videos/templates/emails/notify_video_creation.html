@@ -6,7 +6,7 @@ New video added to your channel.
 <h1>Hello dear {{ first_name }},</h1>
 <p>A new video added to {{ channel_title }}!</p>
 
-<a href="{{ domain }}{% url 'videos:video_detail' channel_token video_token  %}">
+<a href="{{ domain }}{% url 'videos:detail' channel_token video_token  %}">
     Video Link
 </a>
 
