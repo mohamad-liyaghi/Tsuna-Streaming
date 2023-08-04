@@ -26,7 +26,7 @@ class MusicListSerializer(serializers.ModelSerializer):
         ]
 
 
-class MusicCreateSeriaizer(serializers.ModelSerializer):
+class MusicCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for adding new music.
     """
@@ -43,18 +43,15 @@ class MusicCreateSeriaizer(serializers.ModelSerializer):
             "date",
             "token"
         ]
-        extra_kwargs = {
-            "date": {'read_only': True},
-            "token": {'read_only': True}
-        }
+
+        read_only_fields = [
+            'token',
+            'date',
+        ]
 
     def save(self, **kwargs):
-        """
-        Sets user for music uploader.
-        """
-
-        kwargs["user"] = self.context['user']
-        kwargs["channel"] = self.context['channel']
+        kwargs.setdefault('user', self.context['user'])
+        kwargs.setdefault('channel', self.context['channel'])
 
         try:
             return super().save(**kwargs)
@@ -63,13 +60,14 @@ class MusicCreateSeriaizer(serializers.ModelSerializer):
             raise serializers.ValidationError(str(error))
 
 
-
 class MusicDetailSerializer(serializers.ModelSerializer):
-    '''Serializer for retrieving, Updating a music'''
+    """
+    A serializer for music detail.
+    """
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
-    get_viewer_count = serializers.SerializerMethodField(
+    viewer_count = serializers.SerializerMethodField(
         method_name="get_viewer_count",
         read_only=True
     )
@@ -90,23 +88,24 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            "get_viewer_count"
+            "viewer_count"
             ]
 
-        extra_kwargs = {
-            "file" : {'read_only' : True},
-            "token" : {'read_only' : True},
-            "user" : {'read_only' : True},
-            "channel" : {'read_only' : True},
-            "date" : {'read_only' : True},
-            "is_updated" : {'read_only' : True},
-        }
+        read_only_fields = [
+            'file',
+            'token',
+            'user',
+            'channel',
+            'date',
+            'is_updated',
+            'viewer_count'
+        ]
 
-        def get_viewer_count(self, obj):
-            """
-            Return the number of viewers for a music.
-            """
-            return Viewer.objects.get_count(
-                channel=obj.channel,
-                content_object=obj
-            )
+    def get_viewer_count(self, obj):
+        """
+        Get the number of viewers for a music
+        """
+        return Viewer.objects.get_count(
+            content_object=obj,
+            channel=obj.channel,
+        )
