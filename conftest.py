@@ -11,6 +11,8 @@ from apps.votes.tests.fixtures import *  # noqa
 from apps.videos.tests.fixtures import * # noqa
 from apps.viewers.tests.fixtures import *  # noqa
 from apps.comments.tests.fixtures import *  # noqa
+from apps.musics.tests.fixtures import *  # noqa
+
 
 @pytest.fixture
 def create_unique_uuid():

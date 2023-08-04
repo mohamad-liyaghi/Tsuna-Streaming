@@ -9,6 +9,7 @@ from .utils import (
 )
 from core.utils import get_content_type_model
 from .visibility import ContentVisibility
+from contents.managers import BaseContentManager
 
 
 class AbstractContent(AbstractToken):
@@ -40,6 +41,8 @@ class AbstractContent(AbstractToken):
     allow_comment = models.BooleanField(default=True)
 
     date = models.DateTimeField(auto_now_add=True)
+
+    objects = BaseContentManager()
 
     votes = GenericRelation('votes.Vote')
     comments = GenericRelation('comments.Comment')
