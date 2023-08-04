@@ -60,13 +60,14 @@ class MusicCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(str(error))
 
 
-
 class MusicDetailSerializer(serializers.ModelSerializer):
-    '''Serializer for retrieving, Updating a music'''
+    """
+    A serializer for music detail.
+    """
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
-    get_viewer_count = serializers.SerializerMethodField(
+    viewer_count = serializers.SerializerMethodField(
         method_name="get_viewer_count",
         read_only=True
     )
@@ -87,23 +88,24 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            "get_viewer_count"
+            "viewer_count"
             ]
 
-        extra_kwargs = {
-            "file" : {'read_only' : True},
-            "token" : {'read_only' : True},
-            "user" : {'read_only' : True},
-            "channel" : {'read_only' : True},
-            "date" : {'read_only' : True},
-            "is_updated" : {'read_only' : True},
-        }
+        read_only_fields = [
+            'file',
+            'token',
+            'user',
+            'channel',
+            'date',
+            'is_updated',
+            'viewer_count'
+        ]
 
-        def get_viewer_count(self, obj):
-            """
-            Return the number of viewers for a music.
-            """
-            return Viewer.objects.get_count(
-                channel=obj.channel,
-                content_object=obj
-            )
+    def get_viewer_count(self, obj):
+        """
+        Get the number of viewers for a music
+        """
+        return Viewer.objects.get_count(
+            content_object=obj,
+            channel=obj.channel,
+        )
