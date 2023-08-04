@@ -1,7 +1,8 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from core.models import ContentVisibility
+from contents.models import ContentVisibility
+from viewers.models import Viewer
 
 
 @pytest.mark.django_db
@@ -14,7 +15,7 @@ class TestVideoRetrieveView:
             'videos:detail',
             kwargs={
                 'channel_token': create_video.channel.token,
-                'video_token': create_video.token
+                'object_token': create_video.token
             }
         )
 
@@ -44,3 +45,17 @@ class TestVideoRetrieveView:
         assert response.status_code == status.HTTP_200_OK
         assert self.video.visibility == ContentVisibility.PRIVATE
 
+    def test_retrieve_inc_viewers(self, api_client, create_channel_admin):
+        """
+        Inc the viewer of an object after retrieving
+        """
+        self.video.visibility = ContentVisibility.PRIVATE
+        self.video.save()
+        api_client.force_authenticate(create_channel_admin.user)
+        response = api_client.get(self.url_path)
+        assert response.status_code == status.HTTP_200_OK
+        assert Viewer.objects.get_count(
+            channel=self.video.channel,
+            content_object=self.video
+        ) == 1
+        assert self.video.visibility == ContentVisibility.PRIVATE

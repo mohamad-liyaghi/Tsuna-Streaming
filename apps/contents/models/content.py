@@ -2,20 +2,13 @@ from django.db import models
 from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.fields import GenericRelation
 
-from .token import AbstractToken
+from core.models import AbstractToken
 from .utils import (
     get_thumbnail_upload_path,
     get_file_upload_path
 )
 from core.utils import get_content_type_model
-
-
-class ContentVisibility(models.TextChoices):
-    """
-    Content visibility choices
-    """
-    PRIVATE = ("pr", "Private")
-    PUBLISHED = ("pu", "Public")
+from .visibility import ContentVisibility
 
 
 class AbstractContent(AbstractToken):

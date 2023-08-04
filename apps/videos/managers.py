@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import ContentVisibility
+from contents.models import ContentVisibility
 
 
 class VideoManager(models.Manager):

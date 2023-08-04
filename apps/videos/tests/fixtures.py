@@ -1,6 +1,6 @@
 import pytest
 from videos.models import Video
-from core.models import ContentVisibility
+from contents.models import ContentVisibility
 
 
 @pytest.fixture

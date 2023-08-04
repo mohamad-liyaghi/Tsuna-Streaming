@@ -11,7 +11,7 @@ from core.utils import get_content_type_model
 from votes.models import Vote, VoteChoice
 from comments.models import Comment
 from viewers.models import Viewer
-from core.models import ContentVisibility
+from contents.models import ContentVisibility
 
 
 @pytest.mark.django_db

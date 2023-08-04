@@ -13,7 +13,7 @@ class TestVideoUpdateView:
             'videos:detail',
             kwargs={
                 'channel_token': create_video.channel.token,
-                'video_token': create_video.token
+                'object_token': create_video.token
             }
         )
         self.data = {

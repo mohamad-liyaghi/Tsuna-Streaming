@@ -1,7 +1,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
-from core.models import ContentVisibility
+from contents.models import ContentVisibility
 
 
 @pytest.mark.django_db

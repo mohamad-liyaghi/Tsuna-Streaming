@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from apps.core.models import AbstractContent
+from contents.models import AbstractContent
 from channels.models import Channel
 
 

@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from apps.core.models import AbstractContent
+from contents.models import AbstractContent
 from videos.managers import VideoManager
 from videos.validators import validate_video_size
 from channels.models import Channel
