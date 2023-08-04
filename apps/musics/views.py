@@ -2,49 +2,54 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, extend_schema_view
-
+from contents.views import (
+    ContentListCreateView,
+    ContentDetailView
+)
 from musics.models import Music
-from musics.permissions import CreateMusicPermission, MusicDetailPermission
 from musics.mixins import ChannelObjectMixin
-from musics.serializers import (MusicListSerializer, MusicCreateSeriaizer, 
-                                MusicDetailSerializer)
+from musics.serializers import (
+    MusicListSerializer,
+    MusicCreateSerializer,
+    MusicDetailSerializer
+)
 from viewers.decorators import ensure_viewer_exists
-    
+
 
 @extend_schema_view(
-    get=extend_schema(description="List of channel's uploaded musics."),
-    post=extend_schema(description="Upload a new music [For channel that user has permission].")
+    get=extend_schema(
+        description="List of a channel's musics.",
+        responses={
+            200: 'ok',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not found',
+        },
+        tags=['Musics']
+    ),
+    post=extend_schema(
+        description="Create a new music.",
+        responses={
+            201: 'Created',
+            400: 'Bad request',
+            401: 'Unauthorized',
+            403: 'Forbidden',
+            404: 'Not found',
+        },
+        tags=['Musics']
+    ),
 )
-class MusicListCreateView(ChannelObjectMixin, ListCreateAPIView):
-    filterset_fields = ['title', 'visibility']
-    permission_classes = [IsAuthenticated, CreateMusicPermission]
-    
-
-    def get_queryset(self):
-        """
-        List of channels musics.
-        Admins can also see private ones
-        """
-
-    def get_queryset(self):
-        queryset = Music.objects.select_related('user', 'channel').filter(channel=self.channel).order_by('-date')
-        if self.request.user.channel_admins.filter(channel=self.channel):
-            return queryset
-        return queryset.filter(visibility='pu')
-
-    def get_serializer_context(self):
-
-        return {
-            'user': self.request.user,
-            'channel': self.channel
-        }
+class MusicListCreateView(ContentListCreateView):
+    """
+    List/Create a music
+    """
+    model = Music
 
     def get_serializer_class(self):
         if self.request.method == "GET":
             return MusicListSerializer
 
-        elif self.request.method == 'POST':
-            return MusicCreateSeriaizer
+        return MusicCreateSerializer
 
 
 @extend_schema_view(
@@ -55,7 +60,7 @@ class MusicListCreateView(ChannelObjectMixin, ListCreateAPIView):
 )
 class MusicDetailView(ChannelObjectMixin, RetrieveUpdateDestroyAPIView):
     lookup_field = 'music_token'
-    permission_classes = [IsAuthenticated, MusicDetailPermission]
+    permission_classes = [IsAuthenticated,]
     serializer_class = MusicDetailSerializer
 
     def get_object(self):

@@ -16,10 +16,8 @@ post_delete.connect(delete_object_viewers_after_deleting, sender=Music)
 def notify_music_creation(sender, instance, created, **kwargs):
     
     if created:
-        print(instance.token)
-            
         if instance.user == instance.channel.owner:
-            send_email(
+            send_email.delay(
                 template_name="emails/notify_music_creation.html",
                 to_email=instance.user.email,
                 body={
@@ -32,9 +30,9 @@ def notify_music_creation(sender, instance, created, **kwargs):
 
         else:
             # send email to both admin and owner
-            send_email(
+            send_email.delay(
                 template_name="emails/notify_music_creation.html",
-                email=instance.user.email,
+                to_email=instance.user.email,
                 body={
                     "first_name": instance.user.first_name,
                     "channel_title": instance.title,
@@ -43,7 +41,7 @@ def notify_music_creation(sender, instance, created, **kwargs):
                 }
               )
 
-            send_email(
+            send_email.delay(
                 template_name="emails/notify_music_creation.html",
                 to_email=instance.channel.owner.email,
                 body={

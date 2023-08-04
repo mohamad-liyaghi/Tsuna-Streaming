@@ -26,7 +26,7 @@ class MusicListSerializer(serializers.ModelSerializer):
         ]
 
 
-class MusicCreateSeriaizer(serializers.ModelSerializer):
+class MusicCreateSerializer(serializers.ModelSerializer):
     """
     Serializer for adding new music.
     """
@@ -43,18 +43,15 @@ class MusicCreateSeriaizer(serializers.ModelSerializer):
             "date",
             "token"
         ]
-        extra_kwargs = {
-            "date": {'read_only': True},
-            "token": {'read_only': True}
-        }
+
+        read_only_fields = [
+            'token',
+            'date',
+        ]
 
     def save(self, **kwargs):
-        """
-        Sets user for music uploader.
-        """
-
-        kwargs["user"] = self.context['user']
-        kwargs["channel"] = self.context['channel']
+        kwargs.setdefault('user', self.context['user'])
+        kwargs.setdefault('channel', self.context['channel'])
 
         try:
             return super().save(**kwargs)
