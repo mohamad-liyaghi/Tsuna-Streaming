@@ -9,6 +9,7 @@ from channel_admins.signals import create_admin_after_creating_channel
 post_save.connect(create_subscriber_after_creating_channel, sender=Channel)
 post_save.connect(create_admin_after_creating_channel, sender=Channel)
 
+
 @receiver(post_save, sender=Channel)
 def notify_channel_creation(sender, instance, created, **kwargs):
     """
