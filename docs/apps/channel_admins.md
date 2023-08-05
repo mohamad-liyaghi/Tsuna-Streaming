@@ -1,43 +1,83 @@
-# Introduction:
-The "Channel Admins" application is a part of the "Tsuna Streaming" project that handles the management of channels and content for administrators. By default, the channel owner has full permission and can perform any kind of action within the channel. However, as owners are not always available, they can promote other users to be admins with customized access permissions.
+# Channel Admins Application Documentation
 
-# Models:
-The app uses two models - `ChannelAdmin` and `ChannelAdminPermission`. 
+Table of Contents:
+- [Description](#description)
+- [Models](#models)
+  - [ChannelAdmin](#channeladmin)
+  - [ChannelAdminPermission](#channeladminpermission)
+- [Views](#views)
+  - [AdminListCreateView](#adminlistcreateview)
+  - [AdminDetailView](#admindetailview)
+- [Signals](#signals)
+  - [send_admin_promotion_email](#send-admin-promotion-email)
+  - [create_admin_after_creating_channel](#create-admin-after-creating-channel)
+  - [delete_admin_after_unsubscribing](#delete-admin-after-unsubscribing)
+  - [create_permissions_for_admin](#create-permissions-for-admin)
+- [Exceptions](#exceptions)
+  - [SubscriptionRequiredException](#subscriptionrequiredexception)
+- [Tests](#tests)
 
-- `ChannelAdmin` model is the main admin model for each channel. When a user creates a channel, an admin object with full permissions will automatically be created for the channel owner. The channel owner or admins with the 'add_admin' permission can promote other users to become admins.
+## Description
+The Channel Admins application allows channel owners to promote users as admins for their channels. Admins have specific permissions within the channel. This application provides views for listing and creating admins, retrieving and updating admin permissions, and deleting admins.
 
-- `ChannelAdminPermission` model stores information about the permission assigned to the admin. It contains a foreign key to the `ChannelAdmin` model as well as fields to store the permission type and the time when the permission was granted.
+## Models
 
-# Views:
-- `add_admin` Admins can promote other users with this view
+### ChannelAdmin
+The `ChannelAdmin` model represents an admin for a channel. The fields are as follows:
 
-- `list_admins` List of admins of a channel.
+- `user`: A relationship to the `User` model.
+- `promoted_by`: A relationship to the `User` model who promoted the admin.
+- `channel`: A relationship to the `Channel` model.
+- `date`: The date when the admin was promoted.
 
-- `update_admin` Update an admins common permissions.
+### ChannelAdminPermission
+The `ChannelAdminPermission` model represents the permissions assigned to an admin. The fields represent the specific permissions available to admins.
 
-- `update_admin_permission` Update an admins specific permissions.
+## Views
 
-- `delete_admin` Delete an admin.
+### AdminListCreateView
+The `AdminListCreateView` is responsible for listing all the admins for a channel and creating a new admin. It accepts GET and POST requests.
 
-# Signals:
-The app uses signals to perform certain actions. 
+- **Responses**:
+  - `200 OK`: Successfully retrieved the list of admins.
+  - `201 Created`: Successfully created a new admin.
+  - `400 Bad Request`: Invalid data in the request.
+  - `401 Unauthorized`: User is not authenticated.
+  - `403 Forbidden`: User does not have permission to perform the action.
 
-- When a new channel admin is added, the app sends a notification to the admin user. 
+### AdminDetailView
+The `AdminDetailView` is responsible for retrieving, updating, and deleting an admin. It accepts GET, PUT, PATCH, and DELETE requests.
 
-- When a user unsubscribes from a channel, the app removes their corresponding entries from the `ChannelAdmin` and `ChannelAdminPermission` models.
+- **Responses**:
+  - `200 OK`: Successfully retrieved or updated the admin.
+  - `204 No Content`: Successfully deleted the admin.
+  - `400 Bad Request`: Invalid data in the request.
+  - `401 Unauthorized`: User is not authenticated.
+  - `403 Forbidden`: User does not have permission to perform the action.
+  - `404 Not Found`: Admin not found.
 
-- When an admin object or channel gets created, signal creates permission for each ContentModel.
+## Signals
 
-# Exceptions:
-The app has one exception: `SubscriptionRequiredException`.
+### send_admin_promotion_email
+This signal is triggered when a user is promoted as an admin. It sends an email notification to the user about their promotion.
 
-`SubscriptionRequiredException` exception is raised if the user trying to add an admin is not a subscribed member of the channel.
+### create_admin_after_creating_channel
+This signal is triggered when a new channel is created. It automatically creates an admin for the channel, with the channel owner being the admin.
 
-`DuplicatePromotionException` exception is raised if the user is getting promoted twice.
+### delete_admin_after_unsubscribing
+This signal is triggered when a user unsubscribes from a channel. It automatically deletes the admin associated with the user.
+
+### create_permissions_for_admin
+This signal is triggered when a new admin is created. It automatically creates permissions for the admin.
+
+## Exceptions
+
+### SubscriptionRequiredException
+This exception is raised when a user tries to perform an action that requires a subscription to the channel.
 
 ## Tests
-The application's tests can be run using the following command: 
+Tests for the Channel Admins application can be run with the following command:
 
 ```
-$ pytest apps/channel_admins
+pytest apps/channel_admins
 ```

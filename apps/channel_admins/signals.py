@@ -25,6 +25,7 @@ def send_admin_promotion_email(sender, created, instance, **kwargs):
             }
         )
 
+
 def create_admin_after_creating_channel(sender, created, instance, **kwargs):
     """
     Create admin after creating channel.
