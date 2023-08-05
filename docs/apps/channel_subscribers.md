@@ -1,50 +1,98 @@
-# Introduction
+# Channel Subscribers Application Documentation
 
-The "Channel Subscribers" application is a part of the "Tsuna Streaming" project that handles the management of channel subscribers. Users can subscribe to channels, which will be saved in cache first and then inserted into the database using Celery. The `ChannelSubscriber` model is used for this application and there are some views for subscribing and showing list of subscribers.
+Table of Contents:
+- [Description](#description)
+- [Models](#models)
+  - [ChannelSubscriber](#channelsubscriber)
+- [Views](#views)
+  - [SubscriberStatusView](#subscriberstatusview)
+  - [SubscriberCreateView](#subscribercreateview)
+  - [SubscriberDeleteView](#subscriberdeleteview)
+  - [SubscriberListView](#subscriberlistview)
+- [Model Managers](#model-managers)
+  - [ChannelSubscriberManager](#channelsubscribermanager)
+- [Services](#services)
+  - [ChannelSubscriberService](#channelsubscriberservice)
+- [Signals](#signals)
+  - [create_subscriber_after_creating_channel](#create-subscriber-after-creating-channel)
+- [Celery Tasks](#celery-tasks)
+  - [insert_subscriber_from_cache_into_db](#insert-subscriber-from-cache-into-db)
+  - [delete_unsubscribed_from_db](#delete-unsubscribed-from-db)
+- [Tests](#tests)
 
-# Models
+## Description
+The Channel Subscribers application allows users to subscribe to channels and follow their content. To optimize performance, subscribers are first created in the cache and then stored in the database using a Celery task. This application provides views for checking subscriber status, creating subscribers, deleting subscribers, and listing subscribers for a channel.
 
-- `ChannelSubscriber`: This is the only model of this app that represents a subscriber to a channel.
+## Models
 
-# Views
+### ChannelSubscriber
+The `ChannelSubscriber` model represents a subscriber for a channel. The fields are as follows:
 
-## SubscriberView
+- `channel`: A relationship to the `Channel` model.
+- `user`: A relationship to the `User` model.
+- `date`: The date when the subscriber was created.
 
-The `SubscriberView` allows users to subscribe or unsubscribe from a channel and show subscription status. It has three methods:
+## Views
 
-- `get`: Retrieves the subscription status for a given user and channel. Returns whether the user is currently subscribed to the channel or not
-- `post`: This method handles subscription requests. It checks if the user is already subscribed to the channel. If not, it subscribes the user in cache and returns a success message. Otherwise, it returns an error message.
-- `delete`: This method handles unsubscription requests. It removes the user from cache and returns a success message.
+### SubscriberStatusView
+The `SubscriberStatusView` is responsible for checking whether a user is subscribed to a channel or not. It accepts a GET request.
 
-## SubscriberListView
+- **Responses**:
+  - `200 OK`: Return whether the user is subscribed or not.
+  - `401 Unauthorized`: User is not authenticated.
+  - `404 Not Found`: Channel not found.
 
-The `SubscriberListView` provides a list of all the subscribers for a given channel. It has only one method:
+### SubscriberCreateView
+The `SubscriberCreateView` is responsible for creating a new subscriber for a channel. It accepts a POST request.
 
-- `get`: This method retrieves all the subscribers for a given channel and returns them in a JSON format.
+- **Responses**:
+  - `200 OK`: Successfully created the subscriber.
+  - `401 Unauthorized`: User is not authenticated.
+  - `403 Forbidden`: User is already subscribed to this channel.
+  - `404 Not Found`: Channel not found.
 
-# Celery
+### SubscriberDeleteView
+The `SubscriberDeleteView` is responsible for deleting a subscriber from a channel. It accepts a DELETE request.
 
-Celery is used to insert and delete subscribers from the database based on the data stored in cache. There are two tasks:
+- **Responses**:
+  - `204 No Content`: Successfully deleted the subscriber.
+  - `401 Unauthorized`: User is not authenticated.
+  - `403 Forbidden`: User has not subscribed yet.
+  - `404 Not Found`: Channel not found.
 
-- `insert_subscribers`: This task inserts new subscribers into the database from cache.
-- `delete_subscribers`: This task removes subscribers from the database based on the data stored in cache.
+### SubscriberListView
+The `SubscriberListView` is responsible for listing all the subscribers for a channel. It accepts a GET request.
 
-# Manager
+- **Responses**:
+  - `200 OK`: Successfully retrieved the list of subscribers.
+  - `401 Unauthorized`: User is not authenticated.
 
-The `ChannelSubscriberManager` class provides three methods:
+## Model Managers
 
-- `get_from_cache`: This method checks both cache and database to retrieve a subscriber by user and channel.
-- `subscribe_in_cache`: This method adds a subscriber to cache.
-- `unsubscribe_in_cache`: This method removes a subscriber from cache.
+### ChannelSubscriberManager
+The `ChannelSubscriberManager` is a model manager that inherits from the `BaseCacheManager` class. It provides methods for CRUD operations in the cache.
 
-# Signal
+## Services
 
-A signal is used to create a new subscriber after a channel is created.
+### ChannelSubscriberService
+The `ChannelSubscriberService` is a service class that inherits from the `CacheService` class. It provides operations in the cache, such as creating and deleting subscribers.
 
-# Tests
-The application's tests can be run using the following command: 
+## Signals
 
+### create_subscriber_after_creating_channel
+This signal is triggered when a new channel is created. It creates a new subscriber for the channel, with the subscriber being the channel owner.
+
+## Celery Tasks
+
+### insert_subscriber_from_cache_into_db
+This task is responsible for inserting subscribers from the cache into the database.
+
+### delete_unsubscribed_from_db
+This task is responsible for deleting unsubscribed users from the database.
+
+## Tests
+Tests for the Channel Subscribers application can be run with the following command:
 
 ```
-$ pytest apps/channel_subscribers
+pytest apps/channel_subscribers
 ```
