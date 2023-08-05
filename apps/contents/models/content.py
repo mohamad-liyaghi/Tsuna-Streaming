@@ -56,19 +56,6 @@ class AbstractContent(AbstractToken):
         """Return True if object is status is PUBLISHED"""
         return self.visibility == ContentVisibility.PUBLISHED
 
-    @classmethod
-    def get_content_model_by_name(cls, name):
-        # TODO: remove this
-        """
-        Return content model by name
-        """
-
-        for subclass in cls.__subclasses__():
-            if subclass.__name__ == name:
-                return subclass
-
-        return None
-
     def save(self, *args, **kwargs):
         if self.pk:
             # update is_updated field if an object is updated
@@ -88,10 +75,7 @@ class AbstractContent(AbstractToken):
         if not admin:
             raise PermissionDenied("Admin didnt found.")
 
-        if not admin and admin.permissions.filter(
-                model=get_content_type_model(model=self.__class__),
-                add_object=True
-        ).exists():
+        if not admin and admin.permissions.add_object:
             raise PermissionDenied("Admin dont have permission to add object.")
 
         # Return True if user is admin and has add_object permission

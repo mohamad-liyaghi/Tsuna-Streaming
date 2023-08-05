@@ -2,14 +2,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, post_delete
 from apps.core.tasks import send_email
 from musics.models import Music
-from votes.signals import delete_vote_after_deleting_object
-from comments.signals import delete_object_comments_after_deleting
-from viewers.signals import delete_object_viewers_after_deleting
-
-
-post_delete.connect(delete_vote_after_deleting_object, sender=Music)
-post_delete.connect(delete_object_comments_after_deleting, sender=Music)
-post_delete.connect(delete_object_viewers_after_deleting, sender=Music)
 
 
 @receiver(post_save, sender=Music)
