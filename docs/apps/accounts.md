@@ -1,58 +1,132 @@
 # Accounts Application Documentation
-## Overview
 
-The accounts application is an essential part of the project, which handles user registration, account activation, authentication, and user roles. The application ensures that the user's are authenticated, and only verified users can perform actions.
+Table of Contents:
+- [Description](#description)
+- [Models](#models)
+  - [Account](#account)
+  - [VerificationToken](#verificationtoken)
+  - [AbstractAccountRole](#abstractaccountrole)
+- [Views](#views)
+  - [RegisterUserView](#registeruserview)
+  - [VerifyUserView](#verifyuserview)
+  - [ResendTokenView](#resendtokenview)
+  - [LoginUserView](#loginuserview)
+  - [ProfileView](#profileview)
+- [Signals](#signals)
+  - [create_verification_token](#create-verification-token)
+  - [send_token_via_email](#send-token-via-email)
+- [Celery Tasks](#celery-tasks)
+  - [auto_delete_expired_tokens](#auto-delete-expired-tokens)
+  - [auto_delete_deactive_users](#auto-delete-deactive-users)
+- [Model Managers](#model-managers)
+  - [VerificationTokenManager](#verificationtokenmanager)
+- [Model Validators](#model-validators)
+  - [validate_profile_size](#validate-profile-size)
+- [Tests](#tests)
 
-## User Registration
-
-Creating an account is a smooth and straightforward process for users. Once the user submits the registration form, their account will be temporarily deactivated until they verify it using the token sent to their email address.
-
-## Account Verification
-
-A token is generated and sent to the user's email address after successful registration. The user must verify their account using the token to activate their account.
-
-## Authentication
-
-After account verification, the user can log in using the JWT (JSON Web Token) authentication method, which ensures the user's privacy and security.
-
-<hr>
+## Description
+The Accounts application of the Tsuna Streaming project handles the creation, verification, and authentication of user accounts. It provides views for registration and login, and uses JWT tokens for authentication. Account verification is done via email, with the option to resend the verification token if it has expired.
 
 ## Models
 
-This application is comprised of two models:
+### Account
+The `Account` model represents a user account. The fields are as follows:
 
-1. Account - This is the primary model for user accounts within the project. It inherits from the AbstractUser model in Django and includes custom fields for role management and informations.
+- `email`: A unique email address for the user.
+- `picture`: Profile picture of the user.
+- `first_name`: First name of the user.
+- `last_name`: Last name of the user.
+- `bio`: A short biography of the user.
+- `is_active`: A boolean field indicating the active status of the user. Default value is `False`.
 
-2. Token - This model is responsible for generating and storing verification tokens for new user accounts. When a user registers, a unique token is generated and sent to their email address. The user must then use this token to verify their account and activate it.
+### VerificationToken
+The `VerificationToken` model represents a verification token associated with a user account. The fields are as follows:
 
-Together, these two models provide a robust framework for user registration and account management within the project.
+- `user`: A relationship to the `Account` model.
+- `expire_at`: A datetime field representing the expiration date of the verification token.
 
-## User Roles
+### AbstractAccountRole
+The `AbstractAccountRole` model represents a base class for account roles. It provides 3 methods for checking if the account has a specific role.
+The methods are as follows:
+- `is_admin()`: Checks if the account is a superuser.
+- `is_premium()`: Checks if the account is a premium user.
+- `is_normal()`: Checks if the account is a normal user.
 
-By default, new users are assigned the 'n' (normal) role, while superusers are assigned the 'a' (admin) role. Superusers have more privileges and access to the system.
+## Views
 
-## Throttling
+### RegisterUserView
+The `RegisterUserView` is responsible for registering a new account to the system. It accepts a POST request with the user's information.
 
-To avoid spamming, there is throttling in place. Users are restricted from sending multiple requests within a specified time.
+- **Responses**:
+  - `201 Created`: Successfully created the user account.
+  - `400 Bad Request`: Invalid data in the request.
+  - `403 Forbidden`: User is already authenticated.
 
+### VerifyUserView
+The `VerifyUserView` is responsible for verifying an account. It accepts a verification token.
 
-## Token Expiration
+- **Responses**:
+  - `200 OK`: Successfully verified the user account.
+  - `400 Bad Request`: Invalid data in the request.
+  - `403 Forbidden`: Invalid verification token.
+  - `404 Not Found`: User not found.
 
-To keep the system secure, the application uses celery-beat to remove all expired tokens and deactivated users automatically.
+### ResendTokenView
+The `ResendTokenView` is responsible for resending a verification token to the user if the previous one has expired.
 
+- **Responses**:
+  - `201 Created`: Successfully sent a new verification token to the user.
+  - `400 Bad Request`: Invalid data in the request.
+  - `403 Forbidden`: User is already authenticated.
+  - `404 Not Found`: User not found.
+
+### LoginUserView
+The `LoginUserView` is responsible for logging in the user and returning a JWT token for future authentication.
+
+- **Responses**:
+  - `200 OK`: Return a JWT token for the user.
+  - `400 Bad Request`: Invalid data in the request.
+  - `403 Forbidden`: User is already authenticated.
+  - `404 Not Found`: User not found.
+
+### ProfileView
+The `ProfileView` is responsible for retrieving and updating a user's public profile.
+
+- **Responses**:
+  - `200 OK`: Return the user's public profile.
+  - `400 Bad Request`: Invalid data in the request.
+  - `403 Forbidden`: User is not authenticated.
+  - `404 Not Found`: User not found.
 
 ## Signals
 
-In the user registration process, the application will generate a unique token for each newly registered user, which will be stored in the database. This is achieved by using a signal that listens for the post_save event on the Account model.
+### create_verification_token
+This signal is triggered when a new user is created. It creates a verification token for the user.
 
-Once the token has been generated and saved, another signal will be triggered, this time to send the token to the user via email. This email will include instructions for the user to verify their account by clicking on a link, which will confirm their identity as the owner of the email address used during registration.
+### send_token_via_email
+This signal is triggered when a new verification token is created. It sends the token to the user via email.
 
-By utilizing these signals, the application ensures that the user registration process is secure and streamlined, with minimal input required from the user to activate their account.
+## Celery Tasks
+
+### auto_delete_expired_tokens
+This task is responsible for automatically deleting expired tokens after one day.
+
+### auto_delete_deactive_users
+This task is responsible for automatically deleting inactive users after one day.
+
+## Model Managers
+
+### VerificationTokenManager
+The `VerificationTokenManager` includes a `verify` method for verifying a token.
+
+## Model Validators
+
+### validate_profile_size
+This validator ensures the uploaded profile picture does not exceed 5MB in size.
 
 ## Tests
-
-There are some tests that you can run by typing this command: 
+Tests for the Accounts application can be run with the following command:
 
 ```
-$ pytest apps/accounts
+pytest apps/accounts
 ```
