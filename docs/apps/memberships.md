@@ -1,37 +1,83 @@
-## Introduction
-The "Memberships" application is responsible for managing user subscriptions and memberships in the Tsuna Streaming project.
-<br>
-There are three types of users in this project: Admin, Premium, and Normal.<br>
- Superusers are assigned to the "admin" role by default, while normal users are assigned to the "normal" role. Users can upgrade their membership by subscribing to a premium plan, which grants them additional privileges and features and become "premium".
+# Membership Application Documentation
+
+## Description
+The Membership application of the Tsuna Streaming project manages membership plans and subscriptions for users. It allows administrators to create, update, and delete membership plans, while normal users can subscribe to these plans. Premium users have more privileges than normal users, such as higher limits for channel creation and video size.
 
 ## Models
-The Memberships application has two models:
 
-1. Membership - represents the different types of membership plans that users can subscribe to.
-2. Subscription - contains information about a user's subscription to a membership plan.
+### Membership
+The `Membership` model represents a membership plan available for users. The fields are as follows:
+
+- `title`: Title of the membership plan.
+- `description`: Description of the membership plan.
+- `price`: Price of the membership plan.
+- `active_months`: Number of months the membership plan remains active.
+- `is_available`: A boolean field indicating if the membership plan is currently available for users.
+- `__check_in_use()`: A private method to check if the membership plan is in use. It raises `MembershipInUserError` if the plan is in use by any user and cannot be deleted.
+
+### Subscription
+The `Subscription` model represents a user's subscription to a membership plan. The fields are as follows:
+
+- `user`: A relationship to the user who subscribed.
+- `membership`: A relationship to the subscribed membership plan.
+- `start_date`: Start date of the subscription.
+- `end_date`: End date of the subscription.
+- `is_active()`: A method to check if the subscription is currently active.
 
 ## Views
-The following views are available in the Memberships application:
 
-1. Create Membership - allows admins to create new membership plans.
-2. List of Memberships - displays a list of all available membership plans.
-3. Update Membership and Delete - allows admins to update and delete existing membership plans.
-4. Subscribe to Membership - allows users to subscribe to a membership plan.
+### MembershipListCreateView
+- Description: List all Membership Plans and allow admins to create new ones.
+- HTTP Methods:
+  - GET: List all available Membership Plans.
+  - POST: Create a new Membership Plan [Admin only].
+- Responses:
+  - 200 OK: List of all Membership Plans.
+  - 201 Created: Successfully created a new Membership Plan.
+  - 401 Unauthorized: Authentication required.
+  - 403 Forbidden: User does not have admin privileges.
 
-## Features
+### MembershipDetailView
+- Description: View details of a specific Membership Plan and allow admins to update or delete it.
+- HTTP Methods:
+  - GET: Retrieve the details of a Membership Plan.
+  - PUT: Update a Membership Plan [Admin only].
+  - PATCH: Update a Membership Plan [Admin only].
+  - DELETE: Delete a Membership Plan [Admin only].
+- Responses:
+  - 200 OK: Detail page of a Membership Plan.
+  - 204 No Content: Successfully deleted a Membership Plan.
+  - 401 Unauthorized: Authentication required.
+  - 403 Forbidden: User does not have admin privileges.
+  - 404 Not Found: Membership Plan not found.
 
-### Deleting In-Use Memberships
-An Exceptaion will be raised if an admin tries to delete a membership that is currently in use by users. 
+### MembershipSubscribeView
+- Description: Allow normal users to subscribe to a membership plan.
+- HTTP Methods:
+  - POST: Subscribe to a membership plan [Normal users only].
+- Responses:
+  - 201 Created: Successfully created a new subscription.
+  - 401 Unauthorized: Authentication required.
+  - 403 Forbidden: User is not a normal user.
+  - 404 Not Found: Membership Plan not found.
 
-### Email Notifications
-Users will receive email notifications upon successful subscription to a membership plan. They will also be notified when their subscription has expired.
+## Celery Beat Tasks
 
-### Removing Invalid Memberships with Celery
-A Celery task runs periodically to remove invalid memberships. An invalid membership is one that has expired and is no longer active.
+### auto_delete_invalid_subscription
+- Description: Automatically delete expired subscriptions.
+
+## Signals
+
+### notify_user_subscription
+- Description: Notify a user by email when a new subscription is created for them.
+
+### notify_user_plan_expiration
+- Description: Notify a user by email when their subscription has expired.
 
 ## Tests
-The Memberships application includes automated tests that you can run them by typing this command:
+
+The tests for the Membership application can be found in the `memberships/tests` directory. The tests cover various scenarios and functionalities of the Membership models, views, signals, and Celery Beat tasks. To run the tests, you can use the following command:
 
 ```
-$ pytest apps/memberships/
-``` 
+pytest memberships/tests
+```

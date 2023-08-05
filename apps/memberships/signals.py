@@ -7,7 +7,7 @@ from apps.core.tasks import send_email
 @receiver(post_save, sender=Subscription)
 def notify_user_subscription(sender, created, instance, **kwargs):
     """
-    Norify a user when a new subscription is created for him
+    Notify a user when a new subscription is created for him
     """
 
     if created:
