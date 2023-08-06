@@ -6,7 +6,7 @@ db.sqlite3
 accounts/profile
 ../.vscode/settings.json
 .idea/
-.env
+backend/.env
 venv/
 data/
 .pytest_cache/
