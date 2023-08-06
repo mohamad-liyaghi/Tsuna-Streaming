@@ -1,35 +1,56 @@
-The "Votes" application of the "Tsuna Streaming" project handles the Upvoting/Downvoting action in this project.
+# Votes Application Documentation
 
-## Model: Vote
-The `Vote` model is a generic model that can be used in all models and allows users to Upvote/Downvote an object.
+## Description
+The Votes application provides functionality for users to vote on content objects. Votes are initially created in the cache for efficient retrieval and processing, and then stored in the database for permanent storage. The application includes views for checking vote status, creating and deleting votes, listing users who voted on an object, and handling related signals and Celery tasks.
+
+## Models
+
+### Vote
+The `Vote` model represents a user's vote on a content object. It includes the following fields:
+- `user`: The user who made the vote.
+- `choice`: The choice of the vote (e.g., upvote, downvote).
+- `channel`: The channel associated with the vote.
+- `date`: The date the vote was made.
+- `content_object`: The content object the vote is associated with.
 
 ## Views
-The "Votes" application provides two views for handling votes - `VoteView` and `VoteListView`.
 
-### VoteView
-The `VoteView` allows users to create, retrieve, and delete their own votes. It supports the following methods:
-- `GET`: Check vote status.
-- `POST`: Create a new vote.
-- `DELETE`: Delete a vote.
+### VoteStatusView
+The `VoteStatusView` allows users to check if they have voted on an object or not. It handles the following HTTP methods:
+- `GET`: Checks the vote status for a user on an object.
+
+### VoteCreateView
+The `VoteCreateView` allows users to create a vote for an object. It handles the following HTTP methods:
+- `POST`: Creates a vote for an object.
+
+### VoteDeleteView
+The `VoteDeleteView` allows users to delete their vote for an object. It handles the following HTTP methods:
+- `DELETE`: Deletes a user's vote for an object.
 
 ### VoteListView
-The `VoteListView` allows users to list all votes for a given object. It supports only the `GET` method.
+The `VoteListView` allows users to retrieve a list of users who voted on an object. It handles the following HTTP methods:
+- `GET`: Retrieves a list of users who voted on an object.
 
-## Tasks
-As per the design, the application uses Celery for inserting votes from cache to the database. The task is performed asynchronously to allow for better performance. The following Celery task is used in the "Votes" application:
-- **insert_vote_into_db**: This task inserts all the votes stored in the cache into the database.
 
 ## Signals
-- **delete_object_votes_after_deleting**: This signal removes all votes associated with an object when it is deleted.
 
-## Manager
-The "Votes" application's manager is responsible for handling interactions with cache. It provides the following method:
-- **get_from_cache**: This method retrieves a vote from the cache/db.
-- **create_in_cache**: This method creates a new vote in cache so Celery inserts it into db.
+### delete_vote_after_deleting_object
+The `delete_vote_after_deleting_object` signal is triggered when an object is deleted. It deletes all votes associated with the deleted object. This signal ensures that vote records are properly cleaned up when an object is removed from the system.
+
+## Celery Tasks
+
+### remove_object_votes
+The `remove_object_votes` Celery task is responsible for removing votes associated with a deleted object from the cache.
+
+### insert_vote_into_db
+The `insert_vote_into_db` Celery task is responsible for inserting votes from the cache into the database.
+
+### delete_unvoted_from_db
+The `delete_unvoted_from_db` Celery task is responsible for deleting unvoted records from the database.
 
 ## Tests
-This application includes automated tests that you can run them by typing this command:
+Tests for the Votes application can be run with the following command:
 
 ```
-$ pytest apps/votes/
-``` 
+pytest apps/votes
+```
