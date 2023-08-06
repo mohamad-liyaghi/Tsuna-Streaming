@@ -1,7 +1,6 @@
 from django.db import models
 from django.core.cache import cache
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from typing import Union
 from datetime import datetime
 from channels.models import Channel

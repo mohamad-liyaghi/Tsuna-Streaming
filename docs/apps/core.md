@@ -1,32 +1,59 @@
-The Tsuna Streaming "core" app provides common functionality that is shared across different parts of the application.
+# Core Module Documentation
 
-### Models
+Table of Contents:
+- [Description](#description)
+- [Models](#models)
+  - [AbstractToken](#abstracttoken)
+- [Celery Tasks](#celery-tasks)
+  - [send_email](#send-email)
+- [Utils](#utils)
+  - [get_content_type_model](#get-content-type-model)
+  - [get_content_type_by_id](#get-content-type-by-id)
+  - [ObjectSource](#objectsource)
+- [Managers](#managers)
+  - [BaseCacheManager](#basecachemanager)
+- [Mixins](#mixins)
+  - [ContentTypeModelMixin](#contenttypemodelmixin)
+  - [ContentObjectMixin](#contentobjectmixin)
 
-- `BaseContentModel`: This is the base model for all content models, such as `Video` and `Music`. It contains common fields and methods across all subclasses.
+## Description
+The Core module serves as the heart of the application, housing essential and reusable functions that contribute to the overall functionality of various components. It encapsulates core operations and utilities, making them easily accessible and maintainable throughout the project.
 
-- `BaseTokenModel`: This model has only one `Token` field that is shared across all other models. When an object is saved, `create_unique_token()` is called to generate a unique token specific to that model.
+## Models
 
-#### BaseContentModel methods
+### AbstractToken
+The `AbstractToken` model plays a crucial role in handling token generation for its subclasses. By utilizing a `UUIDField`, it efficiently manages the storage and retrieval of tokens. This abstraction allows for consistent and secure token handling across different subclasses, promoting code reusability and maintaining a uniform approach to token management throughout the application.
 
-1. `get_content_model_by_name()`: Returns a content model (like `Video`) by its name.
-2. `get_model_content_type()`: Returns the content type instance of a content model.
-3. `get_model_content_type_id()`: Returns the content type ID of a content model.
-4. `get_viewer_count()`: Returns the viewer count of a content object (total viewers in DB and cache).
-5. `get_votes_count()`: Returns the vote count of a content object (total in DB and cache).
-6. `save()`: Checks permissions for saving an object.
+## Celery Tasks
 
-### Views
-
-The "core" app includes two basic views for handling errors:
-- `handler404(request, exception)`: Handles 404 errors by returning a custom error page.
-- `handler500(request)`: Handles 500 errors by returning a custom error page.
-
-## Celery
-
-### `send_email`
-
-There is a background task in the project responsible for sending custom email content to users.
+### send_email
+The `send_email` task takes `template_name`, `to_email`, and `body` as input and sends an email in the background using Celery.
 
 ## Utils
 
-- `create_unique_token()`: This method generates a unique token for objects and is called within the save method of `BaseTokenModel`.
+### get_content_type_model
+The `get_content_type_model` function returns and caches the content type model of a given model.
+
+### get_content_type_by_id
+The `get_content_type_by_id` function returns the content type by id.
+
+### ObjectSource
+The `ObjectSource` class is an Enum class that specifies whether an object is saved in cache or the database.
+
+## Managers
+
+### BaseCacheManager
+The `BaseCacheManager` is a base manager that uses the `CacheService` to perform operations tasks in the cache.
+
+## Mixins
+
+### ContentTypeModelMixin
+The `ContentTypeModelMixin` gets the content type id from url and returns the content type model.
+
+### ContentObjectMixin
+The `ContentObjectMixin` first retrieves the content type model and filter the object by id. It then returns the object if it exists, otherwise it raises a `Http404` exception.
+
+## Services
+
+### CacheService
+The `CacheService` is a service that handles cache operations. It plays a crucial role in the caching of objects, allowing for efficient retrieval and storage of data. It also provides a consistent interface for performing cache operations, making it easier to maintain and update the cache.
