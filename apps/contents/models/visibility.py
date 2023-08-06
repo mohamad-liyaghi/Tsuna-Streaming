@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class ContentVisibility(models.TextChoices):
     """
     Content visibility choices
