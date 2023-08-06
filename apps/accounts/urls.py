@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from accounts.views.authentication import (
     RegisterUserView,
     VerifyUserView,
@@ -9,7 +9,7 @@ from accounts.views.profile import ProfileView
 
 app_name = "accounts"
 
-urlpatterns = [
+V1 = [
     path("register/", RegisterUserView.as_view(), name='register'),
     path("login/", LoginUserView.as_view(), name="login"),
     path(
@@ -20,3 +20,7 @@ urlpatterns = [
     path("resend/", ResendTokenView.as_view(), name='resend_verification'),
     path("<str:user_token>/", ProfileView.as_view(), name='profile')
 ] 
+
+urlpatterns = [
+    path("v1/", include(V1)),
+]

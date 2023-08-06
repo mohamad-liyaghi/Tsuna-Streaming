@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     SubscriberStatusView,
     SubscriberCreateView,
@@ -8,7 +8,7 @@ from .views import (
 
 app_name = 'channel_subscribers'
 
-urlpatterns = [
+V1 = [
     path(
         '<str:channel_token>/',
         SubscriberStatusView.as_view(),
@@ -29,4 +29,8 @@ urlpatterns = [
         SubscriberListView.as_view(),
         name='subscriber_list'
     ),
+]
+
+urlpatterns = [
+    path('v1/', include(V1)),
 ]

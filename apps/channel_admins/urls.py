@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     AdminListCreateView,
     AdminDetailView,
@@ -6,7 +6,7 @@ from .views import (
 
 app_name = 'channel_admins'
 
-urlpatterns = [
+V1 = [
     path(
         '<str:channel_token>/',
         AdminListCreateView.as_view(),
@@ -17,4 +17,8 @@ urlpatterns = [
         AdminDetailView.as_view(),
         name='admin_detail'
     ),
+]
+
+urlpatterns = [
+    path('v1/', include(V1)),
 ]

@@ -1,9 +1,13 @@
-from django.urls import path
-from .views import CommentListCreateView, CommentDetailView, CommentPinView
+from django.urls import path, include
+from .views import (
+    CommentListCreateView,
+    CommentDetailView,
+    CommentPinView
+)
 
 app_name = "comments"
 
-urlpatterns = [
+V1 = [
     path(
         "<str:content_type_id>/<str:object_token>/",
         CommentListCreateView.as_view(),
@@ -21,4 +25,8 @@ urlpatterns = [
          CommentPinView.as_view(),
         name="comment_pin"
     ),
+]
+
+urlpatterns = [
+    path("v1/", include(V1)),
 ]

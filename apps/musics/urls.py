@@ -1,9 +1,9 @@
-from django.urls import path
+from django.urls import path, include
 from .views import MusicListCreateView, MusicDetailView
 
 app_name = 'musics'
 
-urlpatterns = [
+V1 = [
     path(
         '<str:channel_token>/',
         MusicListCreateView.as_view(),
@@ -14,4 +14,8 @@ urlpatterns = [
         MusicDetailView.as_view(),
         name='detail'
     ),
+]
+
+urlpatterns = [
+    path('v1/', include(V1)),
 ]

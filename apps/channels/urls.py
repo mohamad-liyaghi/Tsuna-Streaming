@@ -1,10 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 from channels.views import ChannelListCreateView, ChannelDetailView
 
 
 app_name = "channels"
 
-urlpatterns = [
+V1 = [
     path(
         '',
         ChannelListCreateView.as_view(),
@@ -17,3 +17,6 @@ urlpatterns = [
     ),
 ]
 
+urlpatterns = [
+    path('v1/', include(V1)),
+]

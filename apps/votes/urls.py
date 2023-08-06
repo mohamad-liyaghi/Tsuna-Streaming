@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from .views import (
     VoteStatusView,
     VoteCreateView,
@@ -8,7 +8,7 @@ from .views import (
 
 app_name = "votes"
 
-urlpatterns = [
+V1 = [
     path(
         "<str:content_type_id>/<str:object_token>/",
         VoteStatusView.as_view(),
@@ -29,4 +29,8 @@ urlpatterns = [
         VoteListView.as_view(),
         name="list"
     ),
+]
+
+urlpatterns = [
+    path("v1/", include(V1)),
 ]
