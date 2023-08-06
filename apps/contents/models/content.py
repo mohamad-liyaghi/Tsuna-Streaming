@@ -7,7 +7,6 @@ from .utils import (
     get_thumbnail_upload_path,
     get_file_upload_path
 )
-from core.utils import get_content_type_model
 from .visibility import ContentVisibility
 from contents.managers import BaseContentManager
 

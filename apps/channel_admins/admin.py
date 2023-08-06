@@ -9,4 +9,4 @@ class ChannelAdminAdmin(admin.ModelAdmin):
 
 @admin.register(ChannelAdminPermission)
 class ChannelAdminPermissionAdmin(admin.ModelAdmin):
-    list_display = ['admin', 'model', 'token']
+    list_display = ['admin', 'token']
