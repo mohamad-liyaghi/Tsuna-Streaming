@@ -35,3 +35,10 @@ The `insert_viewer_into_db` Celery task is responsible for inserting viewer reco
 
 ### delete_object_viewers_after_deleting
 The `delete_object_viewers_after_deleting` signal is triggered when an object is deleted. It deletes all viewer records associated with the deleted object. This signal ensures that viewer records are properly cleaned up when an object is removed from the system.
+
+## Tests
+Tests for the Viewers application can be run with the following command:
+
+```
+pytest apps/viewers
+```
