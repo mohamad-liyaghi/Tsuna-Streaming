@@ -1,0 +1,13 @@
+{% block subject %}
+New video added to your channel.
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ first_name }},</h1>
+<p>A new video added to {{ channel_title }}!</p>
+
+<a href="{{ domain }}{% url 'videos:detail' channel_token video_token  %}">
+    Video Link
+</a>
+
+{% endblock html_body %}    

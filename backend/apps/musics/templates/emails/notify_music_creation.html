@@ -1,0 +1,14 @@
+{% block subject %}
+New music added to your channel.
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Hello dear {{ first_name }},</h1>
+<p>A new music added to {{ channel_title }}!</p>
+
+
+<a href="{{ domain }}{% url 'musics:detail' channel_token music_token  %}">
+    Music Link
+</a> 
+
+{% endblock html_body %}    

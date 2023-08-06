@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+
+  backend:
+    networks:
+      - main
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: backend
+
+  postgres:
+
+    networks:
+      - main
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: postgres
+
+  test_postgres:
+    networks:
+      - main
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: test_postgres
+
+  pgadmin:
+    networks:
+      - main
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: pgadmin
+
+  redis:
+    networks:
+      - main
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: redis
+
+
+  smtp4dev:
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: smtp4dev
+
+  celery:
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: celery
+
+  celery-beat:
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: celery-beat
+
+  flower:
+    extends:
+      file: backend/docker-compose.prod.yml
+      service: flower
+
+
+  # frontend:
+  #   extends:
+  #     file: frontend/docker-compose.prod.yml
+  #     service: frontend
+
+networks:
+  main:
+
+volumes:
+  postgres-data:

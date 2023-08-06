@@ -1,0 +1,15 @@
+{% block subject %}
+Your subscription expired.
+{% endblock subject %} 
+
+{% block html_body %}
+<h1>Dear {{ first_name }},</h1>
+<p>
+    We're sorry to inform you that your subscription to {{ membership_title }} has expired.
+    You can renew your subscription by clicking the button below.
+</p>
+
+<a href="{{domain}}{% url 'memberships:membership' %}">Explore new plans</a>
+
+
+{% endblock html_body %}    

@@ -1,142 +1,48 @@
-# Introduction
+# Tsuna Streaming
 
-`Tsuna Streaming` is a streaming system API that allows users to create their own channels, upload videos and music, and share them with others. Once users register, they can easily add content to their channels.
+## Introduction <a name="introduction"></a>
+Tsuna Streaming is a powerful backend system that enables users to create channels and share various types of content, including videos and music. This platform allows users to follow their favorite channels, vote on content, and engage in discussions through comments. The system also keeps track of the number of viewers for each channel.
 
-One of the key features of Tsuna Streaming is its flexible `Administration system`. Channel owners can easily promote other users as admins with custom permissions, allowing multiple people to collaborate on a single channel based on their permissions.
+Channel owners have the ability to add administrators to their channels, granting them specific permissions to perform various tasks. This feature allows channel owners to delegate responsibilities and manage their channels more effectively.
 
-Premium users have access to additional features, such as the ability to upload larger files and create more channels than non-premium users. Users can subscribe to a membership plan in order to become premium members and unlock these exclusive privileges.
+Users can have two types of accounts: normal and premium. Premium users enjoy additional benefits, such as the ability to create twice as many channels as normal users and upload larger files. This distinction encourages users to upgrade to premium accounts, enhancing their experience on the platform.
 
-In addition to uploading and sharing media, Tsuna Streaming allows users to `subscribe` to channels, follow their favorite creators, and engage with uploaded content through `voting` and leaving `comments`.
+To ensure optimal performance and transaction efficiency, the system employs a caching mechanism. Viewers and votes are initially stored in the cache and then periodically synchronized with the database.
 
+With Tsuna Streaming, users can create, discover, and engage with a wide range of content, fostering a vibrant and interactive community.
 
-To ensure the smooth functioning of this streaming system, <a href="docs.celeryq.dev">`Celery`</a> is used for background tasks, <a href="http://pytest.org/">`Pytest`</a> for testing, <a href="redis.io/">`Redis`</a> for caching, and <a href="docker.com/">`Docker`</a> for containerization.
+## Backend <a name="backend"></a>
+The backend of Tsuna Streaming is built using Django and Django REST Framework, incorporating modern technologies such as Docker, PostgreSQL, Redis, and Celery. This solid technology stack ensures efficient data management and a smooth user experience.
+For detailed information about the Tsuna Streaming backend, please refer to the [Backend Docs](backend/README.md).
 
+## Frontend <a name="frontend"></a>
+The front-end of Tsuna Streaming is currently undergoing maintenance. We welcome contributions from front-end developers to help enhance and further develop the user experience.
 
-<hr>
+## How to Run <a name="how-to-run"></a>
+Follow these simple steps to run the Tsuna Streaming backend:
 
-# Apps and project structure
-<hr>
+1. Clone the project repository:
+    ```bash
+    git clone https://github.com/mohamad-liyaghi/Tsuna-Streaming.git
+    ```
 
-## Authentication and Memberships on Tsuna Streaming
+2. Change to the project directory:
+    ```bash
+    cd tsuna-streaming/
+    ```
 
-## Accounts
-The `Accounts` application in this project is responsible for authentication purposes. When users register, their accounts remain inactive until they verify them using a token sent to their email. Once activated, users can authorize themselves using a JWT token. You can find more information on the `Accounts` application in the <a href="https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/accounts.md">Accounts Docs</a>.<br>
+3. To run the project in development mode using Docker-compose, execute the following command:
+    ```bash
+    docker-compose up --build
+    ```
 
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/profile-page.jpg' alt='sample profile page'>
-<br>
+   If you want to run the project in production mode, use the following command instead:
+    ```bash
+    docker-compose -f docker-compose.prod.yml up --build
+    ```
 
-## Memberships
-The `Memberships` application in this project is responsible for managing user subscriptions and memberships. Once users register, they are limited in performing some actions. For example, they can only create up to 5 channels. They can view the membership plans that admins have created beforehand and subscribe to one of them to take advantage of the benefits. Once the plan expires, a celery task demotes and notifies the user. For more information, refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/memberships.md'>Documentation</a>.
+   This will build and start the containers required for the project to run in a production environment.
 
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/membership-list-page.jpg' alt='sample membership list'>
-<br>
+4. Access the Tsuna Streaming API in a web browser at `http://localhost:8000/`.
 
-<hr>
-
-## Channel Management on Tsuna Streaming
-
-## Channels
-The `Channels` application plays a crucial role in the Tsuna Streaming project by facilitating the management of user-generated channels. This application allows users to create, edit, and delete their own channels, as well as browse through a comprehensive list of all available channels. 
-
-While regular users can create up to 5 channels, premium users are granted the ability to create up to 10 channels, providing them with greater flexibility and control. For more details on the features and functionalities of this application, please refer to the <a href="https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channels.md">documentation</a>.
-
-
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-list-page.jpg' alt='sample channel list'>
-
-
-## Channel Subscribers
-The `Channel Subscribers` application another component of the Tsuna Streaming project. Users have the ability to subscribe to channels, which are initially saved in cache and then inserted into the database using Celery. The ChannelSubscriber model is implemented for this application, with several views available for subscribing and displaying the list of subscribers.
-
-For more detailed information regarding the features and functionalities of this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channel_subscribers.md'>documentation</a>.
-
-
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-subscriber-list-page.jpg' alt='sample subscriber list'>
-<br>
-
-## Channel Admins
-The `Channel Admin` application is a vital component of the Tsuna Streaming project, which enables administrators to efficiently manage channels and content. Once a user creates a channel, administrators can promote subscribers as admins with customized permission levels for accessing or altering content details.
-
-Upon being promoted, a background task automatically generates permissions for each content model, such as `videos` and `music`, for that particular admin. For more in-depth information regarding the features and functionalities of this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/channel_admins.md'>documentation</a>.
-
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/channel-admin-list-page.jpg' alt='sample channel admin list'>
-<br>
-<hr>
-
-## Managing Content on Tsuna Streaming
-
-Tsuna Streaming's <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/core.md'>Core</a> module has a base model called `BaseTokenModel` that serves as the foundation for all content models. It contains common fields and methods.
-
-## Videos
-The `Videos` application is responsible for managing user-uploaded videos. The main model used is `Video`, which inherits from `BaseContentModel` providing all necessary functionalities. Admins can add, update, and delete videos for a channel based on their permissions, while users can view published videos. For more details, check out the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/videos.md'>documentation</a>.
-
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/video-list-page.jpg' alt='sample channel video list'>
-<br>
-
-## Music
-Similar to the `Videos` application, the `Music` application uses a model that inherits from `BaseContentModel`. All functionalities are the same as those of the `Videos` application. You can refer to the official <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/musics.md'>documentation</a>  for more information.
-
-<hr>
-
-
-## Votes, Views and Comments
-
-## Vote
-The `Votes` application manages the essential functionality of Upvoting/Downvoting for all content models through a single, generic `Vote` model. This application implements a caching mechanism to store votes temporarily before inserting them into the database via a celery task.
-
-The application provides several methods for retrieving votes from both cache and the database while also allowing for the insertion of new votes into cache. For more detailed information about this application, please refer to the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/votes.md'>documentation</a>.
-
-### Comments
-The `Comments` application within the "Tsuna Streaming" project enables users to leave comments on objects that allows commenting. Also users can vote a comment or even reply on that. Its primary purpose is to provide a commenting feature for various content models, using a single, generic `Comment` model.
-
-By utilizing this application, users can add comments to different content models with ease. For more information about the "Comments" application, including usage instructions and available methods, please see the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/comments.md'>documentation</a>.
-
-<img src='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/shots/comment-list-page.jpg' alt='sample comment list'>
-<br>
-
-## Viewers
-The `Viewers` application of the Tsuna Streaming project serves the purpose of tracking viewers of an object. It stores viewer information in cache before inserting it into the database. Admins can access the list of all viewers of an object.
-
-The application includes a decorator that is used to decorate detail pages for adding viewing purposes.
-
-To ensure consistent tracking, there is a dedicated task responsible for inserting viewer data into the database. If you require additional information about the "Viewers" application, please consult the <a href='https://github.com/mohamad-liyaghi/Tsuna-Streaming/blob/main/docs/apps/viewers.md'>documentation</a>.
-
-
-<hr>
-
-# How to run?
-To use Tsuna Streaming, you'll first need to clone the project from GitHub. Open your terminal and run the following command:
-
-```
-git clone https://github.com/mohamad-liyaghi/Tsuna-Streaming.git
-```
-
-Once the cloning process is complete, navigate into the project directory using the `cd` command:
-
-```
-cd Tsuna-Streaming
-```
-
-Next, you'll need to configure the environment variables in the `.env` files. You can customize settings such as the database username and email address to suit your needs.
-
-For local development, run the following command to start the Docker containers:
-
-```
-docker-compose -f docker/local/docker-compose.yml up --build
-```
-
-If you're running Tsuna Streaming in production, use the following command instead:
-
-```
-docker-compose -f docker/production/docker-compose.yml up --build
-```
-
-Once the Docker containers are up and running, you can access Tsuna Streaming by navigating to `localhost:8000` in your web browser. 
-
-# Tests
-You can run tests by running this command:
-
-```
-pytest
-```
-
-That's it! You're now ready to use Tsuna Streaming.
+You're all set! Enjoy using Tsuna Streaming.
