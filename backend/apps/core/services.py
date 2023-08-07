@@ -218,7 +218,7 @@ class CacheService:
                 obj = self.model.objects.filter(
                     user=user,
                     channel=channel,
-                    content_type=get_content_type_model(content_object.__class__),
+                    content_type=get_content_type_model(model=type(content_object)),
                     object_id=content_object.id
                 )
             else:

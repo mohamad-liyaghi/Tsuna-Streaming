@@ -1,7 +1,7 @@
 from django.http import JsonResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from core.utils import get_content_type_by_id
+from core.utils import get_content_type_model
 from channels.models import Channel
 
 
@@ -18,9 +18,11 @@ class ContentTypeModelMixin:
 
         # Get the object token from the URL.
         content_type_id = kwargs.get('content_type_id', None)
-        content_type = get_content_type_by_id(_id=content_type_id)
 
-        if not content_type:
+        try:
+            content_type = get_content_type_model(_id=content_type_id)
+
+        except ValueError:
             return JsonResponse(
                 {'error': 'Content type model not found'},
                 status=status.HTTP_404_NOT_FOUND

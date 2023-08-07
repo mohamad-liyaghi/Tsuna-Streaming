@@ -12,9 +12,7 @@ class TestCommentCreateView:
     def setup(self, create_video):
         self.url_name = "comments:comment_list_create"
         self.video = create_video
-        self.content_type_id = get_content_type_model(
-            self.video.__class__, return_id=True
-        )
+        self.content_type_id = get_content_type_model(model=type(self.video)).id
         self.data = {
             'body': 'test comment'
         }

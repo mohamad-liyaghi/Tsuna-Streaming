@@ -25,20 +25,20 @@ class TestMusicModel:
 
         # Assert with the method
         assert get_content_type_model(
-            type(create_music), return_id=True
-        ) == music_content_type_id
+            model=type(create_music)
+        ).id == music_content_type_id
 
     def test_get_music_content_type_model(self, create_music):
         music_content_type = ContentType.objects.get_for_model(
             type(create_music)
         )
-        assert get_content_type_model(type(create_music)) == music_content_type
+        assert get_content_type_model(model=type(create_music)) == music_content_type
 
         # second time, get from cache
         music_content_type = ContentType.objects.get_for_model(
             type(create_music)
         )
-        assert get_content_type_model(type(create_music)) == music_content_type
+        assert get_content_type_model(model=type(create_music)) == music_content_type
 
     def test_get_music_views(self, create_music):
         """

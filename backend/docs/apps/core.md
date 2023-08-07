@@ -8,7 +8,6 @@ Table of Contents:
   - [send_email](#send-email)
 - [Utils](#utils)
   - [get_content_type_model](#get-content-type-model)
-  - [get_content_type_by_id](#get-content-type-by-id)
   - [ObjectSource](#objectsource)
 - [Managers](#managers)
   - [BaseCacheManager](#basecachemanager)
@@ -34,8 +33,6 @@ The `send_email` task takes `template_name`, `to_email`, and `body` as input and
 ### get_content_type_model
 The `get_content_type_model` function returns and caches the content type model of a given model.
 
-### get_content_type_by_id
-The `get_content_type_by_id` function returns the content type by id.
 
 ### ObjectSource
 The `ObjectSource` class is an Enum class that specifies whether an object is saved in cache or the database.

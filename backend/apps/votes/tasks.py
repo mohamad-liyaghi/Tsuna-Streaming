@@ -4,7 +4,7 @@ from celery import shared_task
 from votes.models import Vote
 from votes.constants import CACHE_OBJECT_VOTE
 from accounts.models import Account
-from core.utils import get_content_type_by_id, get_content_type_model
+from core.utils import get_content_type_model
 from core.utils import ObjectSource
 
 
@@ -14,7 +14,7 @@ def remove_object_votes(content_type_id: int, object_id: int, object_token: str)
     Remove all objects votes
     """
     # get the object model content type (eg: Video)
-    content_model = get_content_type_by_id(content_type_id)
+    content_model = get_content_type_model(_id=content_type_id)
 
     # delete all related votes
     Vote.objects.filter(content_type=content_model, object_id=object_id).delete()
@@ -99,7 +99,7 @@ def delete_unvoted_from_db():
         )
 
         content_models = [
-            get_content_type_model(vote['content_object'].__class__)
+            get_content_type_model(model=type(vote['content_object']))
             for vote in pending_delete_votes
         ]
         content_object_ids = [

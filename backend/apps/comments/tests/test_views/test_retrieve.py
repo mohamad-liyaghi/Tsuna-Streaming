@@ -11,9 +11,7 @@ class TestCommentRetrieveView:
         self.url_name = "comments:comment_detail"
         self.video = create_video
         self.comment = create_comment
-        self.content_type_id = get_content_type_model(
-            self.video.__class__, return_id=True
-        )
+        self.content_type_id = get_content_type_model(model=type(self.video)).id
 
     def test_get_unauthorized(self, api_client):
         response = api_client.get(

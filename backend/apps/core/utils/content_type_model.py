@@ -2,73 +2,48 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.core.cache import cache
 from typing import Union
+from core.constants import CACHE_CONTENT_TYPE_KEY
 
 
 def get_content_type_model(
-        model: models.Model,
-        return_id: bool = False
-) -> Union[models.Model, int, None]:
+        model: Union[models.Model, str] = "*",
+        _id: Union[int, str] = "*",
+) -> ContentType:
     """
-    Get the content type model for the given model
+    Get the content type for a model and return it.
     :param model: The model to get the content type for
-    :param return_id: Whether to return the id or the model
-    """
-    cached = cache.get(f'content_type:{model}')
-
-    # If not set in cache
-    if cached is None:
-        # Get content type for the model
-        content_type = ContentType.objects.get_for_model(model)
-
-        if content_type:
-            # Set in cache if found
-            cache.set(
-                key=f'content_type:{model}',
-                value={'id': content_type.id, 'model': content_type}
-            )
-
-            # Get from cache
-            cached = cache.get(f'content_type:{model}')
-            # Return id if requested
-            if return_id:
-                return cached['id']
-            # Otherwise return model
-            return cached['model']
-
-        # Return None if not found
-        return
-
-    # Return id if requested
-    if return_id:
-        return cached['id']
-
-    # Otherwise return model
-    return cached['model']
-
-
-def get_content_type_by_id(_id: int) -> Union[models.Model, None]:
-    """
-    Return the content type model for the given id
     :param _id: The id of the content type
     """
-    # Get from cache
-    cache_key = f'content_type_id:{_id}'
-    cached = cache.get(cache_key)
+    if model == '*' and _id == '*':
+        raise ValueError("Either model or id must be provided")
+
+    cached = cache.get_many(
+        cache.keys(
+            CACHE_CONTENT_TYPE_KEY.format(model=model, id=_id)
+        )
+    )
 
     if not cached:
         try:
-            # Get content type
-            content_type = ContentType.objects.get(id=_id)
-            # Set in cache
+            filters = {}
+
+            if model != "*":
+                filters['model'] = model.__name__.lower()
+
+            if _id != "*":
+                filters['id'] = _id
+
+            content_type = ContentType.objects.get(**filters)
+
+            # Set in cache if found
             cache.set(
-                key=cache_key,
+                key=CACHE_CONTENT_TYPE_KEY.format(model=content_type, id=content_type.id),
                 value={'id': content_type.id, 'model': content_type}
             )
-            cached = cache.get(cache_key)
-            return cached['model']
+            return content_type
 
-        # Return None if not found
         except ContentType.DoesNotExist:
-            return
+            raise ValueError(f"Content type not found")
 
-    return cached['model']
+    return next(iter(cached.values()))['model']
+

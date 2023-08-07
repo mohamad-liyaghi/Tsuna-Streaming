@@ -13,7 +13,7 @@ class TestVoteDeleteView:
     def setup(self, create_video):
         self.url_name = "votes:delete"
         self.video = create_video
-        self.content_type_id = get_content_type_model(self.video.__class__, return_id=True)
+        self.content_type_id = get_content_type_model(model=type(self.video)).id
 
     def test_delete_unauthorized(self, api_client):
         response = api_client.delete(

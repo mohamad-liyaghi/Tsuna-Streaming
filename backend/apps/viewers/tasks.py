@@ -3,7 +3,7 @@ from celery import shared_task
 from viewers.models import Viewer
 from viewers.constants import CACHE_OBJECT_VIEWER
 from core.utils import ObjectSource
-from core.utils import get_content_type_by_id
+from core.utils import get_content_type_model
 from accounts.models import Account
 
 
@@ -55,7 +55,7 @@ def remove_object_viewers(content_type_id: int, object_id: int, object_token: st
     """
     Remove viewers of an object after deleting it.
     """
-    content_model = get_content_type_by_id(
+    content_model = get_content_type_model(
         _id=content_type_id
     )
 

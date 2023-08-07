@@ -10,9 +10,6 @@ def delete_object_comments_after_deleting(sender, instance, *args, **kwargs):
     Delete object comments after deleting the object.
     """
     remove_object_comments.delay(
-        content_type_id=get_content_type_model(
-            model=instance.__class__,
-            return_id=True
-        ),
+        content_type_id=get_content_type_model(model=type(instance)),
         object_id=instance.id
     )

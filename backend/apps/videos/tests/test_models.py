@@ -25,20 +25,24 @@ class TestVideoModel:
 
         # Assert with the method
         assert get_content_type_model(
-            type(create_video), return_id=True
-        ) == video_content_type_id
+            model=type(create_video)
+        ).id == video_content_type_id
 
     def test_get_video_content_type_model(self, create_video):
         video_content_type = ContentType.objects.get_for_model(
             type(create_video)
         )
-        assert get_content_type_model(type(create_video)) == video_content_type
+        assert get_content_type_model(
+            model=type(create_video)
+        ) == video_content_type
 
         # second time, get from cache
         video_content_type = ContentType.objects.get_for_model(
             type(create_video)
         )
-        assert get_content_type_model(type(create_video)) == video_content_type
+        assert get_content_type_model(
+            model=type(create_video)
+        ) == video_content_type
 
     def test_get_video_views(self, create_video):
         """
