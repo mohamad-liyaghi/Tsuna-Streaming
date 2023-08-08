@@ -3,37 +3,26 @@ version: '3.9'
 services:
 
   backend:
-    networks:
-      - main
     extends:
       file: backend/docker-compose.prod.yml
       service: backend
 
   postgres:
-
-    networks:
-      - main
     extends:
       file: backend/docker-compose.prod.yml
       service: postgres
 
   test_postgres:
-    networks:
-      - main
     extends:
       file: backend/docker-compose.prod.yml
       service: test_postgres
 
   pgadmin:
-    networks:
-      - main
     extends:
       file: backend/docker-compose.prod.yml
       service: pgadmin
 
   redis:
-    networks:
-      - main
     extends:
       file: backend/docker-compose.prod.yml
       service: redis
@@ -64,9 +53,6 @@ services:
   #   extends:
   #     file: frontend/docker-compose.prod.yml
   #     service: frontend
-
-networks:
-  main:
 
 volumes:
   postgres-data:
