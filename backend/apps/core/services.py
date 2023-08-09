@@ -5,22 +5,22 @@ from typing import Union
 from datetime import datetime
 from channels.models import Channel
 from core.utils import ObjectSource
-from core.utils import get_content_type_model
+from core.utils import get_content_type_model, generate_cache_key
 
 
 class CacheService:
     """
     A service to handle cache operations.
     """
-    def __init__(self, model: models.Model):
+    def __init__(self, model: models.Model, cache_key: str):
         """
         Set the default model for the service
         """
         self.model = model
+        self.raw_cache_key = cache_key
 
     def get_list(
             self, *,
-            key: str,
             channel: Channel,
             content_object: models.Model = None,
             **kwargs
@@ -28,13 +28,12 @@ class CacheService:
         """
         Return List of objects from cache and db
         Args:
-            key: str
             channel: Channel
             content_object: models.Model
             **kwargs: dict - Extra data
         """
-        key = self.__generate_key(
-            key=key,
+        key = generate_cache_key(
+            key=self.raw_cache_key,
             channel=channel,
             user='*',
             content_object=content_object
@@ -58,7 +57,6 @@ class CacheService:
 
     def get_from_cache(
             self, *,
-            key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
             content_object: models.Model = None,
@@ -71,8 +69,8 @@ class CacheService:
             user: settings.AUTH_USER_MODEL
             content_object: models.Model
         """
-        key = self.__generate_key(
-            key=key,
+        key = generate_cache_key(
+            key=self.raw_cache_key,
             channel=channel,
             user=user,
             content_object=content_object
@@ -96,7 +94,6 @@ class CacheService:
 
     def create_cache(
             self, *,
-            key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
             content_object: models.Model = None,
@@ -111,8 +108,8 @@ class CacheService:
             content_object: models.Model
             **kwargs: dict - Extra data
         """
-        key = self.__generate_key(
-            key=key,
+        key = generate_cache_key(
+            key=self.raw_cache_key,
             channel=channel,
             user=user,
             content_object=content_object
@@ -121,7 +118,6 @@ class CacheService:
         # First check if object exists in cache or db
         # If exists, return None
         if self.get_from_cache(
-                key=key,
                 channel=channel,
                 user=user,
                 content_object=content_object
@@ -139,7 +135,6 @@ class CacheService:
 
     def delete_cache(
             self, *,
-            key: str,
             channel: Channel,
             user: settings.AUTH_USER_MODEL,
             content_object: models.Model = None,
@@ -148,21 +143,22 @@ class CacheService:
         """
         Delete object from cache
         Args:
-            key: str
             channel: Channel
             user: settings.AUTH_USER_MODEL
             content_object: models.Model
             **kwargs - Extra data
         """
-        key = self.__generate_key(
-            key=key,
+        key = generate_cache_key(
+            key=self.raw_cache_key,
             channel=channel,
             user=user,
             content_object=content_object
         )
         # First check if object exists in cache or db
         get_cache = self.get_from_cache(
-            key=key, channel=channel, user=user, content_object=content_object
+            channel=channel,
+            user=user,
+            content_object=content_object
         )
         # If not exists, Raise exception
         if not get_cache:
@@ -333,22 +329,3 @@ class CacheService:
                 seen_users.add(user)
 
         return unique_objects
-
-    def __generate_key(
-            self,
-            key: str,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: models.Model = None
-    ) -> str:
-        """
-        Return a key based on the given key and args
-        """
-        user_token = user if user else '*'
-        if content_object:
-            return key.format(
-                channel_token=channel.token,
-                user_token=user_token,
-                object_token=content_object.token
-            )
-        return key.format(channel_token=channel.token, user_token=user_token)

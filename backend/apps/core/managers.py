@@ -14,7 +14,6 @@ class BaseCacheManager(models.Manager):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.service = None
-        self.cache_key = None
 
     def contribute_to_class(self, model, name):
         """
@@ -22,7 +21,6 @@ class BaseCacheManager(models.Manager):
         """
         super().contribute_to_class(model, name)
         self.service = None
-        self.cache_key = None
 
     def get_count(self, channel: Channel, **kwargs) -> int:
         """
@@ -32,11 +30,7 @@ class BaseCacheManager(models.Manager):
             channel: Channel
             Extra: Could be any extra info such as the object token
         """
-        return len(
-            self.service.get_list(
-                key=self.cache_key, channel=channel, **kwargs
-            )
-        )
+        return len(self.service.get_list(channel=channel, **kwargs))
 
     def get_list(self, channel: Channel, **kwargs) -> dict:
         """
@@ -46,11 +40,7 @@ class BaseCacheManager(models.Manager):
             channel: Channel
             Extra: Could be any extra info such as the object token
         """
-        return self.service.get_list(
-            key=self.cache_key,
-            channel=channel,
-            **kwargs
-        )
+        return self.service.get_list(channel=channel, **kwargs)
 
     def get_from_cache(
             self,
@@ -67,7 +57,6 @@ class BaseCacheManager(models.Manager):
             Extra: Could be any extra info such as the object token
         """
         return self.service.get_from_cache(
-            key=self.cache_key,
             channel=channel,
             user=user,
             **kwargs
@@ -87,7 +76,6 @@ class BaseCacheManager(models.Manager):
             Extra: Could be any extra info such as the object token
         """
         return self.service.create_cache(
-            key=self.cache_key,
             channel=channel,
             user=user,
             source=ObjectSource.CACHE.value,
@@ -110,7 +98,6 @@ class BaseCacheManager(models.Manager):
             content_object: models.Model
         """
         return self.service.delete_cache(
-            key=self.cache_key,
             channel=channel,
             user=user,
             content_object=content_object
