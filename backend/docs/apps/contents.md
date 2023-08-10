@@ -8,6 +8,8 @@ Table of Contents:
   - [ContentVisibility](#contentvisibility)
 - [Managers](#managers)
   - [BaseContentManager](#basecontentmanager)
+- [Serializers](#serializers)
+  - [ContentDetailMethodSerializer](#contentdetailmethodserializer)
 - [Views](#views)
   - [ContentListCreateView](#contentlistcreateview)
   - [ContentDetailView](#contentdetailview)
@@ -44,6 +46,14 @@ The `ContentVisibility` enum represents the visibility options for content. It h
 ### BaseContentManager
 The `BaseContentManager` is a manager class that provides a method for querying published content objects. It includes the following method:
 - `published()`: Returns a queryset of published content objects.
+
+
+## Serializers
+
+### ContentDetailMethodSerializer
+The `ContentSerializer` is a base serializer which provides following fields:
+- `viewers_count`: The number of viewers of the content.
+- `content_type_id`: The content type id of the content's model
 
 ## Views
 

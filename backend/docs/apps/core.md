@@ -14,6 +14,12 @@ Table of Contents:
 - [Mixins](#mixins)
   - [ContentTypeModelMixin](#contenttypemodelmixin)
   - [ContentObjectMixin](#contentobjectmixin)
+- [Services](#services)
+  - [CacheService](#cacheservice)
+    - [CacheCreateMixin](#cachecreatemixin)
+    - [CacheDeleteMixin](#cachedeletemixin)
+    - [CacheGetMixin](#cachegetmixin)
+    - [CacheListMixin](#cachelistmixin)
 
 ## Description
 The Core module serves as the heart of the application, housing essential and reusable functions that contribute to the overall functionality of various components. It encapsulates core operations and utilities, making them easily accessible and maintainable throughout the project.
@@ -54,3 +60,15 @@ The `ContentObjectMixin` first retrieves the content type model and filter the o
 
 ### CacheService
 The `CacheService` is a service that handles cache operations. It plays a crucial role in the caching of objects, allowing for efficient retrieval and storage of data. It also provides a consistent interface for performing cache operations, making it easier to maintain and update the cache.
+
+#### CacheCreateMixin
+The `CacheCreateMixin` is a mixin that handles the creation of objects in the cache and db .
+
+#### CacheDeleteMixin
+The `CacheDeleteMixin` is a mixin that handles the deletion of objects in the cache and db .
+
+#### CacheGetMixin
+The `CacheGetMixin` is a mixin that handles the retrieval of objects in the cache and db .
+
+#### CacheListMixin
+The `CacheListMixin` is a mixin that handles the retrieval of objects in the cache and db [list].
