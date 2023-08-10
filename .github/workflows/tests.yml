@@ -25,4 +25,4 @@ jobs:
         time: '10s'
 
     - name: Run tests
-      run: docker exec -it tsuna-streaming-backend pytest
+      run: docker exec tsuna-streaming-backend pytest
