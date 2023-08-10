@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework import serializers
 
 from musics.models import Music
-from viewers.models import Viewer
+from contents.serializers import ContentDetailMethodSerializer
 
 
 class MusicListSerializer(serializers.ModelSerializer):
@@ -60,17 +60,16 @@ class MusicCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(str(error))
 
 
-class MusicDetailSerializer(serializers.ModelSerializer):
+class MusicDetailSerializer(
+    ContentDetailMethodSerializer,
+    serializers.ModelSerializer
+):
     """
     A serializer for music detail.
     """
 
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
-    viewer_count = serializers.SerializerMethodField(
-        method_name="get_viewer_count",
-        read_only=True
-    )
 
     class Meta:
         model = Music
@@ -88,24 +87,8 @@ class MusicDetailSerializer(serializers.ModelSerializer):
             "is_updated", 
             "is_published", 
             "allow_comment", 
-            "viewer_count"
+            "viewers_count",
+            "content_type_id",  # From BaseContentSerializer
             ]
 
-        read_only_fields = [
-            'file',
-            'token',
-            'user',
-            'channel',
-            'date',
-            'is_updated',
-            'viewer_count'
-        ]
-
-    def get_viewer_count(self, obj):
-        """
-        Get the number of viewers for a music
-        """
-        return Viewer.objects.get_count(
-            content_object=obj,
-            channel=obj.channel,
-        )
+        read_only_fields = fields
