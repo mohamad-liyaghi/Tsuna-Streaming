@@ -1,7 +1,9 @@
 import pytest
 from votes.models import Vote
+from core.utils import ObjectSource
 from channels.models import Channel
 from accounts.models import Account
+
 
 @pytest.mark.django_db
 class TestGetVoteFromCache:
@@ -19,4 +21,4 @@ class TestGetVoteFromCache:
             user=create_vote.user,
             content_object=create_vote.content_object
         )
-        assert vote['source'] == 'database'
+        assert vote.get('source') == ObjectSource.DATABASE.value

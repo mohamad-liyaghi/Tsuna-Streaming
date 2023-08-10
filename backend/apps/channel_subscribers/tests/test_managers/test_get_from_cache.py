@@ -1,7 +1,9 @@
 import pytest
 from channel_subscribers.models import ChannelSubscriber
+from core.utils import ObjectSource
 from channels.models import Channel
 from accounts.models import Account
+
 
 @pytest.mark.django_db
 class TestGetSubFromCache:
@@ -17,4 +19,4 @@ class TestGetSubFromCache:
             channel=create_subscriber.channel,
             user=create_subscriber.user
         )
-        assert sub['source'] == 'database'
+        assert sub.get('source') == ObjectSource.DATABASE.value

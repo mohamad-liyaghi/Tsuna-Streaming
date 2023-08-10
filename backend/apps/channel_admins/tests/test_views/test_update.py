@@ -71,6 +71,5 @@ class TestAdminUpdate:
         })
         response = api_client.put(url, self.data, format='json')
         self.admin.refresh_from_db()
-        print(response.json())
         assert response.status_code == status.HTTP_200_OK
         assert self.admin.permissions.can_add_object is True

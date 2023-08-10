@@ -33,9 +33,8 @@ class TestVoteModel:
         assert votes_count == 0
 
     def test_get_object_votes_count_vote_in_db(self, create_video, create_vote):
-
         votes_count = Vote.objects.get_count(
-            content_object=create_video.channel, channel=create_video.channel
+            content_object=create_video, channel=create_video.channel
         )
         assert votes_count == 1
 

@@ -60,5 +60,4 @@ class TestMembershipRetrieve:
                 kwargs={"membership_token": create_unique_uuid}
             )
         )
-        print(response.json())
         assert response.status_code == status.HTTP_404_NOT_FOUND
