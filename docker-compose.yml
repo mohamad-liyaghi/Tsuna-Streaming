@@ -3,10 +3,13 @@ version: '3.9'
 services:
 
   backend:
-
     extends:
       file: backend/docker-compose.yml
       service: backend
+    depends_on:
+      - postgres
+      - redis
+      - smtp4dev
 
   postgres:
     extends:
@@ -22,6 +25,8 @@ services:
     extends:
       file: backend/docker-compose.yml
       service: pgadmin
+    depends_on:
+      - postgres
 
   redis:
     extends:
@@ -32,6 +37,10 @@ services:
     extends:
       file: backend/docker-compose.yml
       service: flower
+    depends_on:
+      - redis
+      - celery
+      - backend
 
   smtp4dev:
     extends:
@@ -42,11 +51,17 @@ services:
     extends:
       file: backend/docker-compose.yml
       service: celery
+    depends_on:
+      - redis
+      - backend
 
   celery-beat:
     extends:
       file: backend/docker-compose.yml
       service: celery-beat
+    depends_on:
+      - redis
+      - backend
 
 
   # frontend:

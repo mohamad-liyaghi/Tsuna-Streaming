@@ -6,6 +6,10 @@ services:
     extends:
       file: backend/docker-compose.prod.yml
       service: backend
+    depends_on:
+      - postgres
+      - redis
+      - smtp4dev
 
   postgres:
     extends:
@@ -37,16 +41,26 @@ services:
     extends:
       file: backend/docker-compose.prod.yml
       service: celery
+    depends_on:
+      - redis
+      - backend
 
   celery-beat:
     extends:
       file: backend/docker-compose.prod.yml
       service: celery-beat
+    depends_on:
+      - redis
+      - backend
 
   flower:
     extends:
       file: backend/docker-compose.prod.yml
       service: flower
+    depends_on:
+      - redis
+      - celery
+      - backend
 
 
   # frontend:

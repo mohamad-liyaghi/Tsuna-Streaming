@@ -6,36 +6,25 @@ x-environment: &COMMON_VARS
 services:
   backend:
     container_name: tsuna-streaming-backend
+    command: sh docker/production/commands/setup.sh
+    restart: on-failure
     build:
       context: .
       dockerfile: ./docker/production/Dockerfile
-
-    command: sh docker/production/commands/setup.sh
-    restart: on-failure
     env_file:
       - .env.prod
-
     ports:
       - "8000:8000"
-
     volumes:
       - .:/backend
       - .env.prod:/backend/.env
-
     environment:
       *COMMON_VARS
-    
-    depends_on:
-      - postgres
-      - redis
-      - smtp4dev
 
   postgres:
     image: postgres:11
-
     container_name: tsuna-streaming-database
     restart: on-failure
-
     ports: 
           - "5432:5432"
     volumes:
@@ -45,10 +34,8 @@ services:
 
   test_postgres:
     image: postgres:11
-
     container_name: tsuna-streaming-test-database
     restart: on-failure
-
     ports:
           - "5433:5432"
 
@@ -56,30 +43,25 @@ services:
       image: dpage/pgadmin4
       container_name: tsuna-streaming-pgadmin
       restart: on-failure
-
       environment:
           - PGADMIN_DEFAULT_EMAIL=test@test.com
           - PGADMIN_DEFAULT_PASSWORD=test
       ports:
           - "5050:80"
-
       volumes: 
           - /data/pgadmin:/var/lib/pgadmin/data
     
   smtp4dev:
     image: rnwood/smtp4dev:v3
     container_name: tsuna-streaming-smtp4dev
-
     ports:
       - "5000:80"
       - "25:25"
-      
     restart: always
 
   redis:
     image: redis:6.2-alpine
     container_name: tsuna-streaming-redis
-    
     ports:
       - "6379:6379"
     restart: always
@@ -93,9 +75,6 @@ services:
 
     container_name: tsuna-streaming-celery
     command: sh docker/production/commands/celery.sh
-    depends_on:
-      - redis
-      - backend
     volumes:
       - .:/backend
     environment:
@@ -109,9 +88,6 @@ services:
       dockerfile: ./docker/production/Dockerfile
     container_name: tsuna-streaming-celery-beat
     command: sh docker/production/commands/celery-beat.sh
-    depends_on:
-      - redis
-      - backend
     volumes:
       - .:/backend
     environment:
@@ -120,16 +96,10 @@ services:
       - .env.prod
 
   flower:
-
     build:
       context: .
       dockerfile: ./docker/production/Dockerfile
     command: sh docker/production/commands/flower.sh
-
-    depends_on:
-      - redis
-      - celery
-      - backend
     volumes:
       - .:/backend
     ports:
