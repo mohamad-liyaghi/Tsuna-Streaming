@@ -1,68 +1,117 @@
 version: '3.9'
 
+x-environment: &COMMON_VARS
+    DJANGO_SETTINGS_MODULE: 'config.settings.local'
+
 services:
 
   backend:
-    extends:
-      file: backend/docker-compose.yml
-      service: backend
+    container_name: tsuna-streaming-backend
+    command: sh ./docker/local/commands/setup.sh
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/Dockerfile
+    env_file:
+      - backend/.env.local
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+      - ./backend/.env.local:/backend/.env
+    environment:
+      *COMMON_VARS
     depends_on:
       - postgres
       - redis
       - smtp4dev
 
   postgres:
-    extends:
-      file: backend/docker-compose.yml
-      service: postgres
+    image: postgres:11
+    container_name: tsuna-streaming-database
+    restart: on-failure
+    env_file:
+      - backend/.env.local
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
   test_postgres:
-    extends:
-      file: backend/docker-compose.yml
-      service: test_postgres
+    image: postgres:11
+    container_name: tsuna-streaming-test-database
+    restart: on-failure
+    env_file:
+      - backend/.env.local
+    ports:
+      - "5433:5432"
 
   pgadmin:
-    extends:
-      file: backend/docker-compose.yml
-      service: pgadmin
-    depends_on:
-      - postgres
+    image: dpage/pgadmin4
+    container_name: tsuna-streaming-pgadmin
+    restart: on-failure
+    env_file:
+      - backend/.env.local
+    ports:
+      - "5050:80"
+    volumes:
+      - /data/pgadmin:/var/lib/pgadmin/data
 
   redis:
-    extends:
-      file: backend/docker-compose.yml
-      service: redis
-
-  flower:
-    extends:
-      file: backend/docker-compose.yml
-      service: flower
-    depends_on:
-      - redis
-      - celery
-      - backend
+    image: redis:6.2-alpine
+    container_name: tsuna-streaming-redis
+    restart: always
+    ports:
+      - "6379:6379"
 
   smtp4dev:
-    extends:
-      file: backend/docker-compose.yml
-      service: smtp4dev
+    image: rnwood/smtp4dev:v3
+    container_name: tsuna-streaming-smtp4dev
+    ports:
+      - "5000:80"
+      - "25:25"
+    restart: always
 
   celery:
-    extends:
-      file: backend/docker-compose.yml
-      service: celery
-    depends_on:
-      - redis
-      - backend
+    container_name: tsuna-streaming-celery
+    command: sh ./docker/local/commands/celery.sh
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/Dockerfile
+    volumes:
+      - ./backend:/backend
+    env_file:
+      - backend/.env.local
+    environment:
+      *COMMON_VARS
 
   celery-beat:
-    extends:
-      file: backend/docker-compose.yml
-      service: celery-beat
-    depends_on:
-      - redis
-      - backend
+    build:
+      context: .
+      dockerfile: backend/docker/local/Dockerfile
+    container_name: tsuna-streaming-celery-beat
+    command: sh ./docker/local/commands/celery-beat.sh
+    volumes:
+      - ./backend:/backend
+    env_file:
+        - backend/.env.local
+    environment:
+      *COMMON_VARS
 
+  flower:
+    container_name: tsuna-streaming-flower
+    build:
+      context: .
+      dockerfile: ./backend/docker/local/Dockerfile
+    command: sh ./docker/local/commands/flower.sh
+    env_file:
+      - backend/.env.local
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./backend:/backend
+    environment:
+      *COMMON_VARS
 
   # frontend:
   #   extends:

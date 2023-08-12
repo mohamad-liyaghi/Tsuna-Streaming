@@ -16,7 +16,6 @@
     - [Votes](#votes)
     - [Comments](#comments)
     - [Viewers](#viewers)
-4. [How to Run](#how-to-run)
 
 ## Introduction <a name="introduction"></a>
 The Tsuna Streaming backend is a powerful system that allows users to create channels, share videos and music, and engage with other users through voting and commenting. Channel owners can add administrators, and users can follow channels to stay updated. The backend efficiently tracks viewership and votes, utilizing caching for transaction efficiency. With user management, content sharing, and engagement features, the Tsuna Streaming backend provides a seamless and interactive experience for users.
@@ -75,36 +74,3 @@ The `Comments` application is responsible for managing user-generated comments o
 ### Viewers <a name="viewers"></a>
 The `Viewers` application is responsible for tracking and recording user views on content. When a user retrieves or accesses a piece of content, a viewer record is initially saved in a cache to optimize performance. This caching mechanism minimizes direct interactions with the main database. After that, a Celery task is scheduled to insert the viewer record into the main database. By employing this approach, the `Viewers` application efficiently manages and records user views, providing valuable insights into content popularity and engagement. This helps content creators and administrators gain a better understanding of user behavior and preferences, enabling them to make informed decisions and optimize the platform's content strategy.For more detailed information, please refer to the [Full Document](docs/apps/viewers.md).
 
-
-## How to Run <a name="how-to-run"></a>
-To run the backend of this project, ensure Docker and Docker-compose are installed on your machine. Follow these steps:
-
-1. Clone the project:
-    ```bash
-    git clone https://github.com/mohamad-liyaghi/Tsuna-Streaming.git
-    ```
-
-2. Navigate to the project's backend folder:
-    ```bash
-    cd tsuna-streaming/backend
-    ```
-
-3. Run it using Docker-compose:
-    ```bash
-    docker-compose up --build
-    ```
-* If you want to use sample data, run it using Docker-compose:
-    ```bash
-    docker exec -it tsuna-streaming-backend python manage.py loaddata db.json
-    ```
-
-4. Open a browser and navigate to `http://localhost:8000/`.
-
-
-To run tests, execute the following command:
-
-```bash
-docker exec  -it tsuna-streaming-backend pytest
-```
-
-Enjoy using Tsuna Streaming!
