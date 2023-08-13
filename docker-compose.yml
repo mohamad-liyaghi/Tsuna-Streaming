@@ -63,6 +63,14 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    volumes:
+        - redis-data:/data
+  test_redis:
+    image: redis:6.2-alpine
+    container_name: tsuna-streaming-test-redis
+    restart: always
+    ports:
+      - "6380:6379"
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
@@ -120,3 +128,4 @@ services:
 
 volumes:
   postgres-data:
+  redis-data:
