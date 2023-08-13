@@ -43,6 +43,11 @@ Follow these simple steps to run the Tsuna Streaming backend:
 
    This will build and start the containers required for the project to run in a production environment.
 
-4. Access the Tsuna Streaming API in a web browser at `http://localhost:8000/`.
+4. Populate the sample database with some data:
+    ```bash
+    docker exec -it tsuna-streaming-backend python manage.py loaddata db.json
+    ```
+
+5. Access the Tsuna Streaming API in a web browser at `http://localhost:8000/`.
 
 You're all set! Enjoy using Tsuna Streaming.

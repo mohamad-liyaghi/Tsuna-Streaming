@@ -33,7 +33,7 @@ The Tsuna Streaming platform utilizes the following technologies:
 5. Redis
 6. Celery
 7. Swagger
-8JWT
+8. JWT
 
 ## Applications <a name="applications"></a>
 The project is structured into ten main applications and two modules.
