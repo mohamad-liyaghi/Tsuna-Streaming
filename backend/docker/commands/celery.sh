@@ -7,4 +7,4 @@ else
 fi
 
 echo "Running celery worker..."
-celery -A config worker --loglevel=$LOGLEVEL
+celery -A config.celery worker --loglevel=$LOGLEVEL

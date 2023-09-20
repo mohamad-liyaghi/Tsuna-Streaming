@@ -7,4 +7,4 @@ else
 fi
 
 echo "Running flower worker..."
-celery -A config.celery_app flower --loglevel=$LOGLEVEL
+celery -A config.celery flower --loglevel=$LOGLEVEL
