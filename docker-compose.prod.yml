@@ -2,16 +2,17 @@ version: '3.9'
 
 x-environment: &COMMON_VARS
     DJANGO_SETTINGS_MODULE: 'config.settings.production'
+    ENVIRONMENT: PRODUCTION
 
 services:
 
   backend:
     container_name: tsuna-streaming-backend
-    command: sh ./docker/production/commands/setup.sh
+    command: sh ./docker/commands/setup.sh
     restart: on-failure
     build:
       context: .
-      dockerfile: ./backend/docker/production/Dockerfile
+      dockerfile: ./backend/docker/Dockerfile
     env_file:
       - backend/.env.prod
     ports:
@@ -22,9 +23,12 @@ services:
     environment:
       *COMMON_VARS
     depends_on:
-      - postgres
-      - redis
-      - smtp4dev
+      postgres: 
+        condition: service_healthy
+      redis:
+        condition: service_started
+      smtp4dev:
+        condition: service_started
 
   postgres:
     image: postgres:11
@@ -32,10 +36,15 @@ services:
     restart: on-failure
     env_file:
       - backend/.env.prod
-    ports:
-      - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
 
   test_postgres:
     image: postgres:11
@@ -43,8 +52,8 @@ services:
     restart: on-failure
     env_file:
       - backend/.env.prod
-    ports:
-      - "5433:5432"
+    expose:
+      - "5432"
 
   pgadmin:
     image: dpage/pgadmin4
@@ -61,8 +70,8 @@ services:
     image: redis:6.2-alpine
     container_name: tsuna-streaming-redis
     restart: always
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis-data:/data
 
@@ -70,49 +79,54 @@ services:
     image: redis:6.2-alpine
     container_name: tsuna-streaming-test-redis
     restart: always
-    ports:
-      - "6380:6379"
+    expose:
+      - "6379"
 
   smtp4dev:
     image: rnwood/smtp4dev:v3
     container_name: tsuna-streaming-smtp4dev
     ports:
       - "5000:80"
-      - "25:25"
+    expose:
+      - "80"
     restart: always
 
   celery:
     container_name: tsuna-streaming-celery
-    command: sh ./docker/production/commands/celery.sh
+    command: sh ./docker/commands/celery.sh
     build:
       context: .
-      dockerfile: ./backend/docker/production/Dockerfile
+      dockerfile: ./backend/docker/Dockerfile
     volumes:
       - ./backend:/backend
     env_file:
       - backend/.env.prod
     environment:
       *COMMON_VARS
+    depends_on:
+      - backend
 
   celery-beat:
     build:
       context: .
-      dockerfile: backend/docker/production/Dockerfile
+      dockerfile: backend/docker/Dockerfile
     container_name: tsuna-streaming-celery-beat
-    command: sh ./docker/production/commands/celery-beat.sh
+    command: sh ./docker/commands/celery-beat.sh
     volumes:
       - ./backend:/backend
     env_file:
         - backend/.env.prod
     environment:
       *COMMON_VARS
+    depends_on:
+      - backend
 
   flower:
     container_name: tsuna-streaming-flower
     build:
       context: .
-      dockerfile: ./backend/docker/production/Dockerfile
-    command: sh ./docker/production/commands/flower.sh
+      dockerfile: ./backend/docker/Dockerfile
+    command: sh ./docker/commands/flower.sh
     env_file:
       - backend/.env.prod
     ports:
@@ -121,6 +135,8 @@ services:
       - ./backend:/backend
     environment:
       *COMMON_VARS
+    depends_on:
+      - backend
 
   # frontend:
   #   extends:
