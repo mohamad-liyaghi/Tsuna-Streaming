@@ -15,14 +15,15 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Build image and run container
-      run: |
-        docker-compose up --build -d
+    - name: Build the image
+      run: make build
 
-    - name: Wait for backend container build and start
+    - name: Run containers
+      run: make run DETACHED=true
+
+    - name: Wait for containers to setup
       uses: jakejarvis/wait-action@master
       with:
         time: '10s'
-
     - name: Run tests
-      run: docker exec tsuna-streaming-backend pytest
+      run: make test
