@@ -13,6 +13,4 @@ RUN pip install -r requirement.txt
 
 COPY /backend /backend
 
-
-
 EXPOSE 8000
