@@ -11,5 +11,5 @@ def delete_object_comments_after_deleting(sender, instance, *args, **kwargs):
     """
     remove_object_comments.delay(
         content_type_id=get_content_type_model(model=type(instance)),
-        object_id=instance.id
+        object_id=instance.id,
     )

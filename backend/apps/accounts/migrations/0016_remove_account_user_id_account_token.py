@@ -4,19 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0015_alter_account_picture'),
+        ("accounts", "0015_alter_account_picture"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='account',
-            name='user_id',
+            model_name="account",
+            name="user_id",
         ),
         migrations.AddField(
-            model_name='account',
-            name='token',
+            model_name="account",
+            name="token",
             field=models.CharField(blank=True, max_length=32, null=True),
         ),
     ]

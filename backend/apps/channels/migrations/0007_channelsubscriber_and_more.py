@@ -6,25 +6,48 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0006_channeladmin_delete_admin'),
+        ("channels", "0006_channeladmin_delete_admin"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChannelSubscriber',
+            name="ChannelSubscriber",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('is_blocked', models.BooleanField(default=False)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscribers', to='channels.channel')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscribed_channels', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                ("is_blocked", models.BooleanField(default=False)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subscribers",
+                        to="channels.channel",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="subscribed_channels",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddConstraint(
-            model_name='channelsubscriber',
-            constraint=models.UniqueConstraint(fields=('channel', 'user'), name='unique_channel_subscriber'),
+            model_name="channelsubscriber",
+            constraint=models.UniqueConstraint(
+                fields=("channel", "user"), name="unique_channel_subscriber"
+            ),
         ),
     ]

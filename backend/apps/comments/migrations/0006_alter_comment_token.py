@@ -5,15 +5,14 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('comments', '0005_alter_comment_token'),
+        ("comments", "0005_alter_comment_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='token',
+            model_name="comment",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

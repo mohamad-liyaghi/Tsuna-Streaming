@@ -21,7 +21,6 @@ def send_token_via_email(sender, created, **kwargs):
     """
 
     if created:
-
         token = kwargs["instance"]
         user = token.user
 
@@ -31,6 +30,6 @@ def send_token_via_email(sender, created, **kwargs):
             body={
                 "first_name": user.first_name,
                 "user_token": user.token,
-                "token": token.token
-            }
+                "token": token.token,
+            },
         )

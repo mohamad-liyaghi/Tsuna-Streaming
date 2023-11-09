@@ -15,17 +15,13 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
             "title",
             "description",
             "avatar",
-            "thumbnail", 
+            "thumbnail",
             "token",
             "date_created",
-            "is_verified"
-            ]
+            "is_verified",
+        ]
 
-        read_only_fields = [
-            "token",
-            "date_created",
-            "is_verified"
-            ]
+        read_only_fields = ["token", "date_created", "is_verified"]
         write_only_fields = [
             "description",
             "avatar",
@@ -37,8 +33,7 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
         """
         try:
             return Channel.objects.create(
-                owner=self.context["request"].user,
-                **validated_data
+                owner=self.context["request"].user, **validated_data
             )
         except ChannelLimitExceededException as error:
             raise serializers.ValidationError(str(error))
@@ -46,34 +41,32 @@ class ChannelListCreateSerializer(serializers.ModelSerializer):
 
 class ChannelDetailSerializer(serializers.ModelSerializer):
     owner = serializers.StringRelatedField()
-    role = serializers.SerializerMethodField(
-        method_name="role_in_channel"
-    )
+    role = serializers.SerializerMethodField(method_name="role_in_channel")
     subscribers_count = serializers.SerializerMethodField(
-        method_name='get_subscriber_count'
+        method_name="get_subscriber_count"
     )
 
     class Meta:
         model = Channel
         fields = [
             "title",
-            "description", 
+            "description",
             "avatar",
             "thumbnail",
-            "owner", 
-            "token", 
+            "owner",
+            "token",
             "date_created",
-            "is_verified", 
-            "role", 
+            "is_verified",
+            "role",
             "subscribers_count",
-            ]
+        ]
 
         read_only_fields = [
-            'token',
-            'owner',
-            'date_created',
-            'is_verified',
-            'role',
+            "token",
+            "owner",
+            "date_created",
+            "is_verified",
+            "role",
         ]
 
     def role_in_channel(self, channel):
@@ -83,7 +76,7 @@ class ChannelDetailSerializer(serializers.ModelSerializer):
             1. Owner
             2. Admin
         """
-        user = self.context['request'].user
+        user = self.context["request"].user
 
         if channel.owner == user:
             return "owner"

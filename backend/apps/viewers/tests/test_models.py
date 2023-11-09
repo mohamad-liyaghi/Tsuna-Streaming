@@ -4,7 +4,6 @@ from viewers.models import Viewer
 
 @pytest.mark.django_db
 class TestViewerModel:
-
     def test_delete_viewer_after_deleting_object(self, create_viewer):
         assert Viewer.objects.count() == 1
         create_viewer.content_object.delete()

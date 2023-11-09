@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('comments', '0003_alter_comment_token'),
+        ("comments", "0003_alter_comment_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='comment',
-            name='token',
+            model_name="comment",
+            name="token",
             field=models.CharField(blank=True, max_length=32, null=True),
         ),
     ]

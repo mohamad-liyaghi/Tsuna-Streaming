@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
-    RetrieveUpdateAPIView
+    RetrieveUpdateAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -24,22 +24,18 @@ from core.permissions import IsChannelAdmin
 @extend_schema_view(
     get=extend_schema(
         description="List of a channels admins [Available for admins].",
-        responses={
-            200: 'ok',
-            401: 'Unauthorized',
-            403: 'Forbidden'
-        },
-        tags=['Channel Admins']
+        responses={200: "ok", 401: "Unauthorized", 403: "Forbidden"},
+        tags=["Channel Admins"],
     ),
     post=extend_schema(
         description="Promote a user to admin [Only by owner].",
         responses={
-            201: 'Created',
-            400: 'Bad Request',
-            401: 'Unauthorized',
-            403: 'Forbidden'
+            201: "Created",
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
         },
-        tags=['Channel Admins']
+        tags=["Channel Admins"],
     ),
 )
 class AdminListCreateView(ChannelMixin, ListCreateAPIView):
@@ -48,7 +44,8 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
     Create a New Admin
     Methods: POST, GET
     """
-    lookup_url_kwarg = 'channel_token'
+
+    lookup_url_kwarg = "channel_token"
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -59,10 +56,7 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
         """
         Pass user/channel to serializer.
         """
-        return {
-            'request_user': self.request.user,
-            'channel': self.channel
-        }
+        return {"request_user": self.request.user, "channel": self.channel}
 
     def get_queryset(self):
         channel = self.channel
@@ -80,45 +74,40 @@ class AdminListCreateView(ChannelMixin, ListCreateAPIView):
 @extend_schema_view(
     get=extend_schema(
         description="Retrieve an admins permissions.",
-        responses={
-            200: 'ok',
-            401: 'Unauthorized',
-            403: 'Forbidden',
-            404: 'Not Found'
-        },
-        tags=['Channel Admins']
+        responses={200: "ok", 401: "Unauthorized", 403: "Forbidden", 404: "Not Found"},
+        tags=["Channel Admins"],
     ),
     put=extend_schema(
         description="Update an admins permissions.",
         responses={
-            200: 'ok',
-            400: 'Bad Request',
-            401: 'Unauthorized',
-            403: 'Forbidden',
-            404: 'Not Found'
+            200: "ok",
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
         },
-        tags=['Channel Admins']
+        tags=["Channel Admins"],
     ),
     patch=extend_schema(
         description="Update an admins permissions.",
         responses={
-            200: 'ok',
-            400: 'Bad Request',
-            401: 'Unauthorized',
-            403: 'Forbidden',
-            404: 'Not Found'
+            200: "ok",
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
         },
-        tags=['Channel Admins']
+        tags=["Channel Admins"],
     ),
     delete=extend_schema(
         description="Delete an admin.",
         responses={
-            204: 'No Content',
-            401: 'Unauthorized',
-            403: 'Forbidden',
-            404: 'Not Found'
+            204: "No Content",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
         },
-        tags=['Channel Admins']
+        tags=["Channel Admins"],
     ),
 )
 class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
@@ -133,19 +122,16 @@ class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return get_object_or_404(
-            ChannelAdmin.objects.prefetch_related('permissions'),
+            ChannelAdmin.objects.prefetch_related("permissions"),
             channel__token=self.channel.token,
-            token=self.kwargs['admin_token']
+            token=self.kwargs["admin_token"],
         )
 
     def get_serializer_context(self):
         """
         Return user and channel to backend
         """
-        return {
-            'request_user': self.request.user,
-            'channel': self.channel
-        }
+        return {"request_user": self.request.user, "channel": self.channel}
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -155,8 +141,8 @@ class AdminDetailView(ChannelMixin, RetrieveUpdateDestroyAPIView):
         admin = self.get_object()
         if request.user == admin.user:
             return Response(
-                {'detail': 'You cannot delete yourself.'},
-                status=status.HTTP_403_FORBIDDEN
+                {"detail": "You cannot delete yourself."},
+                status=status.HTTP_403_FORBIDDEN,
             )
         admin.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

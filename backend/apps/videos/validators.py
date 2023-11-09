@@ -1,9 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.conf import settings
-from videos.constants import (
-    VIDEO_LIMIT_NORMAL_USER,
-    VIDEO_LIMIT_PREMIUM_USER
-)
+from videos.constants import VIDEO_LIMIT_NORMAL_USER, VIDEO_LIMIT_PREMIUM_USER
 
 
 def validate_video_size(file, user: settings.AUTH_USER_MODEL) -> None:
@@ -14,10 +11,10 @@ def validate_video_size(file, user: settings.AUTH_USER_MODEL) -> None:
 
     if user.is_premium() and file_size > int(VIDEO_LIMIT_PREMIUM_USER):
         raise ValidationError(
-            f'Video file size should not exceed {VIDEO_LIMIT_PREMIUM_USER}MB.'
+            f"Video file size should not exceed {VIDEO_LIMIT_PREMIUM_USER}MB."
         )
 
     if user.is_normal() and file_size > int(VIDEO_LIMIT_NORMAL_USER):
         raise ValidationError(
-            f'Normal users can upload videos up to {VIDEO_LIMIT_NORMAL_USER}MB.'
+            f"Normal users can upload videos up to {VIDEO_LIMIT_NORMAL_USER}MB."
         )

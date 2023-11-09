@@ -7,30 +7,31 @@ class AdminListSerializer(serializers.ModelSerializer):
     """
     List of admins in a channel.
     """
+
     user = serializers.StringRelatedField()
     promoted_by = serializers.StringRelatedField()
 
     class Meta:
         model = ChannelAdmin
-        fields = ['user', 'promoted_by', 'channel', 'token']
+        fields = ["user", "promoted_by", "channel", "token"]
 
 
 class AdminCreateSerializer(serializers.ModelSerializer):
     """
     Create a new admin.
     """
+
     user = serializers.SlugRelatedField(
-        slug_field='token',
-        queryset=Account.objects.all()
+        slug_field="token", queryset=Account.objects.all()
     )
 
     class Meta:
         model = ChannelAdmin
-        fields = ['user']
+        fields = ["user"]
 
     def save(self, **kwargs):
-        kwargs.setdefault('promoted_by', self.context['request_user'])
-        kwargs.setdefault('channel', self.context['channel'])
+        kwargs.setdefault("promoted_by", self.context["request_user"])
+        kwargs.setdefault("channel", self.context["channel"])
 
         try:
             return super().save(**kwargs)
@@ -46,11 +47,11 @@ class PermissionListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChannelAdminPermission
         fields = [
-            'can_add_object',
-            'can_edit_object',
-            'can_delete_object',
-            'can_publish_object',
-            'can_change_channel_info',
+            "can_add_object",
+            "can_edit_object",
+            "can_delete_object",
+            "can_publish_object",
+            "can_change_channel_info",
         ]
 
 
@@ -58,6 +59,7 @@ class AdminDetailSerializer(serializers.ModelSerializer):
     """
     Retrieve an admin alongside its permissions
     """
+
     permissions = PermissionListSerializer()
 
     user = serializers.StringRelatedField()
@@ -66,28 +68,26 @@ class AdminDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChannelAdmin
         fields = [
-            'user',
-            'promoted_by',
-            'date',
-            'permissions',
+            "user",
+            "promoted_by",
+            "date",
+            "permissions",
         ]
         read_only_fields = [
-            'user',
-            'promoted_by',
-            'date',
+            "user",
+            "promoted_by",
+            "date",
         ]
 
     def update(self, instance, validated_data):
         """
         Update the permissions of an admin.
         """
-        permissions_data = validated_data.pop('permissions')
+        permissions_data = validated_data.pop("permissions")
         permissions = instance.permissions
 
         # Update permissions
         for permission in permissions_data:
-            setattr(
-                permissions, permission, permissions_data[permission]
-            )
+            setattr(permissions, permission, permissions_data[permission])
         permissions.save()
         return instance

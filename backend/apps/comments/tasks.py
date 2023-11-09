@@ -11,6 +11,4 @@ def remove_object_comments(content_type_id: int, object_id: int):
     # get the object model content type (eg: Video)
     content_model = get_content_type_model(_id=content_type_id).id
     # Delete Related Comments
-    Comment.objects.filter(
-        content_type=content_model, object_id=object_id
-    ).delete()
+    Comment.objects.filter(content_type=content_model, object_id=object_id).delete()

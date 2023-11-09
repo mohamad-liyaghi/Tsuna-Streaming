@@ -3,7 +3,7 @@ from contents.models import ContentVisibility
 
 
 class CreateContentPermission(BasePermission):
-    message = 'You dont have permission to add content'
+    message = "You dont have permission to add content"
 
     def has_permission(self, request, view):
         """
@@ -17,7 +17,7 @@ class CreateContentPermission(BasePermission):
 
 
 class UpdateContentPermission(BasePermission):
-    message = 'You dont have permission to update this object.'
+    message = "You dont have permission to update this object."
 
     def has_permission(self, request, view):
         """
@@ -30,7 +30,7 @@ class UpdateContentPermission(BasePermission):
 
 
 class DeleteContentPermission(BasePermission):
-    message = 'You dont have permission to delete this content.'
+    message = "You dont have permission to delete this content."
 
     def has_permission(self, request, view):
         """
@@ -43,7 +43,7 @@ class DeleteContentPermission(BasePermission):
 
 
 class RetrievePrivateContentPermission(BasePermission):
-    message = 'You dont have permission to retrieve private contents.'
+    message = "You dont have permission to retrieve private contents."
 
     def has_object_permission(self, request, view, obj):
         """
@@ -51,6 +51,6 @@ class RetrievePrivateContentPermission(BasePermission):
         """
         channel = view.channel
         return (
-                obj.visibility == ContentVisibility.PUBLISHED or
-                request.user.channel_admins.filter(channel=channel).exists()
+            obj.visibility == ContentVisibility.PUBLISHED
+            or request.user.channel_admins.filter(channel=channel).exists()
         )

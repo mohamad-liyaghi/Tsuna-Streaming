@@ -6,29 +6,63 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0008_channeladmin_block_user'),
+        ("channels", "0008_channeladmin_block_user"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Video',
+            name="Video",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=100)),
-                ('description', models.TextField(max_length=300)),
-                ('video', models.FileField(upload_to='videos/user_video/')),
-                ('thumbnail', models.ImageField(default='media/default-video-thumbnail.jpg', upload_to='videos/thumbnail/')),
-                ('token', models.CharField(max_length=32)),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('visibility', models.CharField(choices=[('pr', 'Private'), ('pu', 'Public')], default='pr', max_length=2)),
-                ('is_updated', models.BooleanField(default=False)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='videos', to='channels.channel')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='videos', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=100)),
+                ("description", models.TextField(max_length=300)),
+                ("video", models.FileField(upload_to="videos/user_video/")),
+                (
+                    "thumbnail",
+                    models.ImageField(
+                        default="media/default-video-thumbnail.jpg",
+                        upload_to="videos/thumbnail/",
+                    ),
+                ),
+                ("token", models.CharField(max_length=32)),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                (
+                    "visibility",
+                    models.CharField(
+                        choices=[("pr", "Private"), ("pu", "Public")],
+                        default="pr",
+                        max_length=2,
+                    ),
+                ),
+                ("is_updated", models.BooleanField(default=False)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="videos",
+                        to="channels.channel",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="videos",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

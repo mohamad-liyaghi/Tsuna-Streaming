@@ -14,15 +14,11 @@ class Subscription(AbstractToken):
     """
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="subscriptions"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscriptions"
     )
 
     membership = models.ForeignKey(
-        Membership,
-        on_delete=models.CASCADE,
-        related_name='subscriptions'
+        Membership, on_delete=models.CASCADE, related_name="subscriptions"
     )
 
     start_date = models.DateTimeField(auto_now_add=True)
@@ -42,11 +38,9 @@ class Subscription(AbstractToken):
         """
         Set unique constraint on user field
         """
+
         constraints = [
-            models.UniqueConstraint(
-                fields=['user'],
-                name="unique_subscription"
-            )
+            models.UniqueConstraint(fields=["user"], name="unique_subscription")
         ]
 
     def save(self, *args, **kwargs):
@@ -63,8 +57,8 @@ class Subscription(AbstractToken):
 
     def __set_end_date(self):
         membership_active_months = self.membership.active_months
-        self.end_date = (
-                timezone.now() + datetime.timedelta(membership_active_months * 30)
+        self.end_date = timezone.now() + datetime.timedelta(
+            membership_active_months * 30
         )
 
     def __check_user_role(self):

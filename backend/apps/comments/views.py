@@ -4,19 +4,15 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.generics import (
     RetrieveUpdateDestroyAPIView,
     ListCreateAPIView,
-    UpdateAPIView
+    UpdateAPIView,
 )
 
 from comments.serializers import (
     CommentSerializer,
     CommentDetailSerializer,
-    CommentPinSerializer
+    CommentPinSerializer,
 )
-from comments.permissions import (
-    CommentCreatePermission,
-    IsCommentOwner,
-    CanPinComment
-)
+from comments.permissions import CommentCreatePermission, IsCommentOwner, CanPinComment
 
 from apps.core.mixins import ContentObjectMixin
 
@@ -24,24 +20,20 @@ from apps.core.mixins import ContentObjectMixin
 @extend_schema_view(
     get=extend_schema(
         description="List an object's comments.",
-        responses={
-            200: 'ok',
-            401: 'Unauthorized',
-            404: 'Not found'
-        },
-        tags=['Comments']
+        responses={200: "ok", 401: "Unauthorized", 404: "Not found"},
+        tags=["Comments"],
     ),
     post=extend_schema(
         description="Create/Reply a comment.",
         responses={
-            201: 'Created',
-            400: 'Bad request',
-            401: 'Unauthorized',
-            403: 'Permission denied',
-            404: 'Not found'
+            201: "Created",
+            400: "Bad request",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
         },
-        tags=['Comments']
-    )
+        tags=["Comments"],
+    ),
 )
 class CommentListCreateView(ContentObjectMixin, ListCreateAPIView):
     """
@@ -60,58 +52,54 @@ class CommentListCreateView(ContentObjectMixin, ListCreateAPIView):
         """
         send user and object to serializer.
         """
-        return {'user': self.request.user, 'content_object': self.get_object}
+        return {"user": self.request.user, "content_object": self.get_object}
 
     def get_queryset(self):
         content_object = self.get_object()
-        parent_comments = content_object.comments.select_related(
-            'user'
-        ).filter(parent__isnull=True)
+        parent_comments = content_object.comments.select_related("user").filter(
+            parent__isnull=True
+        )
         return parent_comments.order_by("-pinned", "-date")
-        
+
 
 @extend_schema_view(
     get=extend_schema(
         description="Retrieve a comment and its replies.",
-        responses={
-            200: 'ok',
-            401: 'Unauthorized',
-            404: 'Not found'
-        },
-        tags=['Comments']
+        responses={200: "ok", 401: "Unauthorized", 404: "Not found"},
+        tags=["Comments"],
     ),
     put=extend_schema(
         description="Update a comment by its owner.",
         responses={
-            200: 'ok',
-            400: 'Bad request',
-            401: 'Unauthorized',
-            403: 'Permission denied',
-            404: 'Not found'
+            200: "ok",
+            400: "Bad request",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
         },
-        tags=['Comments']
+        tags=["Comments"],
     ),
     patch=extend_schema(
         description="Update a comment by its owner.",
         responses={
-            200: 'ok',
-            400: 'Bad request',
-            401: 'Unauthorized',
-            403: 'Permission denied',
-            404: 'Not found'
+            200: "ok",
+            400: "Bad request",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
         },
-        tags=['Comments']
+        tags=["Comments"],
     ),
     delete=extend_schema(
         description="Delete a comment by its owner.",
         responses={
-            204: 'No content',
-            401: 'Unauthorized',
-            403: 'Permission denied',
-            404: 'Not found'
+            204: "No content",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
         },
-        tags=['Comments']
-    )
+        tags=["Comments"],
+    ),
 )
 class CommentDetailView(ContentObjectMixin, RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
@@ -126,9 +114,8 @@ class CommentDetailView(ContentObjectMixin, RetrieveUpdateDestroyAPIView):
         content_object = super().get_object(bypass_permission=True)
 
         comment = get_object_or_404(
-            content_object.comments.select_related('user').prefetch_related(
-            ),
-            token=self.kwargs.get("comment_token")
+            content_object.comments.select_related("user").prefetch_related(),
+            token=self.kwargs.get("comment_token"),
         )
         self.check_object_permissions(self.request, comment)
         return comment
@@ -138,22 +125,22 @@ class CommentDetailView(ContentObjectMixin, RetrieveUpdateDestroyAPIView):
     put=extend_schema(
         description="Pin a comment by channel staff.",
         responses={
-            200: 'ok',
-            401: 'Unauthorized',
-            403: 'Permission denied',
-            404: 'Not found'
+            200: "ok",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
         },
-        tags=['Comments']
+        tags=["Comments"],
     ),
     patch=extend_schema(
-            description="Pin a comment by channel staff.",
-            responses={
-                200: 'ok',
-                401: 'Unauthorized',
-                403: 'Permission denied',
-                404: 'Not found'
-            },
-            tags=['Comments']
+        description="Pin a comment by channel staff.",
+        responses={
+            200: "ok",
+            401: "Unauthorized",
+            403: "Permission denied",
+            404: "Not found",
+        },
+        tags=["Comments"],
     ),
 )
 class CommentPinView(ContentObjectMixin, UpdateAPIView):
@@ -164,9 +151,8 @@ class CommentPinView(ContentObjectMixin, UpdateAPIView):
         content_object = super().get_object(bypass_permission=True)
 
         comment = get_object_or_404(
-            content_object.comments.select_related('user').prefetch_related(
-            ),
-            token=self.kwargs.get("comment_token")
+            content_object.comments.select_related("user").prefetch_related(),
+            token=self.kwargs.get("comment_token"),
         )
         self.check_object_permissions(self.request, comment)
         return comment

@@ -5,15 +5,14 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('musics', '0001_initial'),
+        ("musics", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='music',
-            name='token',
+            model_name="music",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

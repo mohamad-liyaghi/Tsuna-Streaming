@@ -15,9 +15,7 @@ def insert_viewer_into_db():
 
     # Get keys of all cached viewers
     viewer_keys = cache.keys(
-        CACHE_OBJECT_VIEWER.format(
-            channel_token='*', object_token='*', user_token='*'
-        )
+        CACHE_OBJECT_VIEWER.format(channel_token="*", object_token="*", user_token="*")
     )
 
     if viewer_keys:
@@ -26,22 +24,24 @@ def insert_viewer_into_db():
 
         # Filter those viewers that are cached
         cached_viewers = [
-            viewer for viewer in all_viewers
-            if viewer['source'] == ObjectSource.CACHE.value
+            viewer
+            for viewer in all_viewers
+            if viewer["source"] == ObjectSource.CACHE.value
         ]
 
         # Get all users of cached viewers
         users = Account.objects.filter(
-            id__in=[viewer['user'] for viewer in cached_viewers]
+            id__in=[viewer["user"] for viewer in cached_viewers]
         )
 
         # Create instances of Viewer model
         new_viewers = [
             Viewer(
-                user=users.get(id=viewer['user']),
-                content_object=viewer['content_object'],
-                date=viewer['date'],
-            ) for viewer in cached_viewers
+                user=users.get(id=viewer["user"]),
+                content_object=viewer["content_object"],
+                date=viewer["date"],
+            )
+            for viewer in cached_viewers
         ]
 
         # Bulk Insert
@@ -55,21 +55,14 @@ def remove_object_viewers(content_type_id: int, object_id: int, object_token: st
     """
     Remove viewers of an object after deleting it.
     """
-    content_model = get_content_type_model(
-        _id=content_type_id
-    )
+    content_model = get_content_type_model(_id=content_type_id)
 
     # Delete all object viewers in db.
-    Viewer.objects.filter(
-        content_type=content_model,
-        object_id=object_id
-    ).delete()
+    Viewer.objects.filter(content_type=content_model, object_id=object_id).delete()
 
     # Delete object viewers from cache
     cache.delete_pattern(
         CACHE_OBJECT_VIEWER.format(
-            channel_token="*",
-            object_token=object_token,
-            user_token='*'
+            channel_token="*", object_token=object_token, user_token="*"
         )
     )

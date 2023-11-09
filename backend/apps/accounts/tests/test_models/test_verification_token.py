@@ -7,7 +7,6 @@ from accounts.models import VerificationToken
 
 @pytest.mark.django_db
 class TestTokenModel:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_deactive_user):
         self.user = create_deactive_user
@@ -24,7 +23,7 @@ class TestTokenModel:
         self.token.expire_at = timezone.now() - timedelta(minutes=11)
         self.token.save()
         assert self.token.is_valid is False
-    
+
     def test_delete_token_after_user_deletion(self):
         """When a user is deleted, the token is deleted too"""
         self.user.delete()

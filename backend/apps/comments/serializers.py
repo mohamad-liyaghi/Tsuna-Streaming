@@ -10,42 +10,25 @@ class CommentParentQueryset(serializers.SlugRelatedField):
 
     def get_queryset(self):
         # Content object is passed to serializer context in views.
-        content_object = self.context['content_object']()
+        content_object = self.context["content_object"]()
         # return parent comments of content object.
         return content_object.comments.filter(parent__isnull=True)
 
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
-    parent = CommentParentQueryset(
-        slug_field='token',
-        required=False,
-        allow_null=True
-    )
+    parent = CommentParentQueryset(slug_field="token", required=False, allow_null=True)
 
     class Meta:
         model = Comment
-        fields = [
-            "parent",
-            "user",
-            "body",
-            "date",
-            "edited",
-            "pinned",
-            "token"
-        ]
+        fields = ["parent", "user", "body", "date", "edited", "pinned", "token"]
 
-        read_only_fields = [
-            "date",
-            "edited",
-            "pinned",
-            "token"
-        ]
+        read_only_fields = ["date", "edited", "pinned", "token"]
 
     def save(self, **kwargs):
         # Set User and Content Object
-        kwargs.setdefault('user', self.context['user'])
-        kwargs.setdefault('content_object', self.context['content_object']())
+        kwargs.setdefault("user", self.context["user"])
+        kwargs.setdefault("content_object", self.context["content_object"]())
         try:
             return Comment.objects.create(**kwargs)
 
@@ -69,15 +52,7 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = [
-            "user",
-            "body",
-            "date",
-            "edited",
-            "pinned",
-            "token",
-            "replies"
-        ]
+        fields = ["user", "body", "date", "edited", "pinned", "token", "replies"]
         read_only_fields = ["date", "edited", "pinned", "token"]
 
     def reply_list(self, comment):
@@ -85,8 +60,7 @@ class CommentDetailSerializer(serializers.ModelSerializer):
         Return List of replies of a comment.
         """
         return CommentRepliesSerializer(
-            instance=comment.replies.select_related('user'),
-            many=True
+            instance=comment.replies.select_related("user"), many=True
         ).data
 
 

@@ -9,20 +9,13 @@ USER = get_user_model()
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     """Serializer for registering users."""
-    
+
     email = serializers.EmailField()
-    password = serializers.CharField(style={'input_type': 'password'})
+    password = serializers.CharField(style={"input_type": "password"})
 
     class Meta:
         model = USER
-        fields = (
-            "email",
-            "first_name",
-            "last_name",
-            "picture",
-            "bio",
-            "password"
-        )
+        fields = ("email", "first_name", "last_name", "picture", "bio", "password")
 
     def validate_email(self, value):
         """
@@ -55,10 +48,7 @@ class VerifyUserSerializer(serializers.Serializer):
         """
         user = get_object_or_404(USER, token=user_token)
 
-        verified, message = VerificationToken.objects.verify(
-            user=user,
-            token=token
-        )
+        verified, message = VerificationToken.objects.verify(user=user, token=token)
 
         if verified:
             self._activate_user(user)
@@ -77,9 +67,9 @@ class ResendTokenSerializer(serializers.ModelSerializer):
     """
     Serializer for resending verification token.
     """
+
     user = serializers.SlugRelatedField(
-        slug_field="token",
-        queryset=USER.objects.filter(is_active=False)
+        slug_field="token", queryset=USER.objects.filter(is_active=False)
     )
 
     class Meta:
@@ -96,4 +86,3 @@ class ResendTokenSerializer(serializers.ModelSerializer):
 
         except PermissionDenied as e:
             raise serializers.ValidationError(e)
-

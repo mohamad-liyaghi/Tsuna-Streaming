@@ -15,9 +15,7 @@ class CanCreateVotePermission(BasePermission):
         """
         vote_exists = bool(
             Vote.objects.get_from_cache(
-                channel=obj.channel,
-                user=request.user,
-                content_object=obj
+                channel=obj.channel, user=request.user, content_object=obj
             )
         )
         return not vote_exists
@@ -36,9 +34,7 @@ class CanDeleteVotePermission(BasePermission):
         """
         vote_exists = bool(
             Vote.objects.get_from_cache(
-                channel=obj.channel,
-                user=request.user,
-                content_object=obj
+                channel=obj.channel, user=request.user, content_object=obj
             )
         )
         return vote_exists

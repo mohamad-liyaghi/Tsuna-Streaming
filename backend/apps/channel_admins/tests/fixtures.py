@@ -10,5 +10,5 @@ def create_channel_admin(create_channel, create_subscriber):
     return ChannelAdmin.objects.create(
         user=create_subscriber.user,
         channel=create_channel,
-        promoted_by=create_channel.owner
+        promoted_by=create_channel.owner,
     )

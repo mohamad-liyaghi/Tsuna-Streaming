@@ -9,14 +9,13 @@ from accounts.models import Account
 class TestGetSubFromCache:
     def test_get_cached(self, create_cached_subscriber):
         sub = ChannelSubscriber.objects.get_from_cache(
-            channel=Channel.objects.get(id=create_cached_subscriber['channel']),
-            user=Account.objects.get(id=create_cached_subscriber['user'])
+            channel=Channel.objects.get(id=create_cached_subscriber["channel"]),
+            user=Account.objects.get(id=create_cached_subscriber["user"]),
         )
-        assert sub['source'] == 'cache'
+        assert sub["source"] == "cache"
 
     def test_get_from_db(self, create_subscriber):
         sub = ChannelSubscriber.objects.get_from_cache(
-            channel=create_subscriber.channel,
-            user=create_subscriber.user
+            channel=create_subscriber.channel, user=create_subscriber.user
         )
-        assert sub.get('source') == ObjectSource.DATABASE.value
+        assert sub.get("source") == ObjectSource.DATABASE.value

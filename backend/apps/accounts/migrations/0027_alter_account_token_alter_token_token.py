@@ -5,20 +5,19 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0026_alter_account_bio'),
+        ("accounts", "0026_alter_account_bio"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='token',
+            model_name="account",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
         migrations.AlterField(
-            model_name='token',
-            name='token',
+            model_name="token",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

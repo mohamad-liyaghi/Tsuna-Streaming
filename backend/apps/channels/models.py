@@ -7,29 +7,25 @@ from core.models import AbstractToken
 
 
 class Channel(AbstractToken):
-    
     title = models.CharField(max_length=240)
     description = models.TextField(
-        max_length=500,
-        default="A new channel on Tsuna Streaming."
+        max_length=500, default="A new channel on Tsuna Streaming."
     )
 
     avatar = models.ImageField(
         upload_to="channels/profile",
         default="assets/images/default-channel-profile.jpg",
-        validators=[validate_profile_size]
+        validators=[validate_profile_size],
     )
 
     thumbnail = models.ImageField(
         upload_to="channels/profile",
         default="assets/images/default-thumbnail.jpg",
-        validators=[validate_profile_size]
+        validators=[validate_profile_size],
     )
 
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="channels"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="channels"
     )
 
     date_created = models.DateTimeField(auto_now_add=True)
@@ -37,7 +33,6 @@ class Channel(AbstractToken):
     is_verified = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        
         if not self.pk:
             self.__check_user_activation()
             self.__check_channel_limit()

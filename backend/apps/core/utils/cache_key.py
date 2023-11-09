@@ -5,10 +5,10 @@ from channels.models import Channel
 
 
 def generate_cache_key(
-        key: str,
-        channel: Channel,
-        user: Union[settings.AUTH_USER_MODEL, str] = '*',
-        content_object: Optional[models.Model] = None
+    key: str,
+    channel: Channel,
+    user: Union[settings.AUTH_USER_MODEL, str] = "*",
+    content_object: Optional[models.Model] = None,
 ) -> str:
     """
     Generate a cache key based on the given parameters.
@@ -22,16 +22,13 @@ def generate_cache_key(
     """
 
     # Use the user's token if available, otherwise use the user string
-    user_token = user.token if hasattr(user, 'token') else user
+    user_token = user.token if hasattr(user, "token") else user
 
     if content_object:
         return key.format(
             channel_token=channel.token,
             user_token=user_token,
-            object_token=content_object.token
+            object_token=content_object.token,
         )
 
-    return key.format(
-        channel_token=channel.token,
-        user_token=user_token
-    )
+    return key.format(channel_token=channel.token, user_token=user_token)

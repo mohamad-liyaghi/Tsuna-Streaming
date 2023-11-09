@@ -9,16 +9,16 @@ from accounts.models import Account
 class TestGetVoteFromCache:
     def test_get_cached(self, create_cached_vote):
         vote = Vote.objects.get_from_cache(
-            channel=Channel.objects.get(id=create_cached_vote['channel']),
-            user=Account.objects.get(id=create_cached_vote['user']),
-            content_object=create_cached_vote['content_object']
+            channel=Channel.objects.get(id=create_cached_vote["channel"]),
+            user=Account.objects.get(id=create_cached_vote["user"]),
+            content_object=create_cached_vote["content_object"],
         )
-        assert vote['source'] == 'cache'
+        assert vote["source"] == "cache"
 
     def test_get_from_db(self, create_vote):
         vote = Vote.objects.get_from_cache(
             channel=create_vote.channel,
             user=create_vote.user,
-            content_object=create_vote.content_object
+            content_object=create_vote.content_object,
         )
-        assert vote.get('source') == ObjectSource.DATABASE.value
+        assert vote.get("source") == ObjectSource.DATABASE.value

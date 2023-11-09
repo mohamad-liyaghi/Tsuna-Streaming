@@ -18,4 +18,3 @@ class TokenAdmin(admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         """No body can change info in admin panel"""
         return False
-    

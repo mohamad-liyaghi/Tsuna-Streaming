@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0018_merge_20230211_2049'),
+        ("accounts", "0018_merge_20230211_2049"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='plan',
-            name='token',
+            model_name="plan",
+            name="token",
             field=models.CharField(blank=True, null=True, max_length=32),
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='token',
+            model_name="subscription",
+            name="token",
             field=models.CharField(blank=True, null=True, max_length=32),
         ),
         migrations.AlterField(
-            model_name='token',
-            name='token',
+            model_name="token",
+            name="token",
             field=models.CharField(blank=True, null=True, max_length=32),
         ),
     ]

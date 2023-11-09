@@ -6,25 +6,30 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('musics', '0002_alter_music_token'),
+        ("musics", "0002_alter_music_token"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='music',
-            name='music',
+            model_name="music",
+            name="music",
         ),
         migrations.AddField(
-            model_name='music',
-            name='file',
-            field=models.FileField(default='ff', upload_to=apps.contents.models.utils.file_path.get_file_upload_path),
+            model_name="music",
+            name="file",
+            field=models.FileField(
+                default="ff",
+                upload_to=apps.contents.models.utils.file_path.get_file_upload_path,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='music',
-            name='thumbnail',
-            field=models.ImageField(default='assets/images/default-thumbnail.jpg', upload_to=apps.contents.models.utils.thumbnail_path.get_thumbnail_upload_path),
+            model_name="music",
+            name="thumbnail",
+            field=models.ImageField(
+                default="assets/images/default-thumbnail.jpg",
+                upload_to=apps.contents.models.utils.thumbnail_path.get_thumbnail_upload_path,
+            ),
         ),
     ]

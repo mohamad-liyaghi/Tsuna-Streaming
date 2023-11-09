@@ -8,15 +8,13 @@ class ChannelSubscriber(models.Model):
     """Model to represent a user's subscription to a channel."""
 
     channel = models.ForeignKey(
-        Channel,
-        on_delete=models.CASCADE,
-        related_name="subscribers"
+        Channel, on_delete=models.CASCADE, related_name="subscribers"
     )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="subscribed_channels"
+        related_name="subscribed_channels",
     )
 
     date = models.DateTimeField(auto_now_add=True)
@@ -25,8 +23,7 @@ class ChannelSubscriber(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["channel", "user"],
-                name="unique_channel_subscribers"
+                fields=["channel", "user"], name="unique_channel_subscribers"
             )
         ]
 

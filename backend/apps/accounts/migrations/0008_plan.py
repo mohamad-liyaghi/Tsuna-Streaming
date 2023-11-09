@@ -4,22 +4,29 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0006_alter_token_options'),
+        ("accounts", "0006_alter_token_options"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Plan',
+            name="Plan",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=210)),
-                ('description', models.TextField(max_length=400)),
-                ('price', models.PositiveBigIntegerField(default=0)),
-                ('token', models.CharField(blank=True, null=True, max_length=32)),
-                ('active_months', models.PositiveBigIntegerField(default=0)),
-                ('is_avaiable', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(max_length=210)),
+                ("description", models.TextField(max_length=400)),
+                ("price", models.PositiveBigIntegerField(default=0)),
+                ("token", models.CharField(blank=True, null=True, max_length=32)),
+                ("active_months", models.PositiveBigIntegerField(default=0)),
+                ("is_avaiable", models.BooleanField(default=False)),
             ],
         ),
     ]

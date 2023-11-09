@@ -1,4 +1,4 @@
-import pytest # noqa
+import pytest  # noqa
 import uuid
 import time
 from apps.core.tests.fixtures import *  # noqa
@@ -8,7 +8,7 @@ from apps.channels.tests.fixtures import *  # noqa
 from apps.channel_subscribers.tests.fixtures import *  # noqa
 from apps.channel_admins.tests.fixtures import *  # noqa
 from apps.votes.tests.fixtures import *  # noqa
-from apps.videos.tests.fixtures import * # noqa
+from apps.videos.tests.fixtures import *  # noqa
 from apps.viewers.tests.fixtures import *  # noqa
 from apps.comments.tests.fixtures import *  # noqa
 from apps.musics.tests.fixtures import *  # noqa

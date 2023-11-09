@@ -7,16 +7,15 @@ from viewers.models import Viewer
 
 @pytest.mark.django_db
 class TestMusicRetrieveView:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_music):
         self.music = create_music
         self.url_path = reverse(
-            'musics:detail',
+            "musics:detail",
             kwargs={
-                'channel_token': create_music.channel.token,
-                'object_token': create_music.token
-            }
+                "channel_token": create_music.channel.token,
+                "object_token": create_music.token,
+            },
         )
 
     def test_retrieve_unauthorized(self, api_client):
@@ -54,8 +53,10 @@ class TestMusicRetrieveView:
         api_client.force_authenticate(create_channel_admin.user)
         response = api_client.get(self.url_path)
         assert response.status_code == status.HTTP_200_OK
-        assert Viewer.objects.get_count(
-            channel=self.music.channel,
-            content_object=self.music
-        ) == 1
+        assert (
+            Viewer.objects.get_count(
+                channel=self.music.channel, content_object=self.music
+            )
+            == 1
+        )
         assert self.music.visibility == ContentVisibility.PRIVATE

@@ -13,10 +13,7 @@ class CacheListMixin:
     """
 
     def get_list(
-            self,
-            channel: Channel,
-            content_object: Optional[models.Model] = None,
-            **kwargs
+        self, channel: Channel, content_object: Optional[models.Model] = None, **kwargs
     ) -> list:
         """
         Return list of objects from both cache and db (without duplication).
@@ -28,33 +25,20 @@ class CacheListMixin:
 
         # Set content_object in kwargs for passing to _get_list_from_db
         if content_object is not None:
-            kwargs.setdefault('content_object', content_object)
+            kwargs.setdefault("content_object", content_object)
 
         key = generate_cache_key(
-            key=self.raw_cache_key,
-            channel=channel,
-            content_object=content_object
+            key=self.raw_cache_key, channel=channel, content_object=content_object
         )
 
         cache_list = self._get_list_from_cache(key=key)
-        database_list = self._get_list_from_db(
-            key=key,
-            channel=channel,
-            **kwargs
-        )
+        database_list = self._get_list_from_db(key=key, channel=channel, **kwargs)
 
-        unique_objects = self._remove_duplication(
-            objects=cache_list + database_list
-        )
+        unique_objects = self._remove_duplication(objects=cache_list + database_list)
 
         return unique_objects
 
-    def _get_list_from_db(
-            self,
-            key: str,
-            channel: Channel,
-            **kwargs
-    ) -> list:
+    def _get_list_from_db(self, key: str, channel: Channel, **kwargs) -> list:
         """
         Return List of objects from db
         Args:
@@ -63,22 +47,16 @@ class CacheListMixin:
             **kwargs: Additional arguments
         """
 
-        if content_object := kwargs.pop('content_object', None):
-            content_model = get_content_type_model(
-                model=type(content_object)
-            )
+        if content_object := kwargs.pop("content_object", None):
+            content_model = get_content_type_model(model=type(content_object))
             # Set content_type and object_id in kwargs
-            kwargs.setdefault('content_type', content_model)
-            kwargs.setdefault('object_id', content_object.id)
+            kwargs.setdefault("content_type", content_model)
+            kwargs.setdefault("object_id", content_object.id)
 
         database_objects = list(
-            self.model.objects.filter(
-                channel=channel, **kwargs
-            ).values(
-                'user', 'channel', 'date'
-            ).annotate(
-                source=Value(ObjectSource.DATABASE.value)
-            )
+            self.model.objects.filter(channel=channel, **kwargs)
+            .values("user", "channel", "date")
+            .annotate(source=Value(ObjectSource.DATABASE.value))
         )
         return database_objects
 
@@ -88,16 +66,17 @@ class CacheListMixin:
         Args:
             key: Cache key
         """
-        caches = [
-            cache.get(object_key) for object_key in cache.keys(key)
-        ]
+        caches = [cache.get(object_key) for object_key in cache.keys(key)]
 
         # Filter those objects which are from cache
-        filtered_result = list(filter(
-            lambda obj: obj.get('source') == ObjectSource.CACHE.value
-            if isinstance(obj, dict) else False,
-            caches
-        ))
+        filtered_result = list(
+            filter(
+                lambda obj: obj.get("source") == ObjectSource.CACHE.value
+                if isinstance(obj, dict)
+                else False,
+                caches,
+            )
+        )
 
         return filtered_result
 
@@ -112,11 +91,11 @@ class CacheListMixin:
         seen_users = set()
 
         for combined_object in objects:
-            user = combined_object.get('user')
+            user = combined_object.get("user")
             # Check if user is new to the set
             if user not in seen_users:
                 # Check object is not pending to delete later
-                if not combined_object.get('pending_delete'):
+                if not combined_object.get("pending_delete"):
                     unique_objects.append(combined_object)
                 seen_users.add(user)
 

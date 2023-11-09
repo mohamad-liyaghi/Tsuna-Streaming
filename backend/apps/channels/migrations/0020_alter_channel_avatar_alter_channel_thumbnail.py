@@ -5,20 +5,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0019_rename_profile_channel_avatar_and_more'),
+        ("channels", "0019_rename_profile_channel_avatar_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='channel',
-            name='avatar',
-            field=models.ImageField(default='static/images/default-channel-profile.jpg', upload_to='channels/profile', validators=[accounts.validators.validate_profile_size]),
+            model_name="channel",
+            name="avatar",
+            field=models.ImageField(
+                default="static/images/default-channel-profile.jpg",
+                upload_to="channels/profile",
+                validators=[accounts.validators.validate_profile_size],
+            ),
         ),
         migrations.AlterField(
-            model_name='channel',
-            name='thumbnail',
-            field=models.ImageField(default='static/images/default-thumbnail.jpg', upload_to='channels/profile', validators=[accounts.validators.validate_profile_size]),
+            model_name="channel",
+            name="thumbnail",
+            field=models.ImageField(
+                default="static/images/default-thumbnail.jpg",
+                upload_to="channels/profile",
+                validators=[accounts.validators.validate_profile_size],
+            ),
         ),
     ]

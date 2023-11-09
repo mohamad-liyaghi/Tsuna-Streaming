@@ -9,9 +9,7 @@ class ChannelAdminPermission(AbstractToken):
     """
 
     admin = models.OneToOneField(
-        ChannelAdmin,
-        on_delete=models.CASCADE,
-        related_name='permissions'
+        ChannelAdmin, on_delete=models.CASCADE, related_name="permissions"
     )
 
     # Permissions
@@ -25,19 +23,17 @@ class ChannelAdminPermission(AbstractToken):
         return str(self.admin.user)
 
     PERMISSION_FIELDS = [
-        'can_add_object',
-        'can_edit_object',
-        'can_delete_object',
-        'can_publish_object',
-        'can_change_channel_info',
+        "can_add_object",
+        "can_edit_object",
+        "can_delete_object",
+        "can_publish_object",
+        "can_change_channel_info",
     ]
 
     def save(self, *args, **kwargs):
         if not self.pk:
             # Set owner permission to True
-            ChannelAdminPermission.set_owner_permission(
-                admin=self
-            )
+            ChannelAdminPermission.set_owner_permission(admin=self)
         return super().save(*args, **kwargs)
 
     @classmethod

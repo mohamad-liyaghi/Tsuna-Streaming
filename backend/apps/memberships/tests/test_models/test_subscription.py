@@ -7,7 +7,6 @@ import pytest
 
 @pytest.mark.django_db
 class TestSubscriptionModel:
-
     def test_create_subscription(self, create_active_user, create_membership):
         Subscription.objects.create(
             user=create_active_user,
@@ -17,23 +16,21 @@ class TestSubscriptionModel:
         assert create_active_user.is_premium()
 
     def test_create_subscription_for_deactive_user(
-            self, create_deactive_user, create_membership
+        self, create_deactive_user, create_membership
     ):
         assert not create_deactive_user.is_active
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
-                user=create_deactive_user,
-                membership=create_membership
+                user=create_deactive_user, membership=create_membership
             )
 
     def test_create_subscription_for_superuser(
-            self, create_superuser, create_membership
+        self, create_superuser, create_membership
     ):
         assert create_superuser.is_superuser
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
-                user=create_superuser,
-                membership=create_membership
+                user=create_superuser, membership=create_membership
             )
 
     def test_delete_subscription(self, create_subscription):
@@ -55,22 +52,21 @@ class TestSubscriptionModel:
         create_membership.save()
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
-                user=create_active_user,
-                membership=create_membership
+                user=create_active_user, membership=create_membership
             )
 
     def test_subscribe_twice(self, create_subscription, create_membership):
         with pytest.raises(PermissionDenied):
             Subscription.objects.create(
-                user=create_subscription.user,
-                membership=create_membership
+                user=create_subscription.user, membership=create_membership
             )
 
     def test_get_active_subscriptions(self, create_subscription):
         user = create_subscription.user
-        assert Subscription.objects.get_active_subscription(user=user) == create_subscription
+        assert (
+            Subscription.objects.get_active_subscription(user=user)
+            == create_subscription
+        )
 
     def test_get_active_sub_not_exist(self, create_active_user):
-        assert not Subscription.objects.get_active_subscription(
-            user=create_active_user
-        )
+        assert not Subscription.objects.get_active_subscription(user=create_active_user)

@@ -10,6 +10,7 @@ class AbstractAccountRole(models.Model):
         is_premium(): Check if user is premium (has an active subscription)
         is_normal(): Check if user is normal
     """
+
     class Meta:
         abstract = True
 

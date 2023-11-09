@@ -9,12 +9,11 @@ from channels.models import Channel
 
 @pytest.mark.django_db
 class TestAdminModel:
-
     def test_create_channel(self, create_channel, create_subscriber):
         ChannelAdmin.objects.create(
             user=create_subscriber.user,
             channel=create_channel,
-            promoted_by=create_channel.owner
+            promoted_by=create_channel.owner,
         )
 
     def test_create_channel_admin_twice(self, create_channel):
@@ -22,7 +21,7 @@ class TestAdminModel:
             ChannelAdmin.objects.create(
                 user=create_channel.owner,
                 channel=create_channel,
-                promoted_by=create_channel.owner
+                promoted_by=create_channel.owner,
             )
 
     def test_create_no_subscription(self, create_channel, create_superuser):
@@ -30,26 +29,25 @@ class TestAdminModel:
             ChannelAdmin.objects.create(
                 user=create_superuser,
                 channel=create_channel,
-                promoted_by=create_channel.owner
+                promoted_by=create_channel.owner,
             )
 
     def test_create_subscription_in_cache(self, create_cached_subscriber):
-        channel = Channel.objects.get(id=create_cached_subscriber['channel'])
-        user = Account.objects.get(id=create_cached_subscriber['user'])
+        channel = Channel.objects.get(id=create_cached_subscriber["channel"])
+        user = Account.objects.get(id=create_cached_subscriber["user"])
         with pytest.raises(SubscriptionRequiredException):
             ChannelAdmin.objects.create(
-                user=user,
-                channel=channel,
-                promoted_by=channel.owner
+                user=user, channel=channel, promoted_by=channel.owner
             )
 
     def test_promote_by_non_owner(
-            self, create_channel,
-            create_channel_admin,
+        self,
+        create_channel,
+        create_channel_admin,
     ):
         with pytest.raises(PermissionDenied):
             ChannelAdmin.objects.create(
                 user=create_channel_admin.user,
                 channel=create_channel,
-                promoted_by=create_channel_admin.user
+                promoted_by=create_channel_admin.user,
             )

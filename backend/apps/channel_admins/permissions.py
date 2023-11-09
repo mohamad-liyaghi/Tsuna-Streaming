@@ -6,7 +6,7 @@ class IsChannelOwner(BasePermission):
     Check if user is the channel owner
     """
 
-    message = 'You are not the owner of the channel.'
+    message = "You are not the owner of the channel."
 
     def has_permission(self, request, view):
         """

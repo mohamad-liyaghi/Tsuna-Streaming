@@ -15,11 +15,14 @@ class TestVoteCreateView:
 
     def test_create_unauthorized(self, api_client):
         response = api_client.post(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": self.video.token
-            }),
-            {}
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": self.video.token,
+                },
+            ),
+            {},
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -27,11 +30,14 @@ class TestVoteCreateView:
         vote = create_vote
         api_client.force_authenticate(user=vote.user)
         response = api_client.post(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": vote.content_object.token
-            }),
-            {}
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": vote.content_object.token,
+                },
+            ),
+            {},
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
@@ -39,16 +45,17 @@ class TestVoteCreateView:
         user = create_active_user
         api_client.force_authenticate(user=user)
         response = api_client.post(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": self.video.token
-            }),
-            {}
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": self.video.token,
+                },
+            ),
+            {},
         )
         vote_status = Vote.objects.get_from_cache(
-            channel=self.video.channel,
-            user=user,
-            content_object=self.video
+            channel=self.video.channel, user=user, content_object=self.video
         )
         assert response.status_code == status.HTTP_201_CREATED
         assert vote_status
@@ -57,22 +64,27 @@ class TestVoteCreateView:
         user = create_active_user
         api_client.force_authenticate(user=user)
         response = api_client.post(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": create_unique_uuid
-            }),
-            {}
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": create_unique_uuid,
+                },
+            ),
+            {},
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_delete_content_object_not_found(self, api_client, create_active_user, create_unique_uuid):
+    def test_delete_content_object_not_found(
+        self, api_client, create_active_user, create_unique_uuid
+    ):
         user = create_active_user
         api_client.force_authenticate(user=user)
         response = api_client.post(
-            reverse(self.url_name, kwargs={
-                "content_type_id": '1234',
-                "object_token": self.video.token
-            }),
-            {}
+            reverse(
+                self.url_name,
+                kwargs={"content_type_id": "1234", "object_token": self.video.token},
+            ),
+            {},
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND

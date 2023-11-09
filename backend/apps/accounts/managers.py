@@ -8,19 +8,13 @@ class AccountManager(BaseUserManager):
     Custom user model manager where email is the unique identifiers
     """
 
-    def create_user(
-            self, email: str, password: str, is_active=False, **kwargs
-    ):
+    def create_user(self, email: str, password: str, is_active=False, **kwargs):
         """
         Override the create_user method to create a user with a given email and password
         """
         email = self.normalize_email(email)
 
-        user = self.model(
-            email=email,
-            is_active=is_active,
-            **kwargs
-        )
+        user = self.model(email=email, is_active=is_active, **kwargs)
 
         user.set_password(password)
         user.save()
@@ -31,11 +25,7 @@ class AccountManager(BaseUserManager):
         email = self.normalize_email(email)
 
         user = self.model(
-            email=email,
-            is_active=True,
-            is_superuser=True,
-            is_staff=True,
-            **kwargs
+            email=email, is_active=True, is_superuser=True, is_staff=True, **kwargs
         )
 
         user.set_password(password)
@@ -46,7 +36,7 @@ class AccountManager(BaseUserManager):
 class VerificationTokenManager(models.Manager):
     """Custom manager for verification tokens"""
 
-    def verify(self, user: "Account", token: 'VerificationToken'):
+    def verify(self, user: "Account", token: "VerificationToken"):
         """
         Check user is not active and the code is valid
         """
@@ -60,4 +50,4 @@ class VerificationTokenManager(models.Manager):
         if not token.is_valid:
             return False, "Token is expired."
 
-        return True, 'ok'
+        return True, "ok"

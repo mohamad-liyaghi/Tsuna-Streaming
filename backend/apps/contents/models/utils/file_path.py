@@ -1,4 +1,3 @@
-
 def get_file_upload_path(instance, filename):
     """
     Return the uploaded files path

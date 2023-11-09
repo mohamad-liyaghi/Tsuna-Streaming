@@ -15,37 +15,41 @@ class TestCommentRetrieveView:
 
     def test_get_unauthorized(self, api_client):
         response = api_client.get(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": self.video.token,
-                "comment_token": self.comment.token
-            })
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": self.video.token,
+                    "comment_token": self.comment.token,
+                },
+            )
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_get_authorized(self, api_client, create_active_user):
         api_client.force_authenticate(user=create_active_user)
         response = api_client.get(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": self.video.token,
-                "comment_token": self.comment.token
-            })
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": self.video.token,
+                    "comment_token": self.comment.token,
+                },
+            )
         )
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_not_found(
-            self,
-            api_client,
-            create_active_user,
-            create_unique_uuid
-    ):
+    def test_get_not_found(self, api_client, create_active_user, create_unique_uuid):
         api_client.force_authenticate(user=create_active_user)
         response = api_client.get(
-            reverse(self.url_name, kwargs={
-                "content_type_id": self.content_type_id,
-                "object_token": self.video.token,
-                "comment_token": create_unique_uuid
-            })
+            reverse(
+                self.url_name,
+                kwargs={
+                    "content_type_id": self.content_type_id,
+                    "object_token": self.video.token,
+                    "comment_token": create_unique_uuid,
+                },
+            )
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND

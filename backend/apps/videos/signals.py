@@ -9,9 +9,8 @@ def notify_video_creation(sender, instance, created, **kwargs):
     """
     Notify Both uploader and channel owner.
     """
-    
-    if created:
 
+    if created:
         data = {
             "first_name": instance.user.first_name,
             "channel_title": instance.title,
@@ -23,7 +22,7 @@ def notify_video_creation(sender, instance, created, **kwargs):
             send_email.delay(
                 template_name="emails/notify_video_creation.html",
                 to_email=instance.user.email,
-                body={**data}
+                body={**data},
             )
 
         else:
@@ -31,11 +30,11 @@ def notify_video_creation(sender, instance, created, **kwargs):
             send_email.delay(
                 template_name="emails/notify_video_creation.html",
                 to_email=instance.user.email,
-                body={**data}
+                body={**data},
             )
 
             send_email.delay(
                 template_name="emails/notify_video_creation.html",
                 to_email=instance.channel.owner.email,
-                body={**data}
+                body={**data},
             )

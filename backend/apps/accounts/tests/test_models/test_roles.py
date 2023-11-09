@@ -3,7 +3,6 @@ import pytest
 
 @pytest.mark.django_db
 class TestAccountRole:
-
     def test_is_admin(self, create_superuser):
         assert create_superuser.is_admin()
 

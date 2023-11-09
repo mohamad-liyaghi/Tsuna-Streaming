@@ -5,7 +5,6 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestChannelDelete:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_channel):
         self.url_name = "channels:channel_detail"

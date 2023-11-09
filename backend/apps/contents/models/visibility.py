@@ -5,5 +5,6 @@ class ContentVisibility(models.TextChoices):
     """
     Content visibility choices
     """
+
     PRIVATE = ("pr", "Private")
     PUBLISHED = ("pu", "Public")

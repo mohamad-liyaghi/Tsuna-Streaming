@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0002_channel_is_verified'),
-        ('channels', '0010_alter_channel_token_alter_channeladmin_token'),
+        ("channels", "0002_channel_is_verified"),
+        ("channels", "0010_alter_channel_token_alter_channeladmin_token"),
     ]
 
-    operations = [
-    ]
+    operations = []

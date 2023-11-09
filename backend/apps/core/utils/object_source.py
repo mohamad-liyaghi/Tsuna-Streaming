@@ -7,5 +7,6 @@ class ObjectSource(Enum):
     - cache: the object is stored in cache
     - database: the object is stored in database and cache
     """
-    CACHE = 'cache'
-    DATABASE = 'database'
+
+    CACHE = "cache"
+    DATABASE = "database"

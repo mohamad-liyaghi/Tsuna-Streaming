@@ -31,9 +31,7 @@ class TestChannelCreate:
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_create_by_normal_user_more_than_5(
-            self, api_client, create_active_user
-    ):
+    def test_create_by_normal_user_more_than_5(self, api_client, create_active_user):
         api_client.force_authenticate(user=create_active_user)
         for _ in range(6):
             api_client.post(self.url, self.data, format="json")
@@ -41,9 +39,7 @@ class TestChannelCreate:
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_create_by_premium_user_more_than_10(
-            self, api_client, create_premium_user
-    ):
+    def test_create_by_premium_user_more_than_10(self, api_client, create_premium_user):
         api_client.force_authenticate(user=create_premium_user)
         for _ in range(11):
             api_client.post(self.url, self.data, format="json")

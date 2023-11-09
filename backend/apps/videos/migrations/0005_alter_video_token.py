@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('videos', '0004_alter_video_thumbnail'),
+        ("videos", "0004_alter_video_thumbnail"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='video',
-            name='token',
+            model_name="video",
+            name="token",
             field=models.CharField(blank=True, max_length=32),
         ),
     ]

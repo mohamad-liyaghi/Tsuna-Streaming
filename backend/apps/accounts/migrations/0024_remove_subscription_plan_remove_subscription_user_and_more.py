@@ -4,24 +4,23 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0023_plan_subscription'),
+        ("accounts", "0023_plan_subscription"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='subscription',
-            name='plan',
+            model_name="subscription",
+            name="plan",
         ),
         migrations.RemoveField(
-            model_name='subscription',
-            name='user',
+            model_name="subscription",
+            name="user",
         ),
         migrations.DeleteModel(
-            name='Plan',
+            name="Plan",
         ),
         migrations.DeleteModel(
-            name='Subscription',
+            name="Subscription",
         ),
     ]

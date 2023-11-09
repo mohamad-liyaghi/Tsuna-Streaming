@@ -5,25 +5,36 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0008_plan'),
+        ("accounts", "0008_plan"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='plan',
-            name='active_months',
-            field=models.PositiveBigIntegerField(default=0, validators=[django.core.validators.MaxValueValidator(24), django.core.validators.MinValueValidator(1)]),
+            model_name="plan",
+            name="active_months",
+            field=models.PositiveBigIntegerField(
+                default=0,
+                validators=[
+                    django.core.validators.MaxValueValidator(24),
+                    django.core.validators.MinValueValidator(1),
+                ],
+            ),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='description',
-            field=models.TextField(default='No Description available', max_length=400),
+            model_name="plan",
+            name="description",
+            field=models.TextField(default="No Description available", max_length=400),
         ),
         migrations.AlterField(
-            model_name='plan',
-            name='price',
-            field=models.PositiveBigIntegerField(default=10, validators=[django.core.validators.MaxValueValidator(1000), django.core.validators.MinValueValidator(10)]),
+            model_name="plan",
+            name="price",
+            field=models.PositiveBigIntegerField(
+                default=10,
+                validators=[
+                    django.core.validators.MaxValueValidator(1000),
+                    django.core.validators.MinValueValidator(10),
+                ],
+            ),
         ),
     ]

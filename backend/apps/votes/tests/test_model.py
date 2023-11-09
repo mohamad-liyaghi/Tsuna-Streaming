@@ -18,8 +18,7 @@ class TestVoteModel:
         """
         with pytest.raises(IntegrityError):
             Vote.objects.create(
-                user=create_vote.user,
-                content_object=create_vote.content_object
+                user=create_vote.user, content_object=create_vote.content_object
             )
 
     def test_get_object_votes_count_no_vote(self, create_video):
@@ -39,9 +38,9 @@ class TestVoteModel:
         assert votes_count == 1
 
     def test_get_object_votes_count_vote_in_cache(self, create_cached_vote):
-        channel = Channel.objects.get(id=create_cached_vote['channel'])
+        channel = Channel.objects.get(id=create_cached_vote["channel"])
 
         votes_count = Vote.objects.get_count(
-            content_object=create_cached_vote['content_object'], channel=channel
+            content_object=create_cached_vote["content_object"], channel=channel
         )
         assert votes_count == 1

@@ -6,6 +6,7 @@ class MembershipSerializer(serializers.ModelSerializer):
     """
     Serializer for Creating and Listing Memberships.
     """
+
     class Meta:
         model = Membership
         fields = [
@@ -39,17 +40,11 @@ class MembershipDetailSerializer(serializers.ModelSerializer):
 
 
 class MembershipSubscribeSerializer(serializers.ModelSerializer):
-
     membership = serializers.StringRelatedField()
 
     class Meta:
         model = Subscription
-        fields = [
-            "membership",
-            "start_date",
-            "end_date",
-            "token"
-        ]
+        fields = ["membership", "start_date", "end_date", "token"]
 
         read_only_fields = fields
 
@@ -58,6 +53,5 @@ class MembershipSubscribeSerializer(serializers.ModelSerializer):
         Override save and add user and membership to the context.
         """
         return Subscription.objects.create(
-            user=self.context['user'],
-            membership=self.context['membership']
+            user=self.context["user"], membership=self.context["membership"]
         )

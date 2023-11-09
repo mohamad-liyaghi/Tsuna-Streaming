@@ -14,34 +14,34 @@ USER = get_user_model()
 
 @extend_schema_view(
     get=extend_schema(
-        description='''Retrieve a Users public profile page.''',
+        description="""Retrieve a Users public profile page.""",
         responses={
-            200: 'ok',
-            404: 'Not Found',
+            200: "ok",
+            404: "Not Found",
         },
-        tags=['Profile'],
+        tags=["Profile"],
     ),
     put=extend_schema(
-        description='''Update users profile page (by its owner).''',
+        description="""Update users profile page (by its owner).""",
         responses={
-            200: 'ok',
-            400: 'Bad Request',
-            401: 'Unauthorized',
-            403: 'Forbidden',
-            404: 'Not Found',
+            200: "ok",
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
         },
-        tags=['Profile'],
+        tags=["Profile"],
     ),
     patch=extend_schema(
-        description='''Update users profile page (by its owner).''',
+        description="""Update users profile page (by its owner).""",
         responses={
-                    200: 'ok',
-                    400: 'Bad Request',
-                    401: 'Unauthorized',
-                    403: 'Forbidden',
-                    404: 'Not Found',
-                },
-        tags=['Profile'],
+            200: "ok",
+            400: "Bad Request",
+            401: "Unauthorized",
+            403: "Forbidden",
+            404: "Not Found",
+        },
+        tags=["Profile"],
     ),
 )
 class ProfileView(RetrieveUpdateAPIView):

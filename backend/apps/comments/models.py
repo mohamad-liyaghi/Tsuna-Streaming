@@ -13,16 +13,11 @@ class Comment(AbstractToken):
     """
 
     parent = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
-        blank=True, null=True,
-        related_name="replies"
+        "self", on_delete=models.CASCADE, blank=True, null=True, related_name="replies"
     )
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='comments'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="comments"
     )
 
     body = models.TextField(max_length=400)
@@ -33,7 +28,7 @@ class Comment(AbstractToken):
 
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
     def save(self, *args, **kwargs):
         if not self.pk:

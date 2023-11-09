@@ -8,6 +8,7 @@ class VideoListSerializer(serializers.ModelSerializer):
     """
     List of a channel's videos.
     """
+
     channel = serializers.StringRelatedField()
     user = serializers.StringRelatedField()
 
@@ -20,7 +21,7 @@ class VideoListSerializer(serializers.ModelSerializer):
             "channel",
             "date",
             "user",
-            "is_published"
+            "is_published",
         ]
 
 
@@ -28,6 +29,7 @@ class VideoCreateSerializer(serializers.ModelSerializer):
     """
     Create a new video
     """
+
     class Meta:
         model = Video
         fields = [
@@ -38,29 +40,26 @@ class VideoCreateSerializer(serializers.ModelSerializer):
             "allow_comment",
             "visibility",
             "date",
-            "token"
+            "token",
         ]
 
         read_only_fields = [
-            'token',
-            'date',
+            "token",
+            "date",
         ]
-    
+
     def save(self, **kwargs):
-        kwargs.setdefault('user', self.context['user'])
-        kwargs.setdefault('channel', self.context['channel'])
+        kwargs.setdefault("user", self.context["user"])
+        kwargs.setdefault("channel", self.context["channel"])
 
         try:
             return super().save(**kwargs)
-    
+
         except PermissionDenied as error:
             raise serializers.ValidationError(str(error))
 
 
-class VideoDetailSerializer(
-    serializers.ModelSerializer,
-    ContentDetailMethodSerializer
-):
+class VideoDetailSerializer(serializers.ModelSerializer, ContentDetailMethodSerializer):
     """
     A serializer for video detail and updating.
     """
@@ -71,21 +70,21 @@ class VideoDetailSerializer(
     class Meta:
         model = Video
         fields = [
-            "title", 
-            "description", 
-            "file", 
-            "thumbnail", 
-            "token", 
-            "user", 
-            "channel", 
-            "date", 
+            "title",
+            "description",
+            "file",
+            "thumbnail",
+            "token",
+            "user",
+            "channel",
+            "date",
             "get_visibility_display",
-            "visibility", 
-            "is_updated", 
-            "is_published", 
-            "allow_comment", 
+            "visibility",
+            "is_updated",
+            "is_published",
+            "allow_comment",
             "viewers_count",
             "content_type_id",
-            ]
+        ]
 
         read_only_fields = fields

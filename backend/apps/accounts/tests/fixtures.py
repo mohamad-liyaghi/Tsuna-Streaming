@@ -43,4 +43,3 @@ def create_superuser():
         first_name=faker.first_name(),
         last_name=faker.last_name(),
     )
-

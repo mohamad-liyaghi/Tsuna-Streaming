@@ -6,21 +6,28 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0014_delete_channeladmin'),
+        ("channels", "0014_delete_channeladmin"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='channelsubscriber',
-            name='channel',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriber', to='channels.channel'),
+            model_name="channelsubscriber",
+            name="channel",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="subscriber",
+                to="channels.channel",
+            ),
         ),
         migrations.AlterField(
-            model_name='channelsubscriber',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscribed_channel', to=settings.AUTH_USER_MODEL),
+            model_name="channelsubscriber",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="subscribed_channel",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

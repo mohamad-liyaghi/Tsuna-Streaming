@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0005_alter_token_token'),
+        ("accounts", "0005_alter_token_token"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='token',
-            options={'ordering': ['-date_created']},
+            name="token",
+            options={"ordering": ["-date_created"]},
         ),
     ]

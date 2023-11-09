@@ -24,6 +24,6 @@ def notify_channel_creation(sender, instance, created, **kwargs):
             body={
                 "first_name": user.first_name,
                 "channel_title": instance.title,
-                "channel_token": instance.token
-            }
+                "channel_token": instance.token,
+            },
         )

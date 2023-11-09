@@ -25,9 +25,7 @@ class TestCommentModel:
 
         with pytest.raises(CommentNotAllowed):
             Comment.objects.create(
-                content_object=create_video,
-                user=create_video.user,
-                body='test'
+                content_object=create_video, user=create_video.user, body="test"
             )
 
     def test_update_comment(self, create_comment):
@@ -36,7 +34,7 @@ class TestCommentModel:
         """
         assert not create_comment.edited
 
-        create_comment.body = 'Updated body'
+        create_comment.body = "Updated body"
         create_comment.save()
         create_comment.refresh_from_db()
 

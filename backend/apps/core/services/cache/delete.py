@@ -13,11 +13,12 @@ class CacheDeleteMixin:
     """
 
     def delete_cache(
-            self, *,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: models.Model = None,
-            **kwargs
+        self,
+        *,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        content_object: models.Model = None,
+        **kwargs
     ) -> Union[dict, None]:
         """
         Delete object from cache
@@ -31,14 +32,12 @@ class CacheDeleteMixin:
             key=self.raw_cache_key,
             channel=channel,
             user=user,
-            content_object=content_object
+            content_object=content_object,
         )
 
         # Check if object exists in db or cache
         get_cache = self.get_from_cache(
-            channel=channel,
-            user=user,
-            content_object=content_object
+            channel=channel, user=user, content_object=content_object
         )
 
         # If not exists, Raise exception
@@ -46,7 +45,7 @@ class CacheDeleteMixin:
             raise ValueError("Object does not exist in cache or db.")
 
         # If object source is database, create a record so celery would delete it.
-        if get_cache.get('source') != ObjectSource.CACHE.value:
+        if get_cache.get("source") != ObjectSource.CACHE.value:
             self._set_cache(
                 key=key,
                 channel=channel,

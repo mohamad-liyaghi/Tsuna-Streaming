@@ -5,4 +5,5 @@ class VideoThrottle(UserRateThrottle):
     """
     Custom throttle for video views.
     """
-    scope = 'video'
+
+    scope = "video"

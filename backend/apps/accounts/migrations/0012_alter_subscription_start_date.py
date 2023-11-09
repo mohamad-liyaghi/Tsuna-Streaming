@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0011_subscription'),
+        ("accounts", "0011_subscription"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='subscription',
-            name='start_date',
+            model_name="subscription",
+            name="start_date",
             field=models.DateTimeField(auto_now_add=True),
         ),
     ]

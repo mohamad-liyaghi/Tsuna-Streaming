@@ -16,5 +16,5 @@ def delete_vote_after_deleting_object(sender, instance, *args, **kwargs):
     remove_object_votes.delay(
         content_type_id=get_content_type_model(model=type(instance)).id,
         object_id=instance.id,
-        object_token=instance.token
+        object_token=instance.token,
     )

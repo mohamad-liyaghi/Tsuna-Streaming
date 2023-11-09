@@ -12,17 +12,18 @@ from core.mixins import ContentObjectMixin
     get=extend_schema(
         description="List of an objects viewers.",
         responses={
-            200: 'ok',
+            200: "ok",
             401: "Unauthorized",
             404: "Not found",
         },
-        tags=['Viewers']
+        tags=["Viewers"],
     ),
 )
 class ViewerListView(ContentObjectMixin, ListAPIView):
     """
     Return a list of viewers for an object.
     """
+
     permission_classes = [IsAuthenticated]
     serializer_class = ViewerListSerializer
 
@@ -30,6 +31,5 @@ class ViewerListView(ContentObjectMixin, ListAPIView):
         content_object = self.get_object()
         # Get the viewers from cache and db and return
         return Viewer.objects.get_list(
-            channel=content_object.channel,
-            content_object=content_object
+            channel=content_object.channel, content_object=content_object
         )

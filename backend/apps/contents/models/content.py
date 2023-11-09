@@ -3,10 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.contrib.contenttypes.fields import GenericRelation
 
 from core.models import AbstractToken
-from .utils import (
-    get_thumbnail_upload_path,
-    get_file_upload_path
-)
+from .utils import get_thumbnail_upload_path, get_file_upload_path
 from .visibility import ContentVisibility
 from contents.managers import BaseContentManager
 
@@ -26,13 +23,13 @@ class AbstractContent(AbstractToken):
     # The thumbnail of the content
     thumbnail = models.ImageField(
         upload_to=get_thumbnail_upload_path,
-        default="assets/images/default-thumbnail.jpg"
+        default="assets/images/default-thumbnail.jpg",
     )
 
     visibility = models.CharField(
         max_length=2,
         choices=ContentVisibility.choices,
-        default=ContentVisibility.PRIVATE
+        default=ContentVisibility.PRIVATE,
     )
     is_updated = models.BooleanField(default=False)
 
@@ -43,9 +40,9 @@ class AbstractContent(AbstractToken):
 
     objects = BaseContentManager()
 
-    votes = GenericRelation('votes.Vote')
-    comments = GenericRelation('comments.Comment')
-    viewers = GenericRelation('viewers.Viewer')
+    votes = GenericRelation("votes.Vote")
+    comments = GenericRelation("comments.Comment")
+    viewers = GenericRelation("viewers.Viewer")
 
     class Meta:
         abstract = True
@@ -62,9 +59,7 @@ class AbstractContent(AbstractToken):
 
         if not self.pk:
             # Check user is admin and has permission to add object
-            self.__check_admin_permission(
-                user=self.user, channel=self.channel
-            )
+            self.__check_admin_permission(user=self.user, channel=self.channel)
 
         return super(AbstractContent, self).save(*args, **kwargs)
 

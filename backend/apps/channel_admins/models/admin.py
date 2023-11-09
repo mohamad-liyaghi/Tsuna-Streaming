@@ -3,9 +3,7 @@ from django.conf import settings
 from channels.models import Channel
 from channel_subscribers.models import ChannelSubscriber
 from django.core.exceptions import PermissionDenied
-from channel_admins.exceptions import (
-    SubscriptionRequiredException
-)
+from channel_admins.exceptions import SubscriptionRequiredException
 from core.models import AbstractToken
 
 
@@ -17,38 +15,35 @@ class ChannelAdmin(AbstractToken):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='channel_admins'
+        related_name="channel_admins",
     )
     promoted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='promoted_admins',
-        blank=True, null=True,
+        related_name="promoted_admins",
+        blank=True,
+        null=True,
     )
 
     channel = models.ForeignKey(
-        Channel,
-        on_delete=models.CASCADE,
-        related_name='admins'
+        Channel, on_delete=models.CASCADE, related_name="admins"
     )
 
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return str(self.user)
-    
+
     class Meta:
         # unique together with channel and user
         constraints = [
             models.UniqueConstraint(
-                fields=["channel", "user"],
-                name="unique_channel_admin"
+                fields=["channel", "user"], name="unique_channel_admin"
             )
         ]
 
     def save(self, *args, **kwargs):
         if not self.pk:
-
             # Check user subscription status
             ChannelAdmin.check_subscription(channel=self.channel, user=self.user)
 
@@ -66,16 +61,16 @@ class ChannelAdmin(AbstractToken):
         If user has subscribed, check if he has subscribed for at least 24 hours.
         """
         subscriber = ChannelSubscriber.objects.get_from_cache(
-                    channel=channel, user=user
+            channel=channel, user=user
         )
 
         # Raise error if use hasnt subscribed to channel
         if not subscriber:
-            raise SubscriptionRequiredException(
-                "User hasnt subscribed to channel."
-            )
+            raise SubscriptionRequiredException("User hasnt subscribed to channel.")
 
-        if subscriber and not ChannelSubscriber.objects.filter(channel=channel, user=user):
+        if subscriber and not ChannelSubscriber.objects.filter(
+            channel=channel, user=user
+        ):
             raise SubscriptionRequiredException(
                 "User must be subscribed to channel for at least 24 hours to get promoted."
             )

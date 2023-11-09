@@ -1,4 +1,3 @@
-
 def get_thumbnail_upload_path(instance, filename):
     """
     Return the uploaded thumbnail path

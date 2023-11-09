@@ -7,8 +7,4 @@ def create_channel(create_active_user):
     """
     Creates a channel.
     """
-    return Channel.objects.create(
-        title="test",
-        owner=create_active_user
-    )
-
+    return Channel.objects.create(title="test", owner=create_active_user)

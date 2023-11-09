@@ -4,15 +4,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0025_alter_account_token_alter_token_token'),
+        ("accounts", "0025_alter_account_token_alter_token_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='bio',
-            field=models.TextField(blank=True, default='Hey there, i am using tsuna streaming.', max_length=250),
+            model_name="account",
+            name="bio",
+            field=models.TextField(
+                blank=True,
+                default="Hey there, i am using tsuna streaming.",
+                max_length=250,
+            ),
         ),
     ]

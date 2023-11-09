@@ -11,15 +11,11 @@ class Music(AbstractContent):
     """
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="musics"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="musics"
     )
 
     channel = models.ForeignKey(
-        Channel,
-        on_delete=models.CASCADE,
-        related_name="musics"
+        Channel, on_delete=models.CASCADE, related_name="musics"
     )
 
     def __str__(self) -> str:
@@ -27,8 +23,5 @@ class Music(AbstractContent):
 
     def save(self, *args, **kwargs):
         # Validate music size
-        validate_music_size(
-            file=self.file,
-            user=self.user
-        )
+        validate_music_size(file=self.file, user=self.user)
         return super().save(*args, **kwargs)

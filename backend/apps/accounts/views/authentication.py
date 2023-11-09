@@ -15,7 +15,7 @@ from accounts.permissions import AllowUnAuthenticatedPermission
 from accounts.serializers import (
     RegisterUserSerializer,
     VerifyUserSerializer,
-    ResendTokenSerializer
+    ResendTokenSerializer,
 )
 from accounts.throttling import AuthenticationThrottle
 from accounts.models import VerificationToken
@@ -26,18 +26,18 @@ USER = get_user_model()
 
 @extend_schema_view(
     post=extend_schema(
-        description='''Register an account to the system.''',
+        description="""Register an account to the system.""",
         responses={
-            201: 'Created',
-            400: 'Bad Request',
-            403: 'Forbidden',
+            201: "Created",
+            400: "Bad Request",
+            403: "Forbidden",
         },
-        tags=['Authentication'],
+        tags=["Authentication"],
     ),
 )
 class RegisterUserView(CreateAPIView):
     """
-        Users can register to the system.
+    Users can register to the system.
     """
 
     permission_classes = [AllowUnAuthenticatedPermission]
@@ -49,12 +49,12 @@ class RegisterUserView(CreateAPIView):
     get=extend_schema(
         description="""Verify an account""",
         responses={
-            200: 'OK',
-            400: 'Bad Request',
-            403: 'Forbidden',
-            404: 'Token or user not found',
+            200: "OK",
+            400: "Bad Request",
+            403: "Forbidden",
+            404: "Token or user not found",
         },
-        tags=['Authentication'],
+        tags=["Authentication"],
     ),
 )
 class VerifyUserView(APIView):
@@ -68,8 +68,7 @@ class VerifyUserView(APIView):
     def get_object(self):
         """Get the token object"""
         return get_object_or_404(
-            VerificationToken,
-            token=self.kwargs['verification_token']
+            VerificationToken, token=self.kwargs["verification_token"]
         )
 
     def get(self, request, *args, **kwargs):
@@ -79,7 +78,7 @@ class VerifyUserView(APIView):
 
         if serializer.is_valid():
             serializer.verify_code(
-                user_token=kwargs['user_token'],
+                user_token=kwargs["user_token"],
                 token=verification_token,
             )
             return Response("Account verified", status=status.HTTP_200_OK)
@@ -89,15 +88,15 @@ class VerifyUserView(APIView):
 
 @extend_schema_view(
     post=extend_schema(
-        description='''
+        description="""
         Resend verification token to user if the other one is expired.
-        ''',
+        """,
         responses={
-            201: 'OK',
-            400: 'Bad Request',
-            403: 'Forbidden',
+            201: "OK",
+            400: "Bad Request",
+            403: "Forbidden",
         },
-        tags=['Authentication'],
+        tags=["Authentication"],
     ),
 )
 class ResendTokenView(CreateAPIView):
@@ -113,13 +112,14 @@ class ResendTokenView(CreateAPIView):
 
 @extend_schema_view(
     post=extend_schema(
-        description='''Return JWT token to users for loging in.''',
-        tags=['Authentication'],
+        description="""Return JWT token to users for loging in.""",
+        tags=["Authentication"],
     ),
 )
 class LoginUserView(TokenObtainPairView):
     """
     Get JWT token for users.
     """
+
     permission_classes = [AllowUnAuthenticatedPermission]
     throttle_classes = [AuthenticationThrottle]

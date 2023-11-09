@@ -8,9 +8,7 @@ def create_membership():
     Simply create a membership
     """
     return Membership.objects.create(
-        title='Fake Membership',
-        active_months=6,
-        is_available=True
+        title="Fake Membership", active_months=6, is_available=True
     )
 
 

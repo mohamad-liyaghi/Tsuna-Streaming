@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('videos', '0002_alter_video_token'),
+        ("videos", "0002_alter_video_token"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='video',
-            name='allow_comment',
+            model_name="video",
+            name="allow_comment",
             field=models.BooleanField(default=True),
         ),
     ]

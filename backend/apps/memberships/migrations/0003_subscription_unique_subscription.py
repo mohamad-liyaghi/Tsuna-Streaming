@@ -4,14 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('memberships', '0002_subscription'),
+        ("memberships", "0002_subscription"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='subscription',
-            constraint=models.UniqueConstraint(fields=('user',), name='unique_subscription'),
+            model_name="subscription",
+            constraint=models.UniqueConstraint(
+                fields=("user",), name="unique_subscription"
+            ),
         ),
     ]

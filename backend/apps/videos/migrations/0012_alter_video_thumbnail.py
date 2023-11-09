@@ -5,15 +5,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('videos', '0011_alter_video_thumbnail'),
+        ("videos", "0011_alter_video_thumbnail"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='video',
-            name='thumbnail',
-            field=models.ImageField(default='assets/images/default-thumbnail.jpg', upload_to=contents.models.utils.thumbnail_path.get_thumbnail_upload_path),
+            model_name="video",
+            name="thumbnail",
+            field=models.ImageField(
+                default="assets/images/default-thumbnail.jpg",
+                upload_to=contents.models.utils.thumbnail_path.get_thumbnail_upload_path,
+            ),
         ),
     ]

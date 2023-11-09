@@ -71,4 +71,5 @@ class VerificationToken(AbstractToken):
         """
         Override the default ordering
         """
+
         ordering = ["expire_at"]

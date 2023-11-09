@@ -6,7 +6,6 @@ import pytest
 
 @pytest.mark.django_db
 class TestChannelModel:
-
     def test_create_channel_by_inactive_user(self, create_deactive_user):
         """
         Inactive users can't create channels.
@@ -74,4 +73,3 @@ class TestChannelModel:
 
         Channel.objects.create(owner=create_premium_user, title="test")
         assert create_premium_user.channels.count() == 10
-

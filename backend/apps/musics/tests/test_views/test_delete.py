@@ -5,16 +5,15 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestMusicDeleteView:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_music):
         self.music = create_music
         self.url_path = reverse(
-            'musics:detail',
+            "musics:detail",
             kwargs={
-                'channel_token': create_music.channel.token,
-                'object_token': create_music.token
-            }
+                "channel_token": create_music.channel.token,
+                "object_token": create_music.token,
+            },
         )
 
     def test_delete_unauthorized(self, api_client):

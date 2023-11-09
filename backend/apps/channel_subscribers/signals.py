@@ -7,7 +7,4 @@ def create_subscriber_after_creating_channel(sender, created, instance, **kwargs
     """
 
     if created:
-        ChannelSubscriber.objects.create(
-            channel=instance,
-            user=instance.owner
-        )
+        ChannelSubscriber.objects.create(channel=instance, user=instance.owner)

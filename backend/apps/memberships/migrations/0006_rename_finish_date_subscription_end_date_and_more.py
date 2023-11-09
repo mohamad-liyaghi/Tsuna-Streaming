@@ -6,21 +6,24 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('memberships', '0005_alter_membership_token_alter_subscription_token'),
+        ("memberships", "0005_alter_membership_token_alter_subscription_token"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='subscription',
-            old_name='finish_date',
-            new_name='end_date',
+            model_name="subscription",
+            old_name="finish_date",
+            new_name="end_date",
         ),
         migrations.AlterField(
-            model_name='subscription',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions', to=settings.AUTH_USER_MODEL),
+            model_name="subscription",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="subscriptions",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

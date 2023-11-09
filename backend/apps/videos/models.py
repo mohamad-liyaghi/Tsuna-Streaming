@@ -11,15 +11,11 @@ class Video(AbstractContent):
     """
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="videos"
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="videos"
     )
 
     channel = models.ForeignKey(
-        Channel,
-        on_delete=models.CASCADE,
-        related_name="videos"
+        Channel, on_delete=models.CASCADE, related_name="videos"
     )
 
     def __str__(self) -> str:

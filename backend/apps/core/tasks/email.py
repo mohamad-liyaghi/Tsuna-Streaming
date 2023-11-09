@@ -4,9 +4,7 @@ from celery import shared_task
 
 
 @shared_task
-def send_email(
-        template_name: str, to_email: str, body: dict
-):
+def send_email(template_name: str, to_email: str, body: dict):
     """
     Send an email to the given user
     :param template_name: The name of the template to send

@@ -5,20 +5,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0002_alter_account_managers'),
+        ("accounts", "0002_alter_account_managers"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='bio',
+            model_name="account",
+            name="bio",
             field=models.TextField(blank=True, max_length=250),
         ),
         migrations.AlterField(
-            model_name='account',
-            name='picture',
-            field=models.ImageField(default='default-user-profile.jpg', upload_to='accounts/profile', validators=[accounts.validators.validate_profile_size]),
+            model_name="account",
+            name="picture",
+            field=models.ImageField(
+                default="default-user-profile.jpg",
+                upload_to="accounts/profile",
+                validators=[accounts.validators.validate_profile_size],
+            ),
         ),
     ]

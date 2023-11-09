@@ -4,15 +4,16 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0016_delete_channelsubscriber'),
+        ("channels", "0016_delete_channelsubscriber"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='channel',
-            name='token',
-            field=models.CharField(blank=True, editable=False, max_length=32, null=True),
+            model_name="channel",
+            name="token",
+            field=models.CharField(
+                blank=True, editable=False, max_length=32, null=True
+            ),
         ),
     ]

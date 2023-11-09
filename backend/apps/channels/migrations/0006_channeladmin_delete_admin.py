@@ -6,31 +6,58 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0005_admin'),
+        ("channels", "0005_admin"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChannelAdmin',
+            name="ChannelAdmin",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('token', models.CharField(blank=True, null=True, max_length=32)),
-                ('change_channel_info', models.BooleanField(default=False)),
-                ('add_new_admin', models.BooleanField(default=False)),
-                ('add_video', models.BooleanField(default=False)),
-                ('edit_video', models.BooleanField(default=False)),
-                ('delete_video', models.BooleanField(default=False)),
-                ('publish_video', models.BooleanField(default=False)),
-                ('channel', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='admins', to='channels.channel')),
-                ('promoted_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='channel_admin', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                ("token", models.CharField(blank=True, null=True, max_length=32)),
+                ("change_channel_info", models.BooleanField(default=False)),
+                ("add_new_admin", models.BooleanField(default=False)),
+                ("add_video", models.BooleanField(default=False)),
+                ("edit_video", models.BooleanField(default=False)),
+                ("delete_video", models.BooleanField(default=False)),
+                ("publish_video", models.BooleanField(default=False)),
+                (
+                    "channel",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="admins",
+                        to="channels.channel",
+                    ),
+                ),
+                (
+                    "promoted_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="channel_admin",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.DeleteModel(
-            name='Admin',
+            name="Admin",
         ),
     ]

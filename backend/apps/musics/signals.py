@@ -11,26 +11,26 @@ def notify_music_creation(sender, instance, created, **kwargs):
             "first_name": instance.user.first_name,
             "channel_title": instance.title,
             "channel_token": instance.channel.token,
-            "music_token": instance.token
+            "music_token": instance.token,
         }
 
         if instance.user == instance.channel.owner:
             send_email.delay(
                 template_name="emails/notify_music_creation.html",
                 to_email=instance.user.email,
-                body=data
-              )
+                body=data,
+            )
 
         else:
             # send email to both admin and owner
             send_email.delay(
                 template_name="emails/notify_music_creation.html",
                 to_email=instance.user.email,
-                body=data
-              )
+                body=data,
+            )
 
             send_email.delay(
                 template_name="emails/notify_music_creation.html",
                 to_email=instance.channel.owner.email,
-                body=data
-              )
+                body=data,
+            )

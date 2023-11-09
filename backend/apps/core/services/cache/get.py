@@ -10,10 +10,10 @@ class CacheGetMixin:
     """
 
     def get_from_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: Optional[models.Model] = None,
+        self,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        content_object: Optional[models.Model] = None,
     ) -> Union[dict, None]:
         """
         Retrieve an object from cache
@@ -23,16 +23,14 @@ class CacheGetMixin:
             content_object: models.Model
         """
         return self._get_cache(
-            channel=channel,
-            user=user,
-            content_object=content_object
+            channel=channel, user=user, content_object=content_object
         )
 
     def _get_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: Optional[models.Model] = None,
+        self,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        content_object: Optional[models.Model] = None,
     ):
         """
         Filter and return an object from list.
@@ -43,21 +41,18 @@ class CacheGetMixin:
         """
 
         # Get list of objects
-        object_list = self.get_list(
-            channel=channel,
-            content_object=content_object
-        )
+        object_list = self.get_list(channel=channel, content_object=content_object)
 
         if object_list:
             # Filter by user
             filtered_result = next(
                 filter(
-                    lambda dictionary: dictionary.get('user', None) == user.id,
-                    object_list
+                    lambda dictionary: dictionary.get("user", None) == user.id,
+                    object_list,
                 ),
-                None
+                None,
             )
-            if filtered_result and not filtered_result.get('pending_delete', False):
+            if filtered_result and not filtered_result.get("pending_delete", False):
                 return filtered_result
 
         return

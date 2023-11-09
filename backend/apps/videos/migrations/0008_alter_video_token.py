@@ -5,15 +5,14 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('videos', '0007_alter_video_token'),
+        ("videos", "0007_alter_video_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='video',
-            name='token',
+            model_name="video",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

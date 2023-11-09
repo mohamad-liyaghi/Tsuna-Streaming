@@ -4,17 +4,13 @@ from viewers.constants import CACHE_OBJECT_VIEWER
 
 
 class ViewerManager(BaseCacheManager):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.service = None
 
     def contribute_to_class(self, model, name):
         super().contribute_to_class(model, name)
-        self.service = ViewerService(
-            model=self.model,
-            cache_key=CACHE_OBJECT_VIEWER
-        )
+        self.service = ViewerService(model=self.model, cache_key=CACHE_OBJECT_VIEWER)
 
     def delete_in_cache(self):
         """Make delete viewer unavailable in cache."""

@@ -14,11 +14,11 @@ class CacheCreateMixin:
     """
 
     def create_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: Optional[models.Model] = None,
-            **kwargs
+        self,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        content_object: Optional[models.Model] = None,
+        **kwargs
     ) -> Union[dict, None]:
         """
         Create a new object in cache (if not exist)
@@ -32,35 +32,29 @@ class CacheCreateMixin:
             key=self.raw_cache_key,
             channel=channel,
             user=user,
-            content_object=content_object
+            content_object=content_object,
         )
 
         # Ensure that the object is not already in cache
         if self.get_from_cache(
-                channel=channel,
-                user=user,
-                content_object=content_object
+            channel=channel, user=user, content_object=content_object
         ):
             return
 
         # If not exist, create a new object in cache
         return self._set_cache(
-            key=key,
-            channel=channel,
-            user=user,
-            content_object=content_object,
-            **kwargs
+            key=key, channel=channel, user=user, content_object=content_object, **kwargs
         )
 
     def _set_cache(
-            self,
-            key: str,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            source: str = ObjectSource.CACHE.value,
-            date: datetime = datetime.now(),
-            pending_delete: bool = False,
-            **extra_data
+        self,
+        key: str,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        source: str = ObjectSource.CACHE.value,
+        date: datetime = datetime.now(),
+        pending_delete: bool = False,
+        **extra_data
     ) -> dict:
         """
         Set a record in cache
@@ -74,12 +68,12 @@ class CacheCreateMixin:
         cache.set(
             key=key,
             value={
-                'user': user.id,
-                'channel': channel.id,
-                'source': source,
-                'date': date,
-                'pending_delete': pending_delete,
-                **extra_data
+                "user": user.id,
+                "channel": channel.id,
+                "source": source,
+                "date": date,
+                "pending_delete": pending_delete,
+                **extra_data,
             },
         )
         return cache.get(key)

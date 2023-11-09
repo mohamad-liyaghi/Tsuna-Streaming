@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0011_subscription'),
-        ('accounts', '0017_alter_plan_token_alter_subscription_token_and_more'),
+        ("accounts", "0011_subscription"),
+        ("accounts", "0017_alter_plan_token_alter_subscription_token_and_more"),
     ]
 
-    operations = [
-    ]
+    operations = []

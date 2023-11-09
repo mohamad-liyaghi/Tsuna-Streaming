@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0014_alter_subscription_finish_date'),
+        ("accounts", "0014_alter_subscription_finish_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='picture',
-            field=models.ImageField(default='assets/images/default-user-profile.jpg', upload_to='accounts/profile', validators=[accounts.validators.validate_profile_size]),
+            model_name="account",
+            name="picture",
+            field=models.ImageField(
+                default="assets/images/default-user-profile.jpg",
+                upload_to="accounts/profile",
+                validators=[accounts.validators.validate_profile_size],
+            ),
         ),
     ]

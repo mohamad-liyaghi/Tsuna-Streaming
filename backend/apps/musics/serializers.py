@@ -22,7 +22,7 @@ class MusicListSerializer(serializers.ModelSerializer):
             "channel",
             "date",
             "user",
-            "is_published"
+            "is_published",
         ]
 
 
@@ -41,17 +41,17 @@ class MusicCreateSerializer(serializers.ModelSerializer):
             "allow_comment",
             "visibility",
             "date",
-            "token"
+            "token",
         ]
 
         read_only_fields = [
-            'token',
-            'date',
+            "token",
+            "date",
         ]
 
     def save(self, **kwargs):
-        kwargs.setdefault('user', self.context['user'])
-        kwargs.setdefault('channel', self.context['channel'])
+        kwargs.setdefault("user", self.context["user"])
+        kwargs.setdefault("channel", self.context["channel"])
 
         try:
             return super().save(**kwargs)
@@ -60,10 +60,7 @@ class MusicCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(str(error))
 
 
-class MusicDetailSerializer(
-    ContentDetailMethodSerializer,
-    serializers.ModelSerializer
-):
+class MusicDetailSerializer(ContentDetailMethodSerializer, serializers.ModelSerializer):
     """
     A serializer for music detail.
     """
@@ -74,21 +71,21 @@ class MusicDetailSerializer(
     class Meta:
         model = Music
         fields = [
-            "title", 
-            "description", 
-            "file", 
-            "thumbnail", 
-            "token", 
-            "user", 
-            "channel", 
-            "date", 
+            "title",
+            "description",
+            "file",
+            "thumbnail",
+            "token",
+            "user",
+            "channel",
+            "date",
             "get_visibility_display",
-            "visibility", 
-            "is_updated", 
-            "is_published", 
-            "allow_comment", 
+            "visibility",
+            "is_updated",
+            "is_published",
+            "allow_comment",
             "viewers_count",
             "content_type_id",  # From BaseContentSerializer
-            ]
+        ]
 
         read_only_fields = fields

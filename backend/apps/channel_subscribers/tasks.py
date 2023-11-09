@@ -5,7 +5,7 @@ from channel_subscribers.models import ChannelSubscriber
 from core.utils import ObjectSource
 
 
-CACHE_SUBSCRIBER_KEY = 'subscribers:*:*'
+CACHE_SUBSCRIBER_KEY = "subscribers:*:*"
 
 
 @shared_task
@@ -15,18 +15,15 @@ def insert_subscriber_from_cache_into_db():
     """
     subscriber_keys = cache.keys(CACHE_SUBSCRIBER_KEY)
     # Get all subscribers from cache
-    subscribers_in_cache = [
-        cache.get(key) for key in subscriber_keys
-    ]
+    subscribers_in_cache = [cache.get(key) for key in subscriber_keys]
 
     # Filter records with source of `cache` and status of `subscribed`
     cached_subscriber = filter(
         lambda subscriber: (
-                subscriber.get('source') == ObjectSource.CACHE.value
-                and
-                subscriber.get('subscription_status') == 'subscribed'
+            subscriber.get("source") == ObjectSource.CACHE.value
+            and subscriber.get("subscription_status") == "subscribed"
         ),
-        subscribers_in_cache
+        subscribers_in_cache,
     )
 
     if cached_subscriber:
@@ -34,10 +31,11 @@ def insert_subscriber_from_cache_into_db():
         ChannelSubscriber.objects.bulk_create(
             [
                 ChannelSubscriber(
-                    channel=subscriber.get('channel'),
-                    user=subscriber.get('user'),
-                    date=subscriber.get('date'),
-                ) for subscriber in cached_subscriber
+                    channel=subscriber.get("channel"),
+                    user=subscriber.get("user"),
+                    date=subscriber.get("date"),
+                )
+                for subscriber in cached_subscriber
             ]
         )
     # Remove subscribers from cache
@@ -53,22 +51,18 @@ def delete_unsubscribed_from_db():
 
     subscriber_keys = cache.keys(CACHE_SUBSCRIBER_KEY)
     # Retrieve all subscribers from cache
-    subscribers_in_cache = [
-        cache.get(key) for key in subscriber_keys
-    ]
+    subscribers_in_cache = [cache.get(key) for key in subscriber_keys]
 
     # Filter records with status of `unsubscribed`
     cached_unsubscriber = filter(
-        lambda subscriber: (
-                subscriber.get('subscription_status') == 'unsubscribed'
-        ),
-        subscribers_in_cache
+        lambda subscriber: (subscriber.get("subscription_status") == "unsubscribed"),
+        subscribers_in_cache,
     )
 
     if cached_unsubscriber:
         # Zip the result (user, channel)
         zipped_user_channel = [
-            (subscriber['user'], subscriber['channel'])
+            (subscriber["user"], subscriber["channel"])
             for subscriber in cached_unsubscriber
         ]
         # Get users and channels

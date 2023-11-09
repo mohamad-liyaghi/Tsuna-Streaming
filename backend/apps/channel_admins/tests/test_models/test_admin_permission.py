@@ -27,6 +27,4 @@ class TestAdminPermissionModel:
 
     def test_create_permission_twice(self, create_channel_admin):
         with pytest.raises(IntegrityError):
-            ChannelAdminPermission.objects.create(
-                admin=create_channel_admin
-            )
+            ChannelAdminPermission.objects.create(admin=create_channel_admin)

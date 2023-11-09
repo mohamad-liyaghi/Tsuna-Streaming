@@ -4,13 +4,12 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0013_alter_channeladmin_channel'),
+        ("channels", "0013_alter_channeladmin_channel"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='ChannelAdmin',
+            name="ChannelAdmin",
         ),
     ]

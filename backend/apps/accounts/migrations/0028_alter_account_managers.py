@@ -5,16 +5,15 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0027_alter_account_token_alter_token_token'),
+        ("accounts", "0027_alter_account_token_alter_token_token"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='account',
+            name="account",
             managers=[
-                ('objects', django.contrib.auth.models.UserManager()),
+                ("objects", django.contrib.auth.models.UserManager()),
             ],
         ),
     ]

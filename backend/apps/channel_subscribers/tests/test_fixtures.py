@@ -10,6 +10,9 @@ def test_create_subscriber(create_subscriber):
 
 @pytest.mark.django_db
 def test_create_cached_subscriber(create_cached_subscriber):
-    assert ChannelSubscriber.objects.get_count(
-        channel=Channel.objects.get(id=create_cached_subscriber['channel'])
-    ) == 2
+    assert (
+        ChannelSubscriber.objects.get_count(
+            channel=Channel.objects.get(id=create_cached_subscriber["channel"])
+        )
+        == 2
+    )

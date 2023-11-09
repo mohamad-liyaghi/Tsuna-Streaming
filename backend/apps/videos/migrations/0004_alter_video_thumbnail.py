@@ -4,15 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('videos', '0003_video_allow_comment'),
+        ("videos", "0003_video_allow_comment"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='video',
-            name='thumbnail',
-            field=models.ImageField(default='assets/images/default-video-thumbnail.jpg', upload_to='videos/thumbnail/'),
+            model_name="video",
+            name="thumbnail",
+            field=models.ImageField(
+                default="assets/images/default-video-thumbnail.jpg",
+                upload_to="videos/thumbnail/",
+            ),
         ),
     ]

@@ -6,6 +6,7 @@ class AbstractToken(models.Model):
     """
     An abstract model which provides a token field and auto fill it.
     """
+
     token = models.UUIDField(default=uuid4, unique=True, editable=False)
 
     class Meta:

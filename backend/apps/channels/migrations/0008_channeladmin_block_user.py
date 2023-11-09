@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0007_channelsubscriber_and_more'),
+        ("channels", "0007_channelsubscriber_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='channeladmin',
-            name='block_user',
+            model_name="channeladmin",
+            name="block_user",
             field=models.BooleanField(default=False),
         ),
     ]

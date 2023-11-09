@@ -4,14 +4,15 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0011_merge_20230211_2032'),
+        ("channels", "0011_merge_20230211_2032"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='channeladmin',
-            constraint=models.UniqueConstraint(fields=('channel', 'user'), name='unique_channel_admin'),
+            model_name="channeladmin",
+            constraint=models.UniqueConstraint(
+                fields=("channel", "user"), name="unique_channel_admin"
+            ),
         ),
     ]

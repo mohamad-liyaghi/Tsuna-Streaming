@@ -5,16 +5,15 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestVideoDeleteView:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_video):
         self.video = create_video
         self.url_path = reverse(
-            'videos:detail',
+            "videos:detail",
             kwargs={
-                'channel_token': create_video.channel.token,
-                'object_token': create_video.token
-            }
+                "channel_token": create_video.channel.token,
+                "object_token": create_video.token,
+            },
         )
 
     def test_delete_unauthorized(self, api_client):

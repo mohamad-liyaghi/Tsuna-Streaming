@@ -5,7 +5,6 @@ from rest_framework import status
 
 @pytest.mark.django_db
 class TestChannelRetrieve:
-
     @pytest.fixture(autouse=True)
     def setup(self, create_channel):
         self.url_name = "channels:channel_detail"
@@ -34,7 +33,9 @@ class TestChannelRetrieve:
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-    def test_retrieve_not_fount(self, api_client, create_unique_uuid, create_active_user):
+    def test_retrieve_not_fount(
+        self, api_client, create_unique_uuid, create_active_user
+    ):
         url = reverse(self.url_name, kwargs={"channel_token": create_unique_uuid})
         api_client.force_authenticate(user=create_active_user)
         response = api_client.get(url)

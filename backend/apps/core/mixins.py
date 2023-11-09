@@ -17,15 +17,15 @@ class ContentTypeModelMixin:
         """
 
         # Get the object token from the URL.
-        content_type_id = kwargs.get('content_type_id', None)
+        content_type_id = kwargs.get("content_type_id", None)
 
         try:
             content_type = get_content_type_model(_id=content_type_id)
 
         except ValueError:
             return JsonResponse(
-                {'error': 'Content type model not found'},
-                status=status.HTTP_404_NOT_FOUND
+                {"error": "Content type model not found"},
+                status=status.HTTP_404_NOT_FOUND,
             )
 
         # Set the content type model to self.model
@@ -46,8 +46,7 @@ class ContentObjectMixin(ContentTypeModelMixin):
 
         # Get the object from the URL
         content_object = get_object_or_404(
-            self.model,
-            token=self.kwargs.get('object_token')
+            self.model, token=self.kwargs.get("object_token")
         )
 
         # Check permissions for the object if bypass_permission is False
@@ -62,9 +61,8 @@ class ChannelObjectMixin:
     """
     Get the channel object from the channel token.
     """
+
     def dispatch(self, request, *args, **kwargs):
         # Set as self.channel
-        self.channel = get_object_or_404(
-            Channel, token=self.kwargs['channel_token']
-        )
+        self.channel = get_object_or_404(Channel, token=self.kwargs["channel_token"])
         return super().dispatch(request, *args, **kwargs)

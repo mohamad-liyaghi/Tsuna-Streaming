@@ -4,20 +4,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0018_alter_channel_token'),
+        ("channels", "0018_alter_channel_token"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='channel',
-            old_name='profile',
-            new_name='avatar',
+            model_name="channel",
+            old_name="profile",
+            new_name="avatar",
         ),
         migrations.RenameField(
-            model_name='channel',
-            old_name='date_joined',
-            new_name='date_created',
+            model_name="channel",
+            old_name="date_joined",
+            new_name="date_created",
         ),
     ]

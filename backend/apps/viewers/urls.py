@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import ViewerListView
 
-app_name = 'viewers'
+app_name = "viewers"
 
 V1 = [
     path(

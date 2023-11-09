@@ -16,9 +16,9 @@ class ProfileSerializer(serializers.ModelSerializer):
     """
     Serializer for User Profile (Get, Update)
     """
+
     active_subscription = serializers.SerializerMethodField(
-        method_name="get_active_subscription",
-        read_only=True
+        method_name="get_active_subscription", read_only=True
     )
 
     class Meta:

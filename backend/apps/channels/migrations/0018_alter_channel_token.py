@@ -5,15 +5,14 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0017_alter_channel_token'),
+        ("channels", "0017_alter_channel_token"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='channel',
-            name='token',
+            model_name="channel",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

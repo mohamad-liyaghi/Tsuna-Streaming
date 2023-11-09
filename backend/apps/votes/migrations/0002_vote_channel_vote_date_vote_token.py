@@ -7,26 +7,30 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('channels', '0019_rename_profile_channel_avatar_and_more'),
-        ('votes', '0001_initial'),
+        ("channels", "0019_rename_profile_channel_avatar_and_more"),
+        ("votes", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='vote',
-            name='channel',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='channels.channel'),
+            model_name="vote",
+            name="channel",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="channels.channel",
+            ),
         ),
         migrations.AddField(
-            model_name='vote',
-            name='date',
+            model_name="vote",
+            name="date",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
         migrations.AddField(
-            model_name='vote',
-            name='token',
+            model_name="vote",
+            name="token",
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
         ),
     ]

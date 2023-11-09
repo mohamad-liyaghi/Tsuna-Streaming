@@ -1,12 +1,12 @@
 from django.contrib import admin
-from channel_admins.models import ChannelAdmin , ChannelAdminPermission
+from channel_admins.models import ChannelAdmin, ChannelAdminPermission
 
 
-@admin.register(ChannelAdmin )
+@admin.register(ChannelAdmin)
 class ChannelAdminAdmin(admin.ModelAdmin):
-    list_display = ['user', 'channel', 'date']
+    list_display = ["user", "channel", "date"]
 
 
 @admin.register(ChannelAdminPermission)
 class ChannelAdminPermissionAdmin(admin.ModelAdmin):
-    list_display = ['admin', 'token']
+    list_display = ["admin", "token"]

@@ -8,13 +8,12 @@ class ContentDetailMethodSerializer(serializers.Serializer):
     """
     Provide necessary fields for content detail serializers.
     """
+
     content_type_id = serializers.SerializerMethodField(
-        method_name='get_content_type_id',
-        read_only=True
+        method_name="get_content_type_id", read_only=True
     )
     viewers_count = serializers.SerializerMethodField(
-        method_name='get_viewers_count',
-        read_only=True
+        method_name="get_viewers_count", read_only=True
     )
 
     def get_content_type_id(self, obj: AbstractContent) -> int:

@@ -4,20 +4,23 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('accounts', '0024_remove_subscription_plan_remove_subscription_user_and_more'),
+        ("accounts", "0024_remove_subscription_plan_remove_subscription_user_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='account',
-            name='token',
-            field=models.CharField(blank=True, editable=False, max_length=32, null=True),
+            model_name="account",
+            name="token",
+            field=models.CharField(
+                blank=True, editable=False, max_length=32, null=True
+            ),
         ),
         migrations.AlterField(
-            model_name='token',
-            name='token',
-            field=models.CharField(blank=True, editable=False, max_length=32, null=True),
+            model_name="token",
+            name="token",
+            field=models.CharField(
+                blank=True, editable=False, max_length=32, null=True
+            ),
         ),
     ]

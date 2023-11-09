@@ -6,31 +6,29 @@ from .views import (
     SubscriberListView,
 )
 
-app_name = 'channel_subscribers'
+app_name = "channel_subscribers"
 
 V1 = [
     path(
-        '<str:channel_token>/',
-        SubscriberStatusView.as_view(),
-        name='subscriber_status'
+        "<str:channel_token>/", SubscriberStatusView.as_view(), name="subscriber_status"
     ),
     path(
-        '<str:channel_token>/create/',
+        "<str:channel_token>/create/",
         SubscriberCreateView.as_view(),
-        name='create_subscriber'
+        name="create_subscriber",
     ),
     path(
-        '<str:channel_token>/delete/',
+        "<str:channel_token>/delete/",
         SubscriberDeleteView.as_view(),
-        name='delete_subscriber'
+        name="delete_subscriber",
     ),
     path(
-        '<str:channel_token>/list/',
+        "<str:channel_token>/list/",
         SubscriberListView.as_view(),
-        name='subscriber_list'
+        name="subscriber_list",
     ),
 ]
 
 urlpatterns = [
-    path('v1/', include(V1)),
+    path("v1/", include(V1)),
 ]

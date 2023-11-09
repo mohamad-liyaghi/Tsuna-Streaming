@@ -43,10 +43,7 @@ class BaseCacheManager(models.Manager):
         return self.service.get_list(channel=channel, **kwargs)
 
     def get_from_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            **kwargs
+        self, channel: Channel, user: settings.AUTH_USER_MODEL, **kwargs
     ) -> Union[dict, None]:
         """
         Get an object from cache or db
@@ -56,17 +53,10 @@ class BaseCacheManager(models.Manager):
             user: settings.AUTH_USER_MODEL
             Extra: Could be any extra info such as the object token
         """
-        return self.service.get_from_cache(
-            channel=channel,
-            user=user,
-            **kwargs
-        )
+        return self.service.get_from_cache(channel=channel, user=user, **kwargs)
 
     def create_in_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            **kwargs
+        self, channel: Channel, user: settings.AUTH_USER_MODEL, **kwargs
     ) -> Union[dict, None]:
         """
         Create an object in cache
@@ -76,17 +66,14 @@ class BaseCacheManager(models.Manager):
             Extra: Could be any extra info such as the object token
         """
         return self.service.create_cache(
-            channel=channel,
-            user=user,
-            source=ObjectSource.CACHE.value,
-            **kwargs
+            channel=channel, user=user, source=ObjectSource.CACHE.value, **kwargs
         )
 
     def delete_in_cache(
-            self,
-            channel: Channel,
-            user: settings.AUTH_USER_MODEL,
-            content_object: models.Model = None
+        self,
+        channel: Channel,
+        user: settings.AUTH_USER_MODEL,
+        content_object: models.Model = None,
     ) -> None:
         """
         Delete an object from cache or db
@@ -98,7 +85,5 @@ class BaseCacheManager(models.Manager):
             content_object: models.Model
         """
         return self.service.delete_cache(
-            channel=channel,
-            user=user,
-            content_object=content_object
+            channel=channel, user=user, content_object=content_object
         )

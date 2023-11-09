@@ -16,7 +16,5 @@ class ChannelSubscriberManager(BaseCacheManager):
     def contribute_to_class(self, model, name):
         super().contribute_to_class(model, name)
         self.service = ChannelSubscriberService(
-            model=self.model,
-            cache_key=CACHE_SUBSCRIBER_KEY
+            model=self.model, cache_key=CACHE_SUBSCRIBER_KEY
         )
-

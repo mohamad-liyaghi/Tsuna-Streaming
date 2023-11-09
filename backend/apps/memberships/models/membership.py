@@ -10,25 +10,14 @@ class Membership(AbstractToken):
     """
 
     title = models.CharField(max_length=210)
-    description = models.TextField(
-        max_length=400,
-        default="No Description available"
-    )
+    description = models.TextField(max_length=400, default="No Description available")
 
     price = models.PositiveBigIntegerField(
-        default=10,
-        validators=[
-            MaxValueValidator(1000),
-            MinValueValidator(10)
-        ]
+        default=10, validators=[MaxValueValidator(1000), MinValueValidator(10)]
     )
 
     active_months = models.PositiveBigIntegerField(
-        default=0,
-        validators=[
-            MaxValueValidator(24),
-            MinValueValidator(1)
-        ]
+        default=0, validators=[MaxValueValidator(24), MinValueValidator(1)]
     )
 
     is_available = models.BooleanField(default=False)

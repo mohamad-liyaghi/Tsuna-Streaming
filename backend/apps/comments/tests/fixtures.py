@@ -9,7 +9,5 @@ def create_comment(create_video):
     """
     video = create_video
     return Comment.objects.create(
-        user=video.user,
-        body="This is a comment",
-        content_object=video
+        user=video.user, body="This is a comment", content_object=video
     )

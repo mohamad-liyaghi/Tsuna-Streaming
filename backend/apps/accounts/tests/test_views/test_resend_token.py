@@ -10,7 +10,7 @@ class TestTokenResendView:
         """
         Setup the url path for the tests
         """
-        self.url_path = reverse('accounts:resend_verification')
+        self.url_path = reverse("accounts:resend_verification")
 
     def test_resend_verification_code(self, create_deactive_user, api_client):
         verification = create_deactive_user.verification_tokens.first()
@@ -20,8 +20,7 @@ class TestTokenResendView:
         assert not verification.is_valid
 
         response = api_client.post(
-            self.url_path,
-            {'user': create_deactive_user.token}, format='json'
+            self.url_path, {"user": create_deactive_user.token}, format="json"
         )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -35,8 +34,7 @@ class TestTokenResendView:
         assert verification.is_valid
 
         response = api_client.post(
-            self.url_path,
-            {'user': create_deactive_user.token}, format='json'
+            self.url_path, {"user": create_deactive_user.token}, format="json"
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert create_deactive_user.verification_tokens.count() == 1
@@ -45,8 +43,7 @@ class TestTokenResendView:
         assert create_active_user.is_active
 
         response = api_client.post(
-            self.url_path,
-            {'user': create_active_user.token}, format='json'
+            self.url_path, {"user": create_active_user.token}, format="json"
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -54,11 +51,7 @@ class TestTokenResendView:
         response = api_client.post(self.url_path)
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_try_authenticated(
-            self, api_client, create_superuser
-    ):
+    def test_try_authenticated(self, api_client, create_superuser):
         api_client.force_authenticate(user=create_superuser)
-        response = api_client.post(
-            self.url_path, {}, format='json'
-        )
+        response = api_client.post(self.url_path, {}, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
