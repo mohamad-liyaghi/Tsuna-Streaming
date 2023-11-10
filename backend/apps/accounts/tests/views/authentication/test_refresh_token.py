@@ -6,22 +6,22 @@ from rest_framework import status
 @pytest.mark.django_db
 class TestObtainTokenView:
     @pytest.fixture(autouse=True)
-    def setup(self, create_active_user):
+    def setup(self, user):
         """
         Set password for the user and create data for the test.
         """
         password = "FAKEpass1234"
-        create_active_user.set_password(password)
-        create_active_user.save()
+        user.set_password(password)
+        user.save()
 
-        self.data = {"email": create_active_user.email, "password": password}
+        self.data = {"email": user.email, "password": password}
         self.url_path = reverse("accounts:login")
 
     def test_get_access_token(self, api_client):
         response = api_client.post(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_access_token_non_existance_user(self, api_client):
+    def test_get_access_token_non_existing_user(self, api_client):
         response = api_client.post(
             self.url_path,
             {"email": "non@exist.com", "password": "1234EErr"},
@@ -37,12 +37,12 @@ class TestObtainTokenView:
         response = api_client.post(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_access_token_inactive_user(self, create_deactive_user, api_client):
-        self.data["email"] = create_deactive_user.email
+    def test_get_access_token_inactive_user(self, inactive_user, api_client):
+        self.data["email"] = inactive_user.email
         response = api_client.post(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_try_authenticated(self, api_client, create_superuser):
-        api_client.force_authenticate(user=create_superuser)
+    def test_try_authenticated(self, api_client, superuser):
+        api_client.force_authenticate(user=superuser)
         response = api_client.post(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN

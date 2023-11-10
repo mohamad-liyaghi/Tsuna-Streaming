@@ -2,14 +2,14 @@ import pytest
 
 
 @pytest.mark.django_db
-def test_create_token_deactive_user(create_deactive_user):
-    """Test create token for deactive user."""
-    assert not create_deactive_user.is_active
-    assert create_deactive_user.verification_tokens.count() == 1
+def test_token_is_created_for_inactive_user(inactive_user):
+    """Test create token for inactive user."""
+    assert not inactive_user.is_active
+    assert inactive_user.verification_tokens.count() == 1
 
 
 @pytest.mark.django_db
-def test_not_create_token_for_superuser(create_superuser):
+def test_token_is_not_created_for_superuser(superuser):
     """Test not create token for superuser."""
-    assert create_superuser.is_active
-    assert create_superuser.verification_tokens.count() == 0
+    assert superuser.is_active
+    assert superuser.verification_tokens.count() == 0

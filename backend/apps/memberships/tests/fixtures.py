@@ -13,12 +13,12 @@ def create_membership():
 
 
 @pytest.fixture
-def create_subscription(create_membership, create_active_user):
+def create_subscription(create_membership, user):
     """
     Create a subscription
     """
     return Subscription.objects.create(
-        user=create_active_user,
+        user=user,
         membership=create_membership,
     )
 
