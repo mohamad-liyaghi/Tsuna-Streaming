@@ -4,7 +4,7 @@ from rest_framework import status
 
 
 @pytest.mark.django_db
-class TestMembershipCreate:
+class TestMembershipCreateView:
     def setup(self):
         self.url = reverse("memberships:membership")
         self.data = {
@@ -19,17 +19,17 @@ class TestMembershipCreate:
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_by_superuser(self, create_superuser, api_client):
-        api_client.force_authenticate(user=create_superuser)
+    def test_get_by_superuser(self, superuser, api_client):
+        api_client.force_authenticate(user=superuser)
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_get_by_premium_user(self, create_premium_user, api_client):
-        api_client.force_authenticate(user=create_premium_user)
+    def test_get_by_premium_user(self, premium_user, api_client):
+        api_client.force_authenticate(user=premium_user)
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_get_by_normal_user(self, create_active_user, api_client):
-        api_client.force_authenticate(user=create_active_user)
+    def test_get_by_normal_user(self, user, api_client):
+        api_client.force_authenticate(user=user)
         response = api_client.post(self.url, self.data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
