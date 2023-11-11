@@ -8,9 +8,9 @@ class TestSubscriberListView:
     def setup(self):
         self.url_name = "channel_subscribers:subscriber_list"
 
-    def test_unauthorized(self, create_channel, api_client):
+    def test_unauthorized(self, channel, api_client):
         response = api_client.get(
-            reverse(self.url_name, kwargs={"channel_token": create_channel.token})
+            reverse(self.url_name, kwargs={"channel_token": channel.token})
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -20,12 +20,10 @@ class TestSubscriberListView:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_list(self, create_subscriber, api_client):
-        api_client.force_authenticate(user=create_subscriber.user)
+    def test_get_list(self, subscriber, api_client):
+        api_client.force_authenticate(user=subscriber.user)
         response = api_client.get(
-            reverse(
-                self.url_name, kwargs={"channel_token": create_subscriber.channel.token}
-            )
+            reverse(self.url_name, kwargs={"channel_token": subscriber.channel.token})
         )
         assert response.status_code == status.HTTP_200_OK
         assert response.data["count"] == 2

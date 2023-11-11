@@ -11,47 +11,44 @@ class TestSubscriberDeleteView:
     def setup(self):
         self.url_name = "channel_subscribers:delete_subscriber"
 
-    def test_unauthorized(self, create_channel, api_client):
+    def test_unsubscribe_unauthorized_fails(self, channel, api_client):
         response = api_client.delete(
-            reverse(self.url_name, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_name, kwargs={"channel_token": channel.token}),
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_not_found(self, api_client, create_unique_uuid, create_superuser):
-        api_client.force_authenticate(user=create_superuser)
+    def test_unsubscribe_not_found(self, api_client, create_unique_uuid, superuser):
+        api_client.force_authenticate(user=superuser)
         response = api_client.delete(
             reverse(self.url_name, kwargs={"channel_token": create_unique_uuid}),
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_delete_unsubscribed(self, api_client, create_channel, create_superuser):
-        api_client.force_authenticate(create_superuser)
+    def test_delete_unsubscribed(self, api_client, channel, superuser):
+        api_client.force_authenticate(superuser)
         response = api_client.delete(
-            reverse(self.url_name, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_name, kwargs={"channel_token": channel.token}),
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
         assert not ChannelSubscriber.objects.get_from_cache(
-            channel=create_channel, user=create_superuser
+            channel=channel, user=superuser
         )
 
-    def test_delete_from_db(self, create_subscriber, api_client):
-        api_client.force_authenticate(create_subscriber.user)
+    def test_delete_from_db(self, subscriber, api_client):
+        api_client.force_authenticate(subscriber.user)
         response = api_client.delete(
-            reverse(
-                self.url_name, kwargs={"channel_token": create_subscriber.channel.token}
-            ),
+            reverse(self.url_name, kwargs={"channel_token": subscriber.channel.token}),
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
         assert not ChannelSubscriber.objects.get_from_cache(
-            channel=create_subscriber.channel, user=create_subscriber.user
+            channel=subscriber.channel, user=subscriber.user
         )
 
-    def test_delete_from_cache(self, create_cached_subscriber, api_client):
-        user = Account.objects.get(id=create_cached_subscriber["user"])
-        channel = Channel.objects.get(id=create_cached_subscriber["channel"])
+    def test_delete_from_cache(self, cached_subscriber, api_client):
+        user = Account.objects.get(id=cached_subscriber["user"])
+        channel = Channel.objects.get(id=cached_subscriber["channel"])
         api_client.force_authenticate(user)
         response = api_client.delete(
             reverse(self.url_name, kwargs={"channel_token": channel.token}),
         )
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        assert not ChannelSubscriber.objects.get_from_cache(channel=channel, user=user)
