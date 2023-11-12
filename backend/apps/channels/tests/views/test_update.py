@@ -34,15 +34,15 @@ class TestChannelUpdate:
         response = api_client.put(url, self.data)
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_update_by_channel_admin(self, create_channel_admin, api_client):
+    def test_update_by_channel_admin(self, channel_admin, api_client):
         """
         Admins with can_change_channel_info permission can update the channel.
         """
         # Set permission to True
-        create_channel_admin.permissions.can_change_channel_info = True
-        create_channel_admin.permissions.save()
+        channel_admin.permissions.can_change_channel_info = True
+        channel_admin.permissions.save()
 
         url = reverse(self.url_name, kwargs={"channel_token": self.channel.token})
-        api_client.force_authenticate(user=create_channel_admin.user)
+        api_client.force_authenticate(user=channel_admin.user)
         response = api_client.put(url, self.data)
         assert response.status_code == status.HTTP_200_OK

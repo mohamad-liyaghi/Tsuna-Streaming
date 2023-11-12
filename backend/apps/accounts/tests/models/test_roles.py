@@ -9,5 +9,5 @@ class TestAccountRole:
     def test_active_user_is_normal(self, user):
         assert user.is_normal()
 
-    def test_user_with_subscription_is_premium(self, create_subscription):
-        assert create_subscription.user.is_premium()
+    def test_user_with_subscription_is_premium(self, premium_user):
+        assert premium_user.is_premium()
