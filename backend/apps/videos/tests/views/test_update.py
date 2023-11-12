@@ -6,13 +6,13 @@ from rest_framework import status
 @pytest.mark.django_db
 class TestVideoUpdateView:
     @pytest.fixture(autouse=True)
-    def setup(self, create_video):
-        self.video = create_video
+    def setup(self, video):
+        self.video = video
         self.url_path = reverse(
             "videos:detail",
             kwargs={
-                "channel_token": create_video.channel.token,
-                "object_token": create_video.token,
+                "channel_token": video.channel.token,
+                "object_token": video.token,
             },
         )
         self.data = {
@@ -24,23 +24,23 @@ class TestVideoUpdateView:
         response = api_client.put(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_update_by_non_admin(self, api_client, create_superuser):
-        api_client.force_authenticate(create_superuser)
+    def test_update_by_non_admin(self, api_client, superuser):
+        api_client.force_authenticate(superuser)
         response = api_client.put(self.url_path, self.data, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_update_admin_no_permission(self, create_channel_admin, api_client):
-        api_client.force_authenticate(create_channel_admin.user)
+    def test_update_admin_no_permission(self, channel_admin, api_client):
+        api_client.force_authenticate(channel_admin.user)
         response = api_client.put(self.url_path, self.data, format="json")
-        assert not create_channel_admin.permissions.can_edit_object
+        assert not channel_admin.permissions.can_edit_object
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_update_by_admin_with_permission(self, create_channel_admin, api_client):
-        create_channel_admin.permissions.can_edit_object = True
-        create_channel_admin.permissions.save()
-        create_channel_admin.permissions.refresh_from_db()
+    def test_update_by_admin_with_permission(self, channel_admin, api_client):
+        channel_admin.permissions.can_edit_object = True
+        channel_admin.permissions.save()
+        channel_admin.permissions.refresh_from_db()
 
-        api_client.force_authenticate(create_channel_admin.user)
+        api_client.force_authenticate(channel_admin.user)
         response = api_client.put(self.url_path, self.data, format="json")
-        assert create_channel_admin.permissions.can_edit_object
+        assert channel_admin.permissions.can_edit_object
         assert response.status_code == status.HTTP_200_OK

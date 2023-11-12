@@ -3,7 +3,7 @@ import mock
 import pytest
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def create_file():
     """
     Create a mock file
