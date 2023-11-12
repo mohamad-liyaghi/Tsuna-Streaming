@@ -3,5 +3,5 @@ from channels.models import Channel
 
 
 @pytest.mark.django_db
-def test_create_channel(create_channel):
-    assert Channel.objects.count() == 1
+def test_create_channel(channel):
+    assert Channel.objects.filter(id=channel.id).count() == 1

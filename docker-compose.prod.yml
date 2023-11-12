@@ -46,15 +46,6 @@ services:
       timeout: 5s
       retries: 5
 
-  test_postgres:
-    image: postgres:11
-    container_name: tsuna-streaming-test-database
-    restart: on-failure
-    env_file:
-      - backend/.env.prod
-    expose:
-      - "5432"
-
   pgadmin:
     image: dpage/pgadmin4
     container_name: tsuna-streaming-pgadmin

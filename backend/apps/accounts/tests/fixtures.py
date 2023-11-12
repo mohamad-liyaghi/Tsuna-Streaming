@@ -1,45 +1,37 @@
 import pytest
-from faker import Faker
 from accounts.models import Account
-
-# Create a Faker object
-faker = Faker()
+from accounts.tests.utils import user_credentials
 
 
-@pytest.fixture
-def create_deactive_user():
-    """A fixture to create a deactive user"""
-    user = Account.objects.create_user(
-        email=faker.email(),
-        password=faker.password(),
-        first_name=faker.first_name(),
-        last_name=faker.last_name(),
-    )
-    user.is_active = False
-    user.save()
-    return user
+@pytest.fixture(scope="class")
+def inactive_user(django_db_setup, django_db_blocker) -> Account:
+    """A fixture to create a inactive user"""
+    with django_db_blocker.unblock():
+        yield Account.objects.create_user(**user_credentials(), is_active=False)
 
 
-@pytest.fixture
-def create_active_user():
+@pytest.fixture(scope="class")
+def user(django_db_setup, django_db_blocker) -> Account:
     """A fixture to create an active user"""
-    user = Account.objects.create_user(
-        email=faker.email(),
-        password=faker.password(),
-        first_name=faker.first_name(),
-        last_name=faker.last_name(),
-    )
-    user.is_active = True
-    user.save()
-    return user
+    with django_db_blocker.unblock():
+        yield Account.objects.create_user(**user_credentials(), is_active=True)
 
 
-@pytest.fixture
-def create_superuser():
+@pytest.fixture(scope="class")
+def another_user(django_db_setup, django_db_blocker) -> Account:
+    """A fixture to create an active user"""
+    with django_db_blocker.unblock():
+        yield Account.objects.create_user(**user_credentials(), is_active=True)
+
+
+@pytest.fixture(scope="class")
+def superuser(django_db_setup, django_db_blocker) -> Account:
     """A fixture to create a superuser"""
-    return Account.objects.create_superuser(
-        email=faker.email(),
-        password=faker.password(),
-        first_name=faker.first_name(),
-        last_name=faker.last_name(),
-    )
+    with django_db_blocker.unblock():
+        yield Account.objects.create_superuser(**user_credentials())
+
+
+@pytest.fixture(scope="class")
+def premium_user(subscription, django_db_blocker, django_db_setup):
+    with django_db_blocker.unblock():
+        yield subscription.user

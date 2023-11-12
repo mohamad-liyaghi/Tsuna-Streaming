@@ -2,17 +2,15 @@ import pytest
 from viewers.models import Viewer
 
 
-@pytest.fixture
-def create_viewer(create_video):
-    return Viewer.objects.create(
-        user=create_video.channel.owner, content_object=create_video
-    )
+@pytest.fixture(scope="class")
+def viewer(video):
+    return Viewer.objects.create(user=video.channel.owner, content_object=video)
 
 
-@pytest.fixture
-def create_cached_viewer(create_video):
+@pytest.fixture(scope="class")
+def cached_viewer(video):
     return Viewer.objects.create_in_cache(
-        user=create_video.channel.owner,
-        channel=create_video.channel,
-        content_object=create_video,
+        user=video.channel.owner,
+        channel=video.channel,
+        content_object=video,
     )

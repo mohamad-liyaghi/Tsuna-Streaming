@@ -3,20 +3,20 @@ from memberships.models import Membership, Subscription
 
 
 @pytest.mark.django_db
-def test_create_membership(create_membership):
-    assert Membership.objects.count() == 1
+def test_membership_is_created(membership):
+    assert Membership.objects.filter(title=membership.title).exists()
 
 
 @pytest.mark.django_db
-def test_create_subscription(create_subscription):
-    assert Subscription.objects.count() == 1
+def test_subscription_is_created(subscription):
+    assert Subscription.objects.filter(user=subscription.user).exists()
 
 
 @pytest.mark.django_db
-def test_subscriptions_plan(create_membership, create_subscription):
-    assert create_subscription.membership == create_membership
+def test_subscriptions_plan(membership, subscription):
+    assert subscription.membership == membership
 
 
 @pytest.mark.django_db
-def test_create_premium_user(create_premium_user):
-    assert create_premium_user.is_premium()
+def test_create_premium_user(premium_user):
+    assert premium_user.is_premium()
