@@ -7,9 +7,9 @@ from core.utils import get_content_type_model
 @pytest.mark.django_db
 class TestVoteListView:
     @pytest.fixture(autouse=True)
-    def setup(self, create_video):
+    def setup(self, video):
         self.url_name = "votes:list"
-        self.video = create_video
+        self.video = video
         self.content_type_id = get_content_type_model(model=type(self.video)).id
 
     def test_get_unauthorized(self, api_client):
@@ -24,8 +24,8 @@ class TestVoteListView:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_get_no_vote(self, api_client, create_active_user):
-        user = create_active_user
+    def test_get_no_vote(self, api_client, another_user):
+        user = another_user
         api_client.force_authenticate(user=user)
         response = api_client.get(
             reverse(
@@ -39,10 +39,8 @@ class TestVoteListView:
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["count"] == 0
 
-    def test_get_vote_in_cache(
-        self, api_client, create_active_user, create_cached_vote
-    ):
-        api_client.force_authenticate(user=create_active_user)
+    def test_get_vote_in_cache(self, api_client, superuser, cached_vote):
+        api_client.force_authenticate(user=superuser)
         response = api_client.get(
             reverse(
                 self.url_name,
@@ -55,8 +53,8 @@ class TestVoteListView:
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["count"] == 1
 
-    def test_get_vote_in_db(self, api_client, create_active_user, create_vote):
-        api_client.force_authenticate(user=create_active_user)
+    def test_get_vote_in_db(self, api_client, another_user, vote):
+        api_client.force_authenticate(user=another_user)
         response = api_client.get(
             reverse(
                 self.url_name,
@@ -69,8 +67,8 @@ class TestVoteListView:
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["count"] == 1
 
-    def test_get_not_found(self, api_client, create_active_user, create_unique_uuid):
-        user = create_active_user
+    def test_get_not_found(self, api_client, another_user, create_unique_uuid):
+        user = another_user
         api_client.force_authenticate(user=user)
         response = api_client.get(
             reverse(
@@ -84,9 +82,9 @@ class TestVoteListView:
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_get_content_object_not_found(
-        self, api_client, create_active_user, create_unique_uuid
+        self, api_client, another_user, create_unique_uuid
     ):
-        user = create_active_user
+        user = another_user
         api_client.force_authenticate(user=user)
         response = api_client.get(
             reverse(
