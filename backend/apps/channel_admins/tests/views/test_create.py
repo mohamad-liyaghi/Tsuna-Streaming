@@ -7,26 +7,23 @@ from channel_admins.models import ChannelAdmin
 @pytest.mark.django_db
 class TestAdminCreateView:
     @pytest.fixture(autouse=True)
-    def setup(self, create_subscriber):
-        """
-        Create a new subscriber which user can be promoted to admin.
-        """
+    def setup(self, subscriber):
         self.url_path = "channel_admins:admin_list_create"
         self.data = {
-            "user": create_subscriber.user.token,
+            "user": subscriber.user.token,
         }
 
-    def test_create_unauthorized(self, api_client, create_channel):
+    def test_create_unauthorized(self, api_client, channel):
         response = api_client.post(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_path, kwargs={"channel_token": channel.token}),
             data=self.data,
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_create_invalid_data(self, api_client, create_channel):
-        api_client.force_authenticate(user=create_channel.owner)
+    def test_create_invalid_data(self, api_client, channel):
+        api_client.force_authenticate(user=channel.owner)
         response = api_client.post(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_path, kwargs={"channel_token": channel.token}),
             data={},
         )
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -39,36 +36,34 @@ class TestAdminCreateView:
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_create_by_channel_owner(self, api_client, create_channel):
-        api_client.force_authenticate(user=create_channel.owner)
+    def test_create_by_channel_owner(self, api_client, channel):
+        api_client.force_authenticate(user=channel.owner)
         response = api_client.post(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_path, kwargs={"channel_token": channel.token}),
             data=self.data,
         )
         assert response.status_code == status.HTTP_201_CREATED
 
-    def test_create_by_channel_admin(
-        self, api_client, create_channel_admin, create_active_user
-    ):
+    def test_create_by_channel_admin(self, api_client, channel_admin, user):
         # Delete the admin
-        ChannelAdmin.objects.get(user=create_active_user).delete()
+        ChannelAdmin.objects.get(user=user).delete()
         # Change the user
-        self.data["user"] = create_active_user.token
+        self.data["user"] = user.token
 
-        api_client.force_authenticate(user=create_channel_admin.channel.owner)
+        api_client.force_authenticate(user=channel_admin.channel.owner)
         response = api_client.post(
             reverse(
                 self.url_path,
-                kwargs={"channel_token": create_channel_admin.channel.token},
+                kwargs={"channel_token": channel_admin.channel.token},
             ),
             data=self.data,
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_create_by_normal_user(self, api_client, create_superuser, create_channel):
-        api_client.force_authenticate(user=create_superuser)
+    def test_create_by_normal_user(self, api_client, superuser, channel):
+        api_client.force_authenticate(user=superuser)
         response = api_client.post(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token}),
+            reverse(self.url_path, kwargs={"channel_token": channel.token}),
             data=self.data,
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN

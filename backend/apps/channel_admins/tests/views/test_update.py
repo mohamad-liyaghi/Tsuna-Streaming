@@ -4,13 +4,18 @@ from rest_framework import status
 
 
 @pytest.mark.django_db
-class TestAdminDelete:
+class TestAdminUpdate:
     @pytest.fixture(autouse=True)
-    def setup(self, create_channel_admin):
-        self.admin = create_channel_admin
+    def setup(self, channel_admin):
+        self.admin = channel_admin
         self.url_name = "channel_admins:admin_detail"
+        self.data = {
+            "permissions": {
+                "can_add_object": True,
+            }
+        }
 
-    def test_delete_unauthorized(self, api_client):
+    def test_update_unauthorized(self, api_client):
         url = reverse(
             self.url_name,
             kwargs={
@@ -18,13 +23,11 @@ class TestAdminDelete:
                 "admin_token": self.admin.token,
             },
         )
-        response = api_client.delete(url)
+        response = api_client.put(url, self.data, format="json")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_delete_invalid_channel(
-        self, api_client, create_active_user, create_unique_uuid
-    ):
-        api_client.force_authenticate(user=create_active_user)
+    def test_update_invalid_channel(self, api_client, user, create_unique_uuid):
+        api_client.force_authenticate(user=user)
         url = reverse(
             self.url_name,
             kwargs={
@@ -32,10 +35,10 @@ class TestAdminDelete:
                 "admin_token": self.admin.token,
             },
         )
-        response = api_client.delete(url)
+        response = api_client.put(url, self.data, format="json")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_delete_invalid_admin(self, api_client, create_unique_uuid):
+    def test_update_invalid_admin(self, api_client, create_unique_uuid):
         api_client.force_authenticate(user=self.admin.channel.owner)
         url = reverse(
             self.url_name,
@@ -44,10 +47,34 @@ class TestAdminDelete:
                 "admin_token": create_unique_uuid,
             },
         )
-        response = api_client.delete(url)
+        response = api_client.put(url, self.data, format="json")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_delete_by_channel_owner(self, api_client):
+    def test_update_by_admin(self, api_client):
+        api_client.force_authenticate(user=self.admin.user)
+        url = reverse(
+            self.url_name,
+            kwargs={
+                "channel_token": self.admin.channel.token,
+                "admin_token": self.admin.token,
+            },
+        )
+        response = api_client.put(url, self.data, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_update_by_not_admin(self, api_client, superuser):
+        api_client.force_authenticate(user=superuser)
+        url = reverse(
+            self.url_name,
+            kwargs={
+                "channel_token": self.admin.channel.token,
+                "admin_token": self.admin.token,
+            },
+        )
+        response = api_client.put(url, self.data, format="json")
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_update_by_channel_owner(self, api_client):
         api_client.force_authenticate(user=self.admin.channel.owner)
         url = reverse(
             self.url_name,
@@ -56,41 +83,7 @@ class TestAdminDelete:
                 "admin_token": self.admin.token,
             },
         )
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_204_NO_CONTENT
-
-    def test_delete_by_channel_admin(self, api_client):
-        api_client.force_authenticate(user=self.admin.user)
-        url = reverse(
-            self.url_name,
-            kwargs={
-                "channel_token": self.admin.channel.token,
-                "admin_token": self.admin.token,
-            },
-        )
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_delete_admin_itself(self, api_client):
-        api_client.force_authenticate(user=self.admin.user)
-        url = reverse(
-            self.url_name,
-            kwargs={
-                "channel_token": self.admin.channel.token,
-                "admin_token": self.admin.token,
-            },
-        )
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
-
-    def test_delete_by_not_admin(self, api_client, create_superuser):
-        api_client.force_authenticate(user=create_superuser)
-        url = reverse(
-            self.url_name,
-            kwargs={
-                "channel_token": self.admin.channel.token,
-                "admin_token": self.admin.token,
-            },
-        )
-        response = api_client.delete(url)
-        assert response.status_code == status.HTTP_403_FORBIDDEN
+        response = api_client.put(url, self.data, format="json")
+        self.admin.refresh_from_db()
+        assert response.status_code == status.HTTP_200_OK
+        assert self.admin.permissions.can_add_object is True

@@ -8,9 +8,9 @@ class TestAdminListView:
     def setup(self):
         self.url_path = "channel_admins:admin_list_create"
 
-    def test_get_list_unauthorized(self, api_client, create_channel):
+    def test_get_list_unauthorized(self, api_client, channel):
         response = api_client.get(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token})
+            reverse(self.url_path, kwargs={"channel_token": channel.token})
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
@@ -20,26 +20,26 @@ class TestAdminListView:
         )
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_get_by_channel_owner(self, api_client, create_channel):
-        api_client.force_authenticate(user=create_channel.owner)
+    def test_get_by_channel_owner(self, api_client, channel):
+        api_client.force_authenticate(user=channel.owner)
         response = api_client.get(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token})
+            reverse(self.url_path, kwargs={"channel_token": channel.token})
         )
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_by_admin(self, api_client, create_channel_admin):
-        api_client.force_authenticate(user=create_channel_admin.user)
+    def test_get_by_admin(self, api_client, channel_admin):
+        api_client.force_authenticate(user=channel_admin.user)
         response = api_client.get(
             reverse(
                 self.url_path,
-                kwargs={"channel_token": create_channel_admin.channel.token},
+                kwargs={"channel_token": channel_admin.channel.token},
             )
         )
         assert response.status_code == status.HTTP_200_OK
 
-    def test_get_by_not_admin(self, api_client, create_channel, create_superuser):
-        api_client.force_authenticate(user=create_superuser)
+    def test_get_by_not_admin(self, api_client, channel, another_user):
+        api_client.force_authenticate(user=another_user)
         response = api_client.get(
-            reverse(self.url_path, kwargs={"channel_token": create_channel.token})
+            reverse(self.url_path, kwargs={"channel_token": channel.token})
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN

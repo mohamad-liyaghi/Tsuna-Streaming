@@ -7,8 +7,8 @@ from channel_admins.models import ChannelAdmin
 @pytest.mark.django_db
 class TestAdminRetrieve:
     @pytest.fixture(autouse=True)
-    def setup(self, create_channel_admin):
-        self.admin = create_channel_admin
+    def setup(self, channel_admin):
+        self.admin = channel_admin
         self.url_name = "channel_admins:admin_detail"
 
     def test_retrieve_unauthorized(self, api_client):
@@ -22,10 +22,8 @@ class TestAdminRetrieve:
         response = api_client.get(url)
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_retrieve_invalid_channel(
-        self, api_client, create_active_user, create_unique_uuid
-    ):
-        api_client.force_authenticate(user=create_active_user)
+    def test_retrieve_invalid_channel(self, api_client, user, create_unique_uuid):
+        api_client.force_authenticate(user=user)
         url = reverse(
             self.url_name,
             kwargs={
@@ -60,11 +58,10 @@ class TestAdminRetrieve:
         response = api_client.get(url)
         assert response.status_code == status.HTTP_200_OK
 
-    def test_retrieve_by_not_admin(self, api_client, create_active_user):
-        # Delete the users admin instance
-        ChannelAdmin.objects.filter(user=create_active_user).delete()
+    def test_retrieve_by_not_admin(self, api_client, user):
+        ChannelAdmin.objects.filter(user=user).delete()
 
-        api_client.force_authenticate(user=create_active_user)
+        api_client.force_authenticate(user=user)
         url = reverse(
             self.url_name,
             kwargs={
