@@ -7,10 +7,10 @@ from core.utils import get_content_type_model
 @pytest.mark.django_db
 class TestCommentPinView:
     @pytest.fixture(autouse=True)
-    def setup(self, create_video, create_comment):
+    def setup(self, video, comment):
         self.url_name = "comments:comment_detail"
-        self.video = create_video
-        self.comment = create_comment
+        self.video = video
+        self.comment = comment
         self.content_type_id = get_content_type_model(model=type(self.video)).id
         self.data = {"pinned": True}
 
@@ -29,8 +29,8 @@ class TestCommentPinView:
         )
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def test_pin_by_non_admin(self, api_client, create_superuser):
-        api_client.force_authenticate(user=create_superuser)
+    def test_pin_by_non_admin(self, api_client, superuser):
+        api_client.force_authenticate(user=superuser)
         response = api_client.patch(
             reverse(
                 self.url_name,
@@ -45,8 +45,8 @@ class TestCommentPinView:
         )
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
-    def test_pin_by_channel_admin(self, api_client, create_active_user):
-        api_client.force_authenticate(user=create_active_user)
+    def test_pin_by_channel_admin(self, api_client, user):
+        api_client.force_authenticate(user=user)
         response = api_client.patch(
             reverse(
                 self.url_name,
@@ -60,12 +60,10 @@ class TestCommentPinView:
             format="json",
         )
         assert response.status_code == status.HTTP_200_OK
-        assert create_active_user.channel_admins.filter(
-            channel=self.video.channel
-        ).exists()
+        assert user.channel_admins.filter(channel=self.video.channel).exists()
 
-    def test_pin_not_found(self, api_client, create_unique_uuid, create_active_user):
-        api_client.force_authenticate(user=create_active_user)
+    def test_pin_not_found(self, api_client, create_unique_uuid, user):
+        api_client.force_authenticate(user=user)
         response = api_client.patch(
             reverse(
                 self.url_name,
