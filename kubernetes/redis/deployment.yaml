@@ -13,9 +13,9 @@ spec:
       metadata:
         labels:
             app: tsuna-streaming-redis
-        spec:
-            containers:
-            - name: tsuna-streaming-redis
-              image: redis:6.2-alpine
-              ports:
-              - containerPort: 6379
+      spec:
+          containers:
+          - name: tsuna-streaming-redis
+            image: redis:6.2-alpine
+            ports:
+            - containerPort: 6379
