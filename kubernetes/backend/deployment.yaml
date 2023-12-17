@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  Name: tsuna-streaming-backend-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tsuna-streaming-backend
+  template:
+    metadata:
+      labels:
+        app: tsuna-streaming-backend
+    spec:
+      containers:
+        - name: backend
+          image: ml06py/tsuna_streaming
+          ports:
+            - containerPort: 8000
