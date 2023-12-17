@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsuna-streaming-redis-service
+spec:
+    selector:
+        app: tsuna-streaming-redis
+    ports:
+        - protocol: TCP
+          port: 6379
+          targetPort: 6379
+    type: LoadBalancer
