@@ -2,7 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  Name: tsuna-streaming-backend-deployment
+  name: tsuna-streaming-backend-deployment
+  labels:
+    app: tsuna-streaming-backend
 
 spec:
   replicas: 1

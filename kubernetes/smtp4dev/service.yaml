@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: smtp4dev
+
+spec:
+    selector:
+        app: tsuna-streaming-smtp4dev
+    ports:
+      - name: http
+        port: 5000
+        targetPort: tcp-80
+      - name: smtp
+        port: 25
+        targetPort: tcp-25
+
+    type: LoadBalancer
