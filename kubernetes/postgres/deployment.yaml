@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsuna-streaming-postgres-deployment
+  labels:
+      app: tsuna-streaming-postgres
+
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+          app: tsuna-streaming-postgres
+    template:
+        metadata:
+          labels:
+              app: tsuna-streaming-postgres
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:11
+              ports:
+                  - containerPort: 5432
+
