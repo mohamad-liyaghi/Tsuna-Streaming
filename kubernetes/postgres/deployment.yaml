@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsuna-streaming-postgres-deployment
+  labels:
+      app: tsuna-streaming-postgres
+
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+          app: tsuna-streaming-postgres
+    template:
+        metadata:
+          labels:
+              app: tsuna-streaming-postgres
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:11
+              ports:
+                  - containerPort: 5432
+              envFrom:
+                - configMapRef:
+                    name: tsuna-streaming-env
+              env:
+                - name: POSTGRES_USER
+                  value: "$(DATABASE_USER)"
+                - name: POSTGRES_PASSWORD
+                  value: "$(DATABASE_PASSWORD)"
+                - name: POSTGRES_DB
+                  value: "$(DATABASE_NAME)"
+
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: postgres-volume
+          volumes:
+            - name: postgres-volume
+              emptyDir: {}

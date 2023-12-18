@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tsuna-streaming-postgres-service
+  labels:
+      app: tsuna-streaming-postgres
+
+spec:
+  selector:
+    app: academy-master-postgres
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

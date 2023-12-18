@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tsuna-streaming-backend-deployment
+  labels:
+    app: tsuna-streaming-backend
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tsuna-streaming-backend
+  template:
+    metadata:
+      labels:
+        app: tsuna-streaming-backend
+    spec:
+      containers:
+        - name: backend
+          image: ml06py/tsuna_streaming
+          command: ['/bin/sh']
+          args: ["/backend/docker/commands/setup.sh"]
+
+          volumeMounts:
+            - name: env-file
+              mountPath: /backend/.env
+              subPath: .env
+          envFrom:
+            - configMapRef:
+                name: tsuna-streaming-env
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "config.settings.local"
+            - name: ENVIRONMENT
+              value: "LOCAL"
+            - name: DATABASE_PORT
+              value: "5432"
+
+          ports:
+            - containerPort: 8000
+
+      volumes:
+        - name: env-file
+          configMap:
+            name: tsuna-streaming-env-file
+            items:
+              - key: .env
+                path: .env
