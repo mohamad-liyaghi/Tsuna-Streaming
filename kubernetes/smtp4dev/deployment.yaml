@@ -10,11 +10,11 @@ spec:
   selector:
     matchLabels:
       app: tsuna-streaming-smtp4dev
-    template:
-      metadata:
-        labels:
-          app: tsuna-streaming-smtp4dev
-        spec:
-          containers:
-            - name: smtp
-              image: rnwood/smtp4dev:v3
+  template:
+    metadata:
+      labels:
+        app: tsuna-streaming-smtp4dev
+    spec:
+      containers:
+        - name: smtp
+          image: rnwood/smtp4dev:v3
