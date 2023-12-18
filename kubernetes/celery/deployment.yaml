@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsuna-streaming-celery-deployment
+  namespace: default
+
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+        app: tsuna-streaming-celery
+
+  template:
+    metadata:
+        labels:
+            app: tsuna-streaming-celery
+    spec:
+      containers:
+        - name: celery
+          image: ml06py/tsuna_streaming
+
+        - name: celery-beat
+          image: ml06py/tsuna_streaming
