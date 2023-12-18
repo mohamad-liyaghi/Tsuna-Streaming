@@ -20,4 +20,20 @@ spec:
               image: postgres:11
               ports:
                   - containerPort: 5432
+              envFrom:
+                - configMapRef:
+                    name: tsuna-streaming-env
+              env:
+                - name: POSTGRES_USER
+                  value: "$(DATABASE_USER)"
+                - name: POSTGRES_PASSWORD
+                  value: "$(DATABASE_PASSWORD)"
+                - name: POSTGRES_DB
+                  value: "$(DATABASE_NAME)"
 
+              volumeMounts:
+                - mountPath: /var/lib/postgresql/data
+                  name: postgres-volume
+          volumes:
+            - name: postgres-volume
+              emptyDir: {}
