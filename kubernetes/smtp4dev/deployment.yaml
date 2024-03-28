@@ -18,3 +18,8 @@ spec:
       containers:
         - name: smtp
           image: rnwood/smtp4dev:v3
+          ports:
+            - name: tcp-80
+              containerPort: 80
+            - name: tcp-25
+              containerPort: 25

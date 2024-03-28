@@ -13,5 +13,3 @@ spec:
       - name: smtp
         port: 25
         targetPort: tcp-25
-
-    type: LoadBalancer
