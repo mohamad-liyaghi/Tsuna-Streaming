@@ -16,7 +16,7 @@ runs:
       shell: bash
 
     - name: Run Kubernetes Deployments
-      run: kubectl apply -f kubernetes/
+      run: kubectl apply -f kubernetes/postgres && kubectl apply -f kubernetes/redis && kubectl apply -f kubernetes/smtp4dev && kubectl apply -f kubernetes/backend && kubectl apply -f kubernetes/celery
       shell: bash
 
     - name: Wait for Test Database Deployments
