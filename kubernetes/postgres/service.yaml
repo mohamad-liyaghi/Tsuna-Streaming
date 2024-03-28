@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tsuna-streaming-postgres-service
+  name: postgres
   labels:
       app: tsuna-streaming-postgres
 
