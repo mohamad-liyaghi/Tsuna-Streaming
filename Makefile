@@ -10,6 +10,7 @@ help:
 	@echo "  test    - Run the tests."
 	@echo "  migrations - Create migrations."
 	@echo "  migrate - Migrate"
+	@echo "  k8s    - Deploy to k8s"
 
 
 build:
@@ -36,3 +37,6 @@ migrations:
 
 migrate:
 	docker exec tsuna-streaming-backend python manage.py migrate
+
+k8s:
+	kubectl apply -f kubernetes/postgres && kubectl apply -f kubernetes/redis && kubectl apply -f kubernetes/smtp4dev && kubectl apply -f kubernetes/backend && kubectl apply -f kubernetes/celery
