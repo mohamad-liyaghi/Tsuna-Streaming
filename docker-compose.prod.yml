@@ -10,9 +10,7 @@ services:
     container_name: tsuna-streaming-backend
     command: sh ./docker/commands/setup.sh
     restart: on-failure
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile
+    image: ml06py/tsuna_streaming
     env_file:
       - backend/.env.prod
     ports:
@@ -78,9 +76,7 @@ services:
   celery:
     container_name: tsuna-streaming-celery
     command: sh ./docker/commands/celery.sh
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile
+    image: ml06py/tsuna_streaming
     volumes:
       - ./backend:/backend
     env_file:
@@ -91,9 +87,7 @@ services:
       - backend
 
   celery-beat:
-    build:
-      context: .
-      dockerfile: backend/docker/Dockerfile
+    image: ml06py/tsuna_streaming
     container_name: tsuna-streaming-celery-beat
     command: sh ./docker/commands/celery-beat.sh
     volumes:
@@ -107,9 +101,7 @@ services:
 
   flower:
     container_name: tsuna-streaming-flower
-    build:
-      context: .
-      dockerfile: ./backend/docker/Dockerfile
+    image: ml06py/tsuna_streaming
     command: sh ./docker/commands/flower.sh
     env_file:
       - backend/.env.prod
