@@ -129,8 +129,6 @@ services:
       - "9090:9090"
     depends_on:
       - backend
-    networks:
-      - main
 
   node_exporter:
     image: quay.io/prometheus/node-exporter:latest
@@ -147,9 +145,6 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     expose:
       - 9100
-    networks:
-      - main
-
 
   # frontend:
   #   extends:
