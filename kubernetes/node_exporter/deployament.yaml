@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tsuna-streaming-node-exporter-dp
+  labels:
+    app: tsuna-streaming-node-exporter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tsuna-streaming-node-exporter
+  template:
+    metadata:
+      labels:
+        app: tsuna-streaming-node-exporter
+    spec:
+      containers:
+        - name: node-exporter
+          image: quay.io/prometheus/node-exporter:latest
+          ports:
+            - containerPort: 9100
