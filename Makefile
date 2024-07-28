@@ -1,4 +1,4 @@
-.PHONY: help build run stop test admin
+.PHONY: help build run stop test admin local_confmap prod_confmap
 
 help:
 	@echo "Available targets:"
@@ -11,6 +11,8 @@ help:
 	@echo "  migrations - Create migrations."
 	@echo "  migrate - Migrate"
 	@echo "  k8s    - Deploy to k8s"
+	@echo "  local_confmap - Make Kubernetes config maps for local stage"
+	@echo "  prod_confmap - Make Kubernetes config maps for production stage"
 
 
 build:
@@ -40,3 +42,9 @@ migrate:
 
 k8s:
 	kubectl apply -f kubernetes/postgres && kubectl apply -f kubernetes/redis && kubectl apply -f kubernetes/smtp4dev && kubectl apply -f kubernetes/backend && kubectl apply -f kubernetes/celery
+
+local_confmap:
+	kubectl create configmap tsuna-streaming-env --from-env-file=./backend/.env.local && kubectl create configmap tsuna-streaming-env-file --from-file=.env=./backend/.env.local
+
+prod_confmap:
+	kubectl create configmap tsuna-streaming-env --from-env-file=./backend/.env.prod && kubectl create configmap tsuna-streaming-env-file --from-file=.env=./backend/.env.prod
