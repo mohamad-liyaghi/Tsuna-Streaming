@@ -6,3 +6,7 @@ scrape_configs:
     scrape_interval: 1m
     static_configs:
       - targets: ['prometheus:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['node_exporter:9100']
