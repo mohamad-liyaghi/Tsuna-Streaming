@@ -23,8 +23,11 @@ CACHES = {
     }
 }
 
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.MD5PasswordHasher",
+]
 
-# TODO: Add the fixture for not sending email and remove this
+
 DOMAIN = "test-domain.com"
 
 # Disable Throttling
